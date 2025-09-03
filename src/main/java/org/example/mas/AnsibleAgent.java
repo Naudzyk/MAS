@@ -20,8 +20,6 @@ public abstract class AnsibleAgent extends Agent {
 
     protected String playbookPath;
     protected String inventoryPath;
-    protected String extraVars;
-    protected boolean useWsl;
     protected Duration timeout;
     protected String workingDir;
 
@@ -31,10 +29,8 @@ public abstract class AnsibleAgent extends Agent {
         if (args != null && args.length >= 2) {
             this.playbookPath = args[0].toString();
             this.inventoryPath = args[1].toString();
-            this.extraVars = args.length > 2 ? args[2].toString() : null;
-            this.useWsl = args.length > 3 && Boolean.parseBoolean(args[3].toString());
-            this.timeout = args.length > 4 ? Duration.ofMinutes(Long.parseLong(args[4].toString())) : Duration.ofMinutes(30);
-            this.workingDir = args.length > 5 ? args[5].toString() : System.getProperty("user.dir");
+            this.timeout = args.length > 2 ? Duration.ofMinutes(Long.parseLong(args[2].toString())) : Duration.ofMinutes(30);
+            this.workingDir = args.length > 3 ? args[3].toString() : System.getProperty("user.dir");
         } else {
             logger.error("Agent {} requires at least playbook and inventory arguments", getLocalName());
             doDelete();
@@ -145,26 +141,12 @@ public abstract class AnsibleAgent extends Agent {
     protected List<String> buildAnsibleCommand() {
         List<String> command = new ArrayList<>();
 
-        if (useWsl) {
-            command.add("wsl");
-            command.add("--");
-        }
 
         command.add("ansible-playbook");
         command.add("-i");
         command.add(inventoryPath);
         command.add(playbookPath);
 
-        if (extraVars != null && !extraVars.trim().isEmpty()) {
-            command.add("--extra-vars");
-            command.add(extraVars);
-        }
-
-        // Дополнительные параметры для лучшего логирования
-        command.add("--forks");
-        command.add("5");
-        command.add("--diff");
-        command.add("-v"); // Verbose output
 
         return command;
     }
