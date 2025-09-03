@@ -4,10 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="'V1'">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="'V2'">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/AnsibleAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/AnsibleAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/original-MAS-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/original-MAS-1.0-SNAPSHOT.jar" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -138,7 +139,7 @@
       <workItem from="1755847282269" duration="7992000" />
       <workItem from="1756110648020" duration="2567000" />
       <workItem from="1756288575764" duration="17942000" />
-      <workItem from="1756893163103" duration="2498000" />
+      <workItem from="1756893163103" duration="3443000" />
     </task>
     <task id="LOCAL-00001" summary="'V1'">
       <option name="closed" value="true" />
@@ -164,7 +165,15 @@
       <option name="project" value="LOCAL" />
       <updated>1756465106769</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="'V2'">
+      <option name="closed" value="true" />
+      <created>1756897021736</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1756897021736</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -172,6 +181,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="'V1'" />
-    <option name="LAST_COMMIT_MESSAGE" value="'V1'" />
+    <MESSAGE value="'V2'" />
+    <option name="LAST_COMMIT_MESSAGE" value="'V2'" />
   </component>
 </project>

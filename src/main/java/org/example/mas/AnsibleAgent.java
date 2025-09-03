@@ -30,7 +30,7 @@ public abstract class AnsibleAgent extends Agent {
             this.playbookPath = args[0].toString();
             this.inventoryPath = args[1].toString();
             this.timeout = args.length > 2 ? Duration.ofMinutes(Long.parseLong(args[2].toString())) : Duration.ofMinutes(30);
-            this.workingDir = args.length > 3 ? args[3].toString() : System.getProperty("user.dir");
+
         } else {
             logger.error("Agent {} requires at least playbook and inventory arguments", getLocalName());
             doDelete();
