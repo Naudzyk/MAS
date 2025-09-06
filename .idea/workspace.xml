@@ -6,9 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="'V2'">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/AnsibleAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/AnsibleAgent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/original-MAS-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/original-MAS-1.0-SNAPSHOT.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Main.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -88,7 +86,7 @@
       <recent name="org.example.mas" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.Unnamed">
+  <component name="RunManager" selected="Application.Main">
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="org.example.mas.Main" />
       <module name="MAS" />
@@ -139,7 +137,9 @@
       <workItem from="1755847282269" duration="7992000" />
       <workItem from="1756110648020" duration="2567000" />
       <workItem from="1756288575764" duration="17942000" />
-      <workItem from="1756893163103" duration="3443000" />
+      <workItem from="1756893163103" duration="3456000" />
+      <workItem from="1756901734272" duration="1494000" />
+      <workItem from="1757138656590" duration="324000" />
     </task>
     <task id="LOCAL-00001" summary="'V1'">
       <option name="closed" value="true" />
@@ -173,7 +173,15 @@
       <option name="project" value="LOCAL" />
       <updated>1756897021736</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="'V2'">
+      <option name="closed" value="true" />
+      <created>1756897856488</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1756897856488</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

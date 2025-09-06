@@ -42,9 +42,7 @@ public class Main {
 
             String inventoryPath = args[0];
             String workingDir = args[1];
-            String extraVars = args.length > 2 ? args[2] : null;
-            boolean useWsl = args.length > 3 && Boolean.parseBoolean(args[3]);
-            int timeoutMinutes = args.length > 4 ? Integer.parseInt(args[4]) : 30;
+            int timeoutMinutes = args.length > 2 ? Integer.parseInt(args[2]) : 30;
 
             // Проверяем существование файлов
             if (!validatePaths(inventoryPath, workingDir)) {
@@ -69,7 +67,7 @@ public class Main {
             coordinator.start();
 
             // Создаем агентов для каждого playbook
-            createAgents(container, inventoryPath, workingDir, extraVars, useWsl, timeoutMinutes);
+            createAgents(container, inventoryPath, workingDir,  timeoutMinutes);
 
             logger.info("All agents created successfully. Deployment will start in 5 seconds...");
 
@@ -84,54 +82,51 @@ public class Main {
      * Создает всех агентов для развертывания
      */
     private static void createAgents(AgentContainer container, String inventoryPath,
-                                   String workingDir, String extraVars, boolean useWsl, int timeoutMinutes)
+                                   String workingDir, int timeoutMinutes)
                                    throws Exception {
 
         // Агент подготовки системы
         createAgent(container, "system-prep-agent", SystemPreparationAgent.class.getName(),
-                   PLAYBOOKS[0], inventoryPath, extraVars, useWsl, timeoutMinutes, workingDir);
+                   PLAYBOOKS[0], inventoryPath, timeoutMinutes, workingDir);
 
         // Агент containerd
         createAgent(container, "containerd-agent", ContainerdAgent.class.getName(),
-                   PLAYBOOKS[1], inventoryPath, extraVars, useWsl, timeoutMinutes, workingDir);
+                   PLAYBOOKS[1], inventoryPath, timeoutMinutes, workingDir);
 
         // Агент установки Kubernetes
         createAgent(container, "kubernetes-install-agent", KubernetesInstallAgent.class.getName(),
-                   PLAYBOOKS[2], inventoryPath, extraVars, useWsl, timeoutMinutes, workingDir);
+                   PLAYBOOKS[2], inventoryPath, timeoutMinutes, workingDir);
 
         // Агент инициализации Kubernetes
         createAgent(container, "kubernetes-init-agent", KubernetesInitAgent.class.getName(),
-                   PLAYBOOKS[3], inventoryPath, extraVars, useWsl, timeoutMinutes, workingDir);
+                   PLAYBOOKS[3], inventoryPath, timeoutMinutes, workingDir);
 
         // Агент Calico CNI
         createAgent(container, "calico-agent", CalicoAgent.class.getName(),
-                   PLAYBOOKS[4], inventoryPath, extraVars, useWsl, timeoutMinutes, workingDir);
+                   PLAYBOOKS[4], inventoryPath, timeoutMinutes, workingDir);
 
         // Агент подготовки worker'ов
         createAgent(container, "worker-prep-agent", WorkerPreparationAgent.class.getName(),
-                   PLAYBOOKS[5], inventoryPath, extraVars, useWsl, timeoutMinutes, workingDir);
+                   PLAYBOOKS[5], inventoryPath, timeoutMinutes, workingDir);
 
         // Агент присоединения worker'ов
         createAgent(container, "worker-join-agent", WorkerJoinAgent.class.getName(),
-                   PLAYBOOKS[6], inventoryPath, extraVars, useWsl, timeoutMinutes, workingDir);
+                   PLAYBOOKS[6], inventoryPath, timeoutMinutes, workingDir);
 
         // Агент HTCondor
         createAgent(container, "htcondor-agent", HTCondorAgent.class.getName(),
-                   PLAYBOOKS[7], inventoryPath, extraVars, useWsl, timeoutMinutes, workingDir);
+                   PLAYBOOKS[7], inventoryPath, timeoutMinutes, workingDir);
     }
 
     /**
      * Создает одного агента
      */
     private static void createAgent(AgentContainer container, String agentName, String agentClass,
-                                    String playbook, String inventoryPath, String extraVars,
-                                    boolean useWsl, int timeoutMinutes, String workingDir) throws Exception {
+                                    String playbook, String inventoryPath, int timeoutMinutes, String workingDir) throws Exception {
 
         Object[] args = {
             playbook,
             inventoryPath,
-            extraVars,
-            useWsl,
             timeoutMinutes,
             workingDir
         };
