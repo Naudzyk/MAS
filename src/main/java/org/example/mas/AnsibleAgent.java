@@ -31,8 +31,23 @@ public abstract class AnsibleAgent extends Agent {
             this.inventoryPath = args[1].toString();
             this.timeout = args.length > 2 ? Duration.ofMinutes(Long.parseLong(args[2].toString())) : Duration.ofMinutes(30);
 
+            if (args.length > 3) {
+            this.workingDir = args[3].toString();
+            } else {
+                // Значение по умолчанию - текущая директория
+                this.workingDir = System.getProperty("user.dir");
+                logger.warn("Working directory not specified, using default: {}", workingDir);
+            }
+
         } else {
             logger.error("Agent {} requires at least playbook and inventory arguments", getLocalName());
+            doDelete();
+            return;
+        }
+
+        File workingDirFile = new File(workingDir);
+        if (!workingDirFile.exists() || !workingDirFile.isDirectory()) {
+            logger.error("Working directory does not exist or is not a directory: {}", workingDir);
             doDelete();
             return;
         }

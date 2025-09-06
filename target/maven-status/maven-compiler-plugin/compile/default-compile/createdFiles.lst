@@ -1,0 +1,15 @@
+org\example\mas\CoordinatorAgent$1.class
+org\example\mas\Agent\CalicoAgent.class
+org\example\mas\Main.class
+org\example\mas\Agent\HTCondorAgent.class
+org\example\mas\AnsibleAgent.class
+org\example\mas\AnsibleAgent$MessageHandlerBehaviour.class
+org\example\mas\Agent\WorkerPreparationAgent.class
+org\example\mas\Agent\KubernetesInstallAgent.class
+org\example\mas\Agent\WorkerJoinAgent.class
+org\example\mas\Agent\ContainerdAgent.class
+org\example\mas\CoordinatorAgent$MessageHandlerBehaviour.class
+org\example\mas\AnsibleAgent$ExecutePlaybookBehaviour.class
+org\example\mas\CoordinatorAgent.class
+org\example\mas\Agent\SystemPreparationAgent.class
+org\example\mas\Agent\KubernetesInitAgent.class

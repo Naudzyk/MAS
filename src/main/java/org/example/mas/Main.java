@@ -177,8 +177,6 @@ public class Main {
         System.out.println("Arguments:");
         System.out.println("  inventory        Path to Ansible inventory file");
         System.out.println("  working_dir      Directory containing playbooks");
-        System.out.println("  extra_vars       Optional: Extra variables for Ansible (JSON format)");
-        System.out.println("  use_wsl          Optional: Use WSL for Windows (true/false, default: false)");
         System.out.println("  timeout_minutes  Optional: Timeout for each playbook in minutes (default: 30)");
         System.out.println();
         System.out.println("Example:");
