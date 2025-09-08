@@ -17,23 +17,4 @@ public class KubernetesInstallAgent extends AnsibleAgent {
         super.setup();
         logger.info("KubernetesInstallAgent {} initialized", getLocalName());
     }
-
-    @Override
-    protected void handleMessage(ACLMessage msg) {
-        String content = msg.getContent();
-        logger.info("KubernetesInstallAgent {} received: {}", getLocalName(), content);
-        if (content.contains("CONTAINERD_READY_FOR_K8S") || content.contains("START_K8S_INSTALL")) {
-            logger.info("Starting Kubernetes components installation");
-        }
-    }
-
-    @Override
-    protected void notifyCompletion(boolean success, String details) {
-        super.notifyCompletion(success, details);
-        if (success) {
-            sendMessage("kubernetes-init-agent", "K8S_INSTALL_COMPLETE");
-        } else {
-            sendMessage("coordinator-agent", "K8S_INSTALL_FAILED: " + details);
-        }
-    }
 }

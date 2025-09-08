@@ -1,8 +1,10 @@
 package org.example.mas;
 
 
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.WakerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import org.slf4j.Logger;
@@ -18,18 +20,16 @@ import java.util.Map;
 public class CoordinatorAgent extends Agent {
     private static final Logger logger = LoggerFactory.getLogger(CoordinatorAgent.class);
 
-    private Map<String, String> agentStatus = new HashMap<>();
+    private final Map<String, String> agentStatus = new HashMap<>();
     private boolean deploymentStarted = false;
 
     @Override
     protected void setup() {
         logger.info("CoordinatorAgent {} initialized", getLocalName());
 
-        // Добавляем поведение для обработки сообщений
         addBehaviour(new MessageHandlerBehaviour());
 
-        // Инициируем начало развертывания через 5 секунд
-        addBehaviour(new jade.core.behaviours.WakerBehaviour(this, 5000) {
+        addBehaviour(new WakerBehaviour(this, 5000) {
             @Override
             protected void onWake() {
                 if (!deploymentStarted) {
@@ -39,60 +39,42 @@ public class CoordinatorAgent extends Agent {
         });
     }
 
-    /**
-     * Обработчик сообщений от всех агентов
-     */
     private class MessageHandlerBehaviour extends CyclicBehaviour {
         @Override
         public void action() {
-            MessageTemplate template = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
-            ACLMessage msg = receive(template);
+            ACLMessage msg = receive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+            if (msg == null) { block(); return; }
 
-            if (msg != null) {
-                String content = msg.getContent();
-                String sender = msg.getSender().getLocalName();
+            String content = msg.getContent();
+            String sender = msg.getSender().getLocalName();
 
-                logger.info("Coordinator received from {}: {}", sender, content);
-                processMessage(sender, content);
-            } else {
-                block();
-            }
+            logger.info("Coordinator received from {}: {}", sender, content);
+            processMessage(sender, content);
         }
     }
 
-    /**
-     * Обрабатывает сообщения от агентов
-     */
     private void processMessage(String sender, String content) {
         agentStatus.put(sender, content);
 
-        if (content.contains("FAILED")) {
+        if (content != null && content.contains("FAILED")) {
             logger.error("Deployment failed at {}: {}", sender, content);
             handleFailure(sender, content);
-        } else if (content.contains("COMPLETE")) {
+        } else if (content != null && content.contains("COMPLETE")) {
             logger.info("Stage completed successfully: {}", sender);
-            handleSuccess(sender, content);
-        } else if (content.contains("DEPLOYMENT_COMPLETE")) {
+            handleSuccess(sender);
+        } else if (content != null && content.contains("DEPLOYMENT_COMPLETE")) {
             logger.info("=== HTCONDOR CLUSTER DEPLOYMENT COMPLETED SUCCESSFULLY ===");
             handleDeploymentComplete();
         }
     }
 
-    /**
-     * Инициирует начало развертывания
-     */
     private void startDeployment() {
         deploymentStarted = true;
         logger.info("=== STARTING HTCONDOR CLUSTER DEPLOYMENT ===");
-
-        // Запускаем первый этап
         sendMessage("system-prep-agent", "START_SYSTEM_PREP");
     }
 
-    /**
-     * Обрабатывает успешное завершение этапа
-     */
-    private void handleSuccess(String agent, String content) {
+    private void handleSuccess(String agent) {
         switch (agent) {
             case "system-prep-agent":
                 sendMessage("containerd-agent", "START_CONTAINERD");
@@ -121,51 +103,27 @@ public class CoordinatorAgent extends Agent {
         }
     }
 
-    /**
-     * Обрабатывает ошибки
-     */
     private void handleFailure(String agent, String content) {
         logger.error("Deployment failed at stage: {}", agent);
         logger.error("Error details: {}", content);
-
-        // Здесь можно добавить логику восстановления или остановки
         logger.error("=== DEPLOYMENT FAILED - MANUAL INTERVENTION REQUIRED ===");
     }
 
-    /**
-     * Обрабатывает завершение всего развертывания
-     */
     private void handleDeploymentComplete() {
         logger.info("=== DEPLOYMENT SUMMARY ===");
-        agentStatus.forEach((agent, status) -> {
-            logger.info("{}: {}", agent, status);
-        });
+        agentStatus.forEach((agent, status) -> logger.info("{}: {}", agent, status));
         logger.info("=== HTCONDOR CLUSTER IS READY ===");
-
-        // Можно добавить финальные проверки
         performFinalChecks();
     }
 
-    /**
-     * Выполняет финальные проверки кластера
-     */
     private void performFinalChecks() {
         logger.info("Performing final cluster checks...");
-
-        // Здесь можно добавить проверки:
-        // - kubectl get nodes
-        // - kubectl get pods -A
-        // - condor_status (внутри manager pod)
-
         logger.info("Final checks completed. Cluster is operational.");
     }
 
-    /**
-     * Отправляет сообщение агенту
-     */
     private void sendMessage(String agentName, String content) {
         ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-        msg.addReceiver(new jade.core.AID(agentName, jade.core.AID.ISLOCALNAME));
+        msg.addReceiver(new AID(agentName, AID.ISLOCALNAME));
         msg.setContent(content);
         send(msg);
         logger.info("Coordinator sent to {}: {}", agentName, content);

@@ -4,11 +4,35 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="'V4'">
+    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;V5&quot;">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/CalicoAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/CalicoAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/ContainerdAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/ContainerdAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/HTCondorAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/HTCondorAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/KubernetesInitAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/KubernetesInitAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/KubernetesInstallAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/KubernetesInstallAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/SystemPreparationAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/SystemPreparationAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/WorkerJoinAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/WorkerJoinAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/WorkerPreparationAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/WorkerPreparationAgent.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/AnsibleAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/AnsibleAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/CoordinatorAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/CoordinatorAgent.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/CalicoAgent.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/CalicoAgent.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/ContainerdAgent.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/ContainerdAgent.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/HTCondorAgent.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/HTCondorAgent.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/KubernetesInitAgent.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/KubernetesInitAgent.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/KubernetesInstallAgent.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/KubernetesInstallAgent.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/SystemPreparationAgent.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/SystemPreparationAgent.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/WorkerJoinAgent.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/WorkerJoinAgent.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/WorkerPreparationAgent.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/WorkerPreparationAgent.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/AnsibleAgent$ExecutePlaybookBehaviour.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/AnsibleAgent$ExecutePlaybookBehaviour.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/AnsibleAgent$MessageHandlerBehaviour.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/AnsibleAgent$MessageHandlerBehaviour.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/AnsibleAgent.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/AnsibleAgent.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/CoordinatorAgent$MessageHandlerBehaviour.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/CoordinatorAgent$MessageHandlerBehaviour.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/CoordinatorAgent.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/CoordinatorAgent.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/Main.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/original-MAS-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/original-MAS-1.0-SNAPSHOT.jar" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -142,7 +166,8 @@
       <workItem from="1756288575764" duration="17942000" />
       <workItem from="1756893163103" duration="3456000" />
       <workItem from="1756901734272" duration="1494000" />
-      <workItem from="1757138656590" duration="2802000" />
+      <workItem from="1757138656590" duration="8644000" />
+      <workItem from="1757329663444" duration="306000" />
     </task>
     <task id="LOCAL-00001" summary="'V1'">
       <option name="closed" value="true" />
@@ -200,7 +225,15 @@
       <option name="project" value="LOCAL" />
       <updated>1757140500478</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="&quot;V5&quot;">
+      <option name="closed" value="true" />
+      <created>1757142860999</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1757142860999</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -211,6 +244,7 @@
     <MESSAGE value="'V2'" />
     <MESSAGE value="'V3'" />
     <MESSAGE value="'V4'" />
-    <option name="LAST_COMMIT_MESSAGE" value="'V4'" />
+    <MESSAGE value="&quot;V5&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="&quot;V5&quot;" />
   </component>
 </project>
