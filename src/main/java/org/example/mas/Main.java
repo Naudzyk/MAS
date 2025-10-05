@@ -1,11 +1,12 @@
 package org.example.mas;
 
 
+import jade.core.*;
 import jade.core.Runtime;
-import jade.core.Profile;
-import jade.core.ProfileImpl;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
+import jade.wrapper.ControllerException;
+import jade.wrapper.StaleProxyException;
 import org.example.mas.Agent.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,11 +65,20 @@ public class Main {
             createAgents(container, inventoryPath, workingDir, timeoutMinutes);
 
             logger.info("All agents created successfully. Deployment will start in 5 seconds...");
-
-        } catch (Exception e) {
-            logger.error("Failed to start multi-agent system", e);
+//            container.joi
+            } catch (ProfileException e) {
+            logger.error("JADE profile configuration error", e);
             System.exit(1);
-        }
+            } catch (StaleProxyException e) {
+                logger.error("Agent creation failed: agent proxy is stale", e);
+                System.exit(1);
+            } catch (IMTPException | ControllerException e) {
+                logger.error("JADE internal communication error", e);
+                System.exit(1);
+            } catch (Exception e) {
+                logger.error("Unexpected error during startup", e);
+                System.exit(1);
+            }
     }
 
     private static void createAgents(AgentContainer container, String inventoryPath,
@@ -140,4 +150,5 @@ public class Main {
         System.out.println("  java -jar ansible-multi-agent.jar inventory.ini /path/to/playbooks");
         System.out.println("  java -jar ansible-multi-agent.jar inventory.ini /path/to/playbooks 45");
     }
+
 }

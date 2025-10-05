@@ -1,27 +1,37 @@
 package org.example.mas;
 
+import jade.core.Agent;
 
 import jade.core.AID;
-import jade.core.Agent;
-import jade.core.behaviours.CyclicBehaviour;
-import jade.core.behaviours.WakerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.WakerBehaviour;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * Координатор для управления последовательностью развертывания HTCondor кластера
- * Отслеживает статус каждого этапа и инициирует следующий
- */
 public class CoordinatorAgent extends Agent {
     private static final Logger logger = LoggerFactory.getLogger(CoordinatorAgent.class);
 
+
+    private static final List<String> DEPLOYMENT_SEQUENCE = Arrays.asList(
+        "system-prep-agent",
+        "containerd-agent",
+        "kubernetes-install-agent",
+        "kubernetes-init-agent",
+        "calico-agent",
+        "worker-prep-agent",
+        "worker-join-agent",
+        "htcondor-agent"
+    );
+
     private final Map<String, String> agentStatus = new HashMap<>();
-    private boolean deploymentStarted = false;
+    private final AtomicBoolean deploymentStarted = new AtomicBoolean(false);
+    private final AtomicBoolean deploymentFinished = new AtomicBoolean(false);
 
     @Override
     protected void setup() {
@@ -29,23 +39,68 @@ public class CoordinatorAgent extends Agent {
 
         addBehaviour(new MessageHandlerBehaviour());
 
+
         addBehaviour(new WakerBehaviour(this, 5000) {
             @Override
             protected void onWake() {
-                if (!deploymentStarted) {
+                if (deploymentStarted.compareAndSet(false, true)) {
                     startDeployment();
                 }
             }
         });
     }
 
+    private void startDeployment() {
+        logger.info("=== STARTING HTCONDOR CLUSTER DEPLOYMENT ===");
+        triggerNextStage(null); // null → первый этап
+    }
+
+
+    private void triggerNextStage(String completedAgent) {
+        int nextIndex = (completedAgent == null) ? 0 : DEPLOYMENT_SEQUENCE.indexOf(completedAgent) + 1;
+
+        if (nextIndex >= DEPLOYMENT_SEQUENCE.size()) {
+            // Все этапы завершены
+            sendDeploymentComplete();
+            return;
+        }
+
+        String nextAgent = DEPLOYMENT_SEQUENCE.get(nextIndex);
+        String command = buildStartCommand(nextAgent);
+        sendMessage(nextAgent, command);
+        logger.info("Triggered next stage: {}", nextAgent);
+    }
+
+    private String buildStartCommand(String agentName) {
+        return "START_" + agentName.toUpperCase().replace("-", "_");
+    }
+
+    private void sendDeploymentComplete() {
+        ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+        msg.addReceiver(getAID()); // отправляем самому себе
+        msg.setContent("DEPLOYMENT_COMPLETE");
+        send(msg);
+    }
+
+    private void abortAllAgents(String failedAgent) {
+        logger.warn("Aborting all agents due to failure in: {}", failedAgent);
+        for (String agentName : DEPLOYMENT_SEQUENCE) {
+            if (!agentName.equals(failedAgent)) {
+                sendMessage(agentName, "ABORT");
+            }
+        }
+    }
+
     private class MessageHandlerBehaviour extends CyclicBehaviour {
         @Override
         public void action() {
             ACLMessage msg = receive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
-            if (msg == null) { block(); return; }
+            if (msg == null) {
+                block();
+                return;
+            }
 
-            String content = msg.getContent();
+            String content = msg.getContent() == null ? "" : msg.getContent();
             String sender = msg.getSender().getLocalName();
 
             logger.info("Coordinator received from {}: {}", sender, content);
@@ -54,70 +109,59 @@ public class CoordinatorAgent extends Agent {
     }
 
     private void processMessage(String sender, String content) {
+        // Игнорируем сообщения после завершения
+        if (deploymentFinished.get()) {
+            return;
+        }
+
         agentStatus.put(sender, content);
 
-        if (content != null && content.contains("FAILED")) {
-            logger.error("Deployment failed at {}: {}", sender, content);
+        if (content.contains("ABORT_ACK")) {
+            logger.debug("Agent {} acknowledged abort", sender);
+            return;
+        }
+
+        if (content.contains("FAILED")) {
             handleFailure(sender, content);
-        } else if (content != null && content.contains("COMPLETE")) {
-            logger.info("Stage completed successfully: {}", sender);
+        } else if (content.contains("COMPLETE")) {
             handleSuccess(sender);
-        } else if (content != null && content.contains("DEPLOYMENT_COMPLETE")) {
-            logger.info("=== HTCONDOR CLUSTER DEPLOYMENT COMPLETED SUCCESSFULLY ===");
+        } else if (content.equals("DEPLOYMENT_COMPLETE")) {
             handleDeploymentComplete();
         }
     }
 
-    private void startDeployment() {
-        deploymentStarted = true;
-        logger.info("=== STARTING HTCONDOR CLUSTER DEPLOYMENT ===");
-        sendMessage("system-prep-agent", "START_SYSTEM_PREP");
-    }
-
     private void handleSuccess(String agent) {
-        switch (agent) {
-            case "system-prep-agent":
-                sendMessage("containerd-agent", "START_CONTAINERD");
-                break;
-            case "containerd-agent":
-                sendMessage("kubernetes-install-agent", "START_K8S_INSTALL");
-                break;
-            case "kubernetes-install-agent":
-                sendMessage("kubernetes-init-agent", "START_K8S_INIT");
-                break;
-            case "kubernetes-init-agent":
-                sendMessage("calico-agent", "START_CALICO");
-                break;
-            case "calico-agent":
-                sendMessage("worker-prep-agent", "START_WORKER_PREP");
-                break;
-            case "worker-prep-agent":
-                sendMessage("worker-join-agent", "START_WORKER_JOIN");
-                break;
-            case "worker-join-agent":
-                sendMessage("htcondor-agent", "START_HTCONDOR");
-                break;
-            case "htcondor-agent":
-                logger.info("All stages completed successfully!");
-                break;
-        }
+        logger.info("Stage completed successfully: {}", agent);
+        triggerNextStage(agent);
     }
 
     private void handleFailure(String agent, String content) {
         logger.error("Deployment failed at stage: {}", agent);
         logger.error("Error details: {}", content);
         logger.error("=== DEPLOYMENT FAILED - MANUAL INTERVENTION REQUIRED ===");
+
+        deploymentFinished.set(true);
+        abortAllAgents(agent);
     }
 
     private void handleDeploymentComplete() {
+        if (!deploymentFinished.compareAndSet(false, true)) {
+            return; // уже обработано
+        }
+
+        logger.info("=== HTCONDOR CLUSTER DEPLOYMENT COMPLETED SUCCESSFULLY ===");
         logger.info("=== DEPLOYMENT SUMMARY ===");
-        agentStatus.forEach((agent, status) -> logger.info("{}: {}", agent, status));
+        DEPLOYMENT_SEQUENCE.forEach(agent -> {
+            String status = agentStatus.getOrDefault(agent, "NOT STARTED");
+            logger.info("{}: {}", agent, status);
+        });
         logger.info("=== HTCONDOR CLUSTER IS READY ===");
         performFinalChecks();
     }
 
     private void performFinalChecks() {
         logger.info("Performing final cluster checks...");
+        // Здесь можно добавить проверки: kubectl get nodes, condor_status и т.д.
         logger.info("Final checks completed. Cluster is operational.");
     }
 
@@ -126,6 +170,6 @@ public class CoordinatorAgent extends Agent {
         msg.addReceiver(new AID(agentName, AID.ISLOCALNAME));
         msg.setContent(content);
         send(msg);
-        logger.info("Coordinator sent to {}: {}", agentName, content);
+        logger.debug("Coordinator sent to {}: {}", agentName, content);
     }
 }
