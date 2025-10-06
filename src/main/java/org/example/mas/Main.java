@@ -1,36 +1,40 @@
 package org.example.mas;
 
 
-import jade.core.*;
+import jade.core.Profile;
+import jade.core.ProfileImpl;
 import jade.core.Runtime;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
-import jade.wrapper.ControllerException;
 import jade.wrapper.StaleProxyException;
-import org.example.mas.Agent.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.CountDownLatch;
 
 public class Main {
+
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     private static final String[] PLAYBOOKS = {
-        "01_system_preparation.yml",
-        "02_containerd.yml",
-        "03_kubernetes_install.yml",
-        "04_kubernetes_init.yml",
-        "05_calico_cni.yml",
-        "06_worker_preparation.yml",
-        "07_worker_join.yml",
-        "08_htcondor.yml"
+            "01_system_preparation.yml",
+            "02_containerd.yml",
+            "03_kubernetes_install.yml",
+            "04_kubernetes_init.yml",
+            "05_calico_cni.yml",
+            "06_worker_preparation.yml",
+            "07_worker_join.yml",
+            "08_htcondor.yml"
     };
 
     public static void main(String[] args) {
+        CountDownLatch deploymentLatch = new CountDownLatch(1);
+
         try {
             logger.info("Starting HTCondor Multi-Agent Deployment System");
 
@@ -47,66 +51,65 @@ public class Main {
                 System.exit(1);
             }
 
+            // Настройка JADE контейнера
             Runtime rt = Runtime.instance();
             Profile p = new ProfileImpl();
             p.setParameter(Profile.MAIN_HOST, "localhost");
-            p.setParameter(Profile.GUI, "true");
+            p.setParameter(Profile.GUI, "true"); // можно "false" в production
             p.setParameter(Profile.CONTAINER_NAME, "HTCondorDeployment");
 
             AgentContainer container = rt.createMainContainer(p);
 
+            // Запуск координатора с latch'ем для синхронизации завершения
             AgentController coordinator = container.createNewAgent(
-                "coordinator-agent",
-                CoordinatorAgent.class.getName(),
-                null
+                    "coordinator-agent",
+                    CoordinatorAgent.class.getName(),
+                    new Object[]{ deploymentLatch, inventoryPath, workingDir, timeoutMinutes }
             );
             coordinator.start();
 
+            // Запуск исполнительных агентов
             createAgents(container, inventoryPath, workingDir, timeoutMinutes);
 
-            logger.info("All agents created successfully. Deployment will start in 5 seconds...");
-//            container.joi
-            } catch (ProfileException e) {
-            logger.error("JADE profile configuration error", e);
+            logger.info("All agents created. Deployment starting in 5 seconds...");
+
+            // 🔑 Ожидаем завершения всего процесса
+            deploymentLatch.await();
+
+            logger.info("=== DEPLOYMENT PROCESS FINISHED ===");
+
+        } catch (Exception e) {
+            logger.error("System failed to start or execute", e);
             System.exit(1);
-            } catch (StaleProxyException e) {
-                logger.error("Agent creation failed: agent proxy is stale", e);
-                System.exit(1);
-            } catch (IMTPException | ControllerException e) {
-                logger.error("JADE internal communication error", e);
-                System.exit(1);
-            } catch (Exception e) {
-                logger.error("Unexpected error during startup", e);
-                System.exit(1);
-            }
+        }
     }
 
     private static void createAgents(AgentContainer container, String inventoryPath,
                                      String workingDir, int timeoutMinutes) throws Exception {
 
-        createAgent(container, "system-prep-agent", SystemPreparationAgent.class.getName(),
-            PLAYBOOKS[0], inventoryPath, timeoutMinutes, workingDir);
+        createAgent(container, "system-prep-agent", AnsibleAgent.class.getName(),
+                PLAYBOOKS[0], inventoryPath, timeoutMinutes, workingDir);
 
-        createAgent(container, "containerd-agent", ContainerdAgent.class.getName(),
-            PLAYBOOKS[1], inventoryPath, timeoutMinutes, workingDir);
+        createAgent(container, "containerd-agent", AnsibleAgent.class.getName(),
+                PLAYBOOKS[1], inventoryPath, timeoutMinutes, workingDir);
 
-        createAgent(container, "kubernetes-install-agent", KubernetesInstallAgent.class.getName(),
-            PLAYBOOKS[2], inventoryPath, timeoutMinutes, workingDir);
+        createAgent(container, "kubernetes-install-agent", AnsibleAgent.class.getName(),
+                PLAYBOOKS[2], inventoryPath, timeoutMinutes, workingDir);
 
-        createAgent(container, "kubernetes-init-agent", KubernetesInitAgent.class.getName(),
-            PLAYBOOKS[3], inventoryPath, timeoutMinutes, workingDir);
+        createAgent(container, "kubernetes-init-agent", AnsibleAgent.class.getName(),
+                PLAYBOOKS[3], inventoryPath, timeoutMinutes, workingDir);
 
-        createAgent(container, "calico-agent", CalicoAgent.class.getName(),
-            PLAYBOOKS[4], inventoryPath, timeoutMinutes, workingDir);
+        createAgent(container, "calico-agent", AnsibleAgent.class.getName(),
+                PLAYBOOKS[4], inventoryPath, timeoutMinutes, workingDir);
 
-        createAgent(container, "worker-prep-agent", WorkerPreparationAgent.class.getName(),
-            PLAYBOOKS[5], inventoryPath, timeoutMinutes, workingDir);
+        createAgent(container, "worker-prep-agent", AnsibleAgent.class.getName(),
+                PLAYBOOKS[5], inventoryPath, timeoutMinutes, workingDir);
 
-        createAgent(container, "worker-join-agent", WorkerJoinAgent.class.getName(),
-            PLAYBOOKS[6], inventoryPath, timeoutMinutes, workingDir);
+        createAgent(container, "worker-join-agent", AnsibleAgent.class.getName(),
+                PLAYBOOKS[6], inventoryPath, timeoutMinutes, workingDir);
 
-        createAgent(container, "htcondor-agent", HTCondorAgent.class.getName(),
-            PLAYBOOKS[7], inventoryPath, timeoutMinutes, workingDir);
+        createAgent(container, "htcondor-agent", AnsibleAgent.class.getName(),
+                PLAYBOOKS[7], inventoryPath, timeoutMinutes, workingDir);
     }
 
     private static void createAgent(AgentContainer container, String agentName, String agentClass,
@@ -150,5 +153,4 @@ public class Main {
         System.out.println("  java -jar ansible-multi-agent.jar inventory.ini /path/to/playbooks");
         System.out.println("  java -jar ansible-multi-agent.jar inventory.ini /path/to/playbooks 45");
     }
-
 }

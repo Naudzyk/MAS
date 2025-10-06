@@ -17,12 +17,7 @@
   </properties>
 
   <dependencies>
-    <!-- JADE -->
-  <dependency>
-    <groupId>com.tilab.jade</groupId>
-    <artifactId>jade</artifactId>
-    <version>4.5.0</version>
-  </dependency>
+
 
     <!-- SLF4J API + Logback (биндинг логгера) -->
     <dependency>

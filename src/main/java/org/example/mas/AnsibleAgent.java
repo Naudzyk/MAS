@@ -1,22 +1,33 @@
 package org.example.mas;
 
 import jade.core.Agent;
-import jade.core.behaviours.CyclicBehaviour;
-import jade.core.behaviours.OneShotBehaviour;
+import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.OneShotBehaviour;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class AnsibleAgent extends Agent {
+
     private static final Logger logger = LoggerFactory.getLogger(AnsibleAgent.class);
 
     protected String playbookPath;
@@ -29,32 +40,34 @@ public abstract class AnsibleAgent extends Agent {
     @Override
     protected void setup() {
         Object[] args = getArguments();
-        if (args != null && args.length >= 2) {
-            this.playbookPath = args[0].toString();
-            this.inventoryPath = args[1].toString();
-            this.timeout = args.length > 2 ? Duration.ofMinutes(Long.parseLong(args[2].toString()))
-                    : Duration.ofMinutes(30);
-            if (args.length > 3) {
-                this.workingDir = args[3].toString();
-            } else {
-                this.workingDir = System.getProperty("user.dir");
-                logger.warn("Working directory not specified, using default: {}", workingDir);
-            }
-        } else {
-            logger.error("Agent {} requires at least playbook and inventory arguments", getLocalName());
+        if (args == null || args.length < 4) {
+            logger.error("Agent {} requires: playbook, inventory, timeoutMinutes, workingDir", getLocalName());
             doDelete();
             return;
         }
 
-        File workingDirFile = new File(workingDir);
-        if (!workingDirFile.exists() || !workingDirFile.isDirectory()) {
-            logger.error("Working directory does not exist or is not a directory: {}", workingDir);
+        this.playbookPath = args[0].toString();
+        this.inventoryPath = args[1].toString();
+        int timeoutMinutes = Integer.parseInt(args[2].toString());
+        this.timeout = Duration.ofMinutes(timeoutMinutes);
+        this.workingDir = args[3].toString();
+
+        File wd = new File(workingDir);
+        if (!wd.exists() || !wd.isDirectory()) {
+            logger.error("Working directory does not exist: {}", workingDir);
             doDelete();
             return;
         }
 
-        logger.info("Agent {} initialized with playbook: {}, inventory: {}",
-                getLocalName(), playbookPath, inventoryPath);
+        Path playbookFullPath = Paths.get(workingDir, playbookPath);
+        if (!Files.exists(playbookFullPath)) {
+            logger.error("Playbook not found: {}", playbookFullPath);
+            doDelete();
+            return;
+        }
+
+        logger.info("Agent {} initialized with playbook: {}, inventory: {}, timeout: {}, workingDir: {}",
+                getLocalName(), playbookPath, inventoryPath, timeout, workingDir);
 
         addBehaviour(new MessageHandlerBehaviour());
     }
@@ -67,7 +80,6 @@ public abstract class AnsibleAgent extends Agent {
 
                 List<String> command = buildAnsibleCommand();
                 ProcessBuilder pb = new ProcessBuilder(command);
-
                 setupEnvironment(pb);
                 pb.directory(new File(workingDir));
                 pb.redirectErrorStream(true);
@@ -82,8 +94,10 @@ public abstract class AnsibleAgent extends Agent {
                         StringBuilder output = new StringBuilder();
                         String line;
                         while ((line = reader.readLine()) != null) {
+                            String safeLine = line.replaceAll("(?i)(password|token|secret)[=:].*",
+                                    "$1=***MASKED***");
+                            logger.info("{} | {}", getLocalName(), safeLine);
                             output.append(line).append("\n");
-                            logger.info("{} | {}", getLocalName(), line);
                         }
                         return output.toString();
                     } catch (IOException e) {
@@ -103,7 +117,7 @@ public abstract class AnsibleAgent extends Agent {
                     int exitCode = process.exitValue();
                     boolean success = exitCode == 0;
                     logger.info("Agent {} playbook completed with exit code: {}", getLocalName(), exitCode);
-                    notifyCompletion(success, "Exit code: " + exitCode + "\nOutput: " + output);
+                    notifyCompletion(success, "Exit code: " + exitCode);
                 }
 
             } catch (Exception e) {
@@ -125,6 +139,16 @@ public abstract class AnsibleAgent extends Agent {
             String content = msg.getContent() == null ? "" : msg.getContent();
             logger.info("Agent {} received message: {}", getLocalName(), content);
 
+            if ("ABORT".equals(content)) {
+                logger.info("Received ABORT signal. Terminating without running playbook.");
+                ACLMessage ack = new ACLMessage(ACLMessage.INFORM);
+                ack.addReceiver(new AID("coordinator-agent", AID.ISLOCALNAME));
+                ack.setContent("ABORT_ACK");
+                send(ack);
+                doDelete();
+                return;
+            }
+
             if (content.contains("START") && started.compareAndSet(false, true)) {
                 addBehaviour(new ExecutePlaybookBehaviour());
             }
@@ -133,20 +157,19 @@ public abstract class AnsibleAgent extends Agent {
         }
     }
 
-        protected List<String> buildAnsibleCommand() {
-        List<String> command = new ArrayList<>();
-        command.add("ansible-playbook");
-        command.add("-i");
-        command.add(inventoryPath);
-        command.add(playbookPath);
-        return command;
+    protected List<String> buildAnsibleCommand() {
+        return new ArrayList<>(Arrays.asList(
+                "ansible-playbook",
+                "-i", inventoryPath,
+                playbookPath
+        ));
     }
 
     protected void setupEnvironment(ProcessBuilder pb) {
         pb.environment().putIfAbsent("ANSIBLE_HOST_KEY_CHECKING", "False");
         pb.environment().putIfAbsent("ANSIBLE_STDOUT_CALLBACK", "debug");
 
-        String lower = playbookPath == null ? "" : playbookPath.toLowerCase();
+        String lower = playbookPath.toLowerCase();
         if (lower.contains("kubernetes") || lower.contains("calico") || lower.contains("htcondor")) {
             pb.environment().put("KUBECONFIG", "/etc/kubernetes/admin.conf");
         }
@@ -158,21 +181,13 @@ public abstract class AnsibleAgent extends Agent {
     protected void notifyCompletion(boolean success, String details) {
         logger.info("Agent {} playbook execution {}.", getLocalName(), success ? "SUCCESS" : "FAILED");
         ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-        msg.addReceiver(new jade.core.AID("coordinator-agent", jade.core.AID.ISLOCALNAME));
+        msg.addReceiver(new AID("coordinator-agent", AID.ISLOCALNAME));
         msg.setContent(success ? "COMPLETE" : "FAILED: " + details);
         send(msg);
     }
-
+    // Метод для переопределения
     protected void handleMessage(ACLMessage msg) {
-        logger.debug("Agent {} processing message: {}", getLocalName(), msg.getContent());
-    }
 
-    protected void sendMessage(String agentName, String content) {
-        ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-        msg.addReceiver(new jade.core.AID(agentName, jade.core.AID.ISLOCALNAME));
-        msg.setContent(content);
-        send(msg);
-        logger.debug("Agent {} sent message to {}: {}", getLocalName(), agentName, content);
     }
 }
 
