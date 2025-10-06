@@ -4,272 +4,36 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;V6&quot;">
+    <list default="true" id="017bf609-001c-45ad-805d-7768f181f043" name="Changes" comment="&quot;test&quot;">
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dependency-reduced-pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/dependency-reduced-pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/CalicoAgent.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/ContainerdAgent.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/HTCondorAgent.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/KubernetesInitAgent.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/KubernetesInstallAgent.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/SystemPreparationAgent.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/WorkerJoinAgent.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/WorkerPreparationAgent.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/AnsibleAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/AnsibleAgent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/CoordinatorAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/CoordinatorAgent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/CalicoAgent.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/ContainerdAgent.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/HTCondorAgent.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/KubernetesInitAgent.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/KubernetesInstallAgent.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/SystemPreparationAgent.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/WorkerJoinAgent.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/WorkerPreparationAgent.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/AnsibleAgent$ExecutePlaybookBehaviour.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/AnsibleAgent$MessageHandlerBehaviour.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/AnsibleAgent.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/CoordinatorAgent$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/CoordinatorAgent$MessageHandlerBehaviour.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/CoordinatorAgent.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Main.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/hello-view.fxml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-archiver/pom.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/original-MAS-1.0-SNAPSHOT.jar" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="Class" />
-      </list>
-    </option>
-  </component>
   <component name="Git.Settings">
-    <option name="RECENT_BRANCH_BY_REPOSITORY">
-      <map>
-        <entry key="$PROJECT_DIR$" value="master" />
-      </map>
-    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory">{
-  &quot;lastFilter&quot;: {
-    &quot;state&quot;: &quot;OPEN&quot;,
-    &quot;assignee&quot;: &quot;Naudzyk&quot;
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;git-widget-placeholder&quot;: &quot;tets__branch&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/EVgeNII/Desktop/JADE dOW/jade/lib/jade.jar&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/Naudzyk/MAS.git",
-    "accountId": "427a359f-c137-4bcf-8958-737c01098ef4"
-  }
-}]]></component>
-  <component name="KubernetesApiPersistence">{}</component>
-  <component name="KubernetesApiProvider">{
-  &quot;isMigrated&quot;: true
-}</component>
-  <component name="MavenImportPreferences">
-    <option name="generalSettings">
-      <MavenGeneralSettings>
-        <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
-      </MavenGeneralSettings>
-    </option>
-  </component>
-  <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 8
-}</component>
-  <component name="ProjectId" id="31dHxtjXMoIBElOhyr2EIIkZoch" />
-  <component name="ProjectViewState">
-    <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showLibraryContents" value="true" />
-  </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.Main.executor": "Run",
-    "Application.Unnamed.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "tets__branch",
-    "ignore.virus.scanning.warn.message": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/EVgeNII/Desktop/MAS",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Libraries",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.47126436",
-    "settings.editor.selected.configurable": "preferences.lookFeel",
-    "vue.rearranger.settings.migration": "true"
-  }
-}]]></component>
-  <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\EVgeNII\Desktop\MAS" />
-      <recent name="C:\Users\EVgeNII\Desktop\MAS\scripts" />
-    </key>
-    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
-      <recent name="org.example.mas" />
-    </key>
-  </component>
-  <component name="RunManager" selected="Application.Main">
-    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="org.example.mas.Main" />
-      <module name="MAS" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="org.example.mas.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Unnamed" type="Application" factoryName="Application" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="jade.Boot" />
-      <module name="MAS" />
-      <option name="PROGRAM_PARAMETERS" value="-gui" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <list>
-      <item itemvalue="Application.Unnamed" />
-      <item itemvalue="Application.Main" />
-    </list>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Application.Main" />
-      </list>
-    </recent_temporary>
-  </component>
-  <component name="SharedIndexes">
-    <attachedChunks>
-      <set>
-        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.25557.131" />
-        <option value="bundled-js-predefined-d6986cc7102b-b598e85cdad2-JavaScript-IU-252.25557.131" />
-      </set>
-    </attachedChunks>
-  </component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
-    <task active="true" id="Default" summary="Default task">
-      <changelist id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="" />
-      <created>1755847281222</created>
-      <option name="number" value="Default" />
-      <option name="presentableId" value="Default" />
-      <updated>1755847281222</updated>
-      <workItem from="1755847282269" duration="7992000" />
-      <workItem from="1756110648020" duration="2567000" />
-      <workItem from="1756288575764" duration="17942000" />
-      <workItem from="1756893163103" duration="3456000" />
-      <workItem from="1756901734272" duration="1494000" />
-      <workItem from="1757138656590" duration="8644000" />
-      <workItem from="1757329663444" duration="939000" />
-      <workItem from="1757560924064" duration="6000" />
-      <workItem from="1757590896638" duration="2689000" />
-      <workItem from="1759385676895" duration="5803000" />
-      <workItem from="1759745224270" duration="2174000" />
-    </task>
-    <task id="LOCAL-00001" summary="'V1'">
-      <option name="closed" value="true" />
-      <created>1756464007140</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1756464007140</updated>
-    </task>
-    <task id="LOCAL-00002" summary="'V1'">
-      <option name="closed" value="true" />
-      <created>1756464140529</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1756464140529</updated>
-    </task>
-    <task id="LOCAL-00003" summary="'V1'">
-      <option name="closed" value="true" />
-      <created>1756465106769</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1756465106769</updated>
-    </task>
-    <task id="LOCAL-00004" summary="'V2'">
-      <option name="closed" value="true" />
-      <created>1756897021736</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1756897021736</updated>
-    </task>
-    <task id="LOCAL-00005" summary="'V2'">
-      <option name="closed" value="true" />
-      <created>1756897856488</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1756897856488</updated>
-    </task>
-    <task id="LOCAL-00006" summary="'V3'">
-      <option name="closed" value="true" />
-      <created>1757139034111</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1757139034111</updated>
-    </task>
-    <task id="LOCAL-00007" summary="'V4'">
-      <option name="closed" value="true" />
-      <created>1757140500478</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1757140500478</updated>
-    </task>
-    <task id="LOCAL-00008" summary="&quot;V5&quot;">
-      <option name="closed" value="true" />
-      <created>1757142860999</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1757142860999</updated>
-    </task>
-    <task id="LOCAL-00009" summary="&quot;V6&quot;">
-      <option name="closed" value="true" />
-      <created>1757330000045</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1757330000045</updated>
-    </task>
-    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
-  <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="3" />
-  </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="'V1'" />
-    <MESSAGE value="'V2'" />
-    <MESSAGE value="'V3'" />
-    <MESSAGE value="'V4'" />
-    <MESSAGE value="&quot;V5&quot;" />
-    <MESSAGE value="&quot;V6&quot;" />
-    <option name="LAST_COMMIT_MESSAGE" value="&quot;V6&quot;" />
+    <MESSAGE value="&quot;test&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="&quot;test&quot;" />
   </component>
 </project>

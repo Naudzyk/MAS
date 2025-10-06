@@ -16,8 +16,30 @@
     <junit.version>5.10.2</junit.version>
   </properties>
 
-  <dependencies>
+  <repositories>
 
+  <repository>
+    <id>jade-repo</id>
+    <url>https://raw.githubusercontent.com/tilab-org/jade/mvn-repo/</url>
+  </repository>
+
+    <!-- Maven Central -->
+    <repository>
+      <id>maven-central</id>
+      <url>https://repo.maven.apache.org/maven2</url>
+    </repository>
+
+
+  </repositories>
+
+
+  <dependencies>
+    <!-- JADE -->
+  <dependency>
+    <groupId>com.tilab.jade</groupId>
+    <artifactId>jade</artifactId>
+    <version>4.5.0</version>
+  </dependency>
 
     <!-- SLF4J API + Logback (биндинг логгера) -->
     <dependency>
@@ -31,6 +53,18 @@
       <version>1.2.12</version>
     </dependency>
 
+
+    <dependency>
+      <groupId>com.github.almasb</groupId>
+      <artifactId>fxgl</artifactId>
+      <version>11.17</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.openjfx</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
     <!-- JUnit -->
     <dependency>
@@ -61,7 +95,7 @@
         </configuration>
       </plugin>
 
-      <!-- Fat-jar со стартовым классом -->
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
@@ -82,6 +116,7 @@
           </execution>
         </executions>
       </plugin>
+
 
     </plugins>
   </build>
