@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>HTCondor Cluster Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+    <h1>HTCondor Multi-Agent Deployment System</h1>
+    <p>Автоматизация DevOps для научных приложений</p>
+</header>
+
+<main>
+    <section id="ansible-pipeline">
+        <h2>Ansible Deployment Pipeline</h2>
+        <div id="ansible-status" class="status-box">Загрузка...</div>
+    </section>
+
+    <section id="cluster-status">
+        <h2>Состояние кластера HTCondor</h2>
+        <div id="htcondor-status" class="status-box">Загрузка...</div>
+    </section>
+
+    <section id="alerts">
+        <h2>Алерты</h2>
+        <ul id="alerts-list"></ul>
+    </section>
+</main>
+
+<footer>
+    <p>Обновлено: <span id="last-update">—</span></p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

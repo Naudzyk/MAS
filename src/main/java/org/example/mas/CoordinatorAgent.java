@@ -1,189 +1,145 @@
 package org.example.mas;
 
-import jade.core.Agent;
 import jade.core.AID;
-import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
+import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
-import jade.core.behaviours.WakerBehaviour;
-
+import jade.core.behaviours.OneShotBehaviour;
+import jade.lang.acl.ACLMessage;
+import jade.wrapper.AgentController;
+import org.example.mas.Agent.MasterAgent;
+import org.example.mas.Agent.WorkerAgent;
+import org.example.mas.utils.AnsibleRunner;
+import org.example.mas.utils.InventoryParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
 
 public class CoordinatorAgent extends Agent {
-
     private static final Logger logger = LoggerFactory.getLogger(CoordinatorAgent.class);
-
-    private static final List<String> DEPLOYMENT_SEQUENCE = Arrays.asList(
-            "system-prep-agent",
-            "containerd-agent",
-            "kubernetes-install-agent",
-            "kubernetes-init-agent",
-            "calico-agent",
-            "worker-prep-agent",
-            "worker-join-agent",
-            "htcondor-agent"
-    );
-
-    private CountDownLatch completionLatch;
-    private String inventoryPath;
-    private String workingDir;
-    private int timeoutMinutes;
-
-    private final Map<String, String> agentStatus = new ConcurrentHashMap<>();
-    private volatile boolean deploymentFinished = false;
+    private String inventory;
+    private String playbooksDir;
+    private final Map<String, AID> nodeAgents = new HashMap<>();
 
     @Override
     protected void setup() {
         Object[] args = getArguments();
-        if (args == null || args.length < 4) {
-            logger.error("CoordinatorAgent requires: CountDownLatch, inventoryPath, workingDir, timeoutMinutes");
+        if (args == null || args.length < 2) {
+            logger.error("CoordinatorAgent requires: inventoryPath, playbooksDir");
             doDelete();
             return;
         }
 
-        this.completionLatch = (CountDownLatch) args[0];
-        this.inventoryPath = (String) args[1];
-        this.workingDir = (String) args[2];
-        this.timeoutMinutes = (Integer) args[3];
+        this.inventory = (String) args[0];
+        this.playbooksDir = (String) args[1];
+        logger.info("CoordinatorAgent initialized with inventory: {}, playbooksDir: {}", inventory, playbooksDir);
 
-        logger.info("CoordinatorAgent initialized with inventory: {}, workingDir: {}, timeout: {} min",
-                inventoryPath, workingDir, timeoutMinutes);
-
-        addBehaviour(new MessageHandlerBehaviour());
-
-        addBehaviour(new WakerBehaviour(this, 5000) {
+        // === ФАЗА 1: Инициализация кластера (однократно) ===
+        addBehaviour(new OneShotBehaviour() {
             @Override
-            protected void onWake() {
-                startDeployment();
+            public void action() {
+                logger.info("Starting initial cluster deployment...");
+
+                // Запускаем Ansible-плейбуки для полной настройки
+                String[] playbooks = {
+                        "01_system_preparation.yml",
+                        "02_containerd.yml",
+                        "03_kubernetes_install.yml",
+                        "04_kubernetes_init.yml",
+                        "05_calico_cni.yml",
+                        "06_worker_preparation.yml",
+                        "07_worker_join.yml",
+                        "08_htcondor.yml"
+                };
+
+                for (String playbook : playbooks) {
+                    logger.info("Running playbook: {}", playbook);
+                    if (!AnsibleRunner.run(playbook, inventory, playbooksDir, 15)) {
+                        logger.error("Deployment failed at playbook: {}", playbook);
+                        DashboardServer.updateStatus("alerts", new String[]{
+                                "htcondor-execute-rh3q: CrashLoopBackOff",
+                                "Проверьте логи пода"
+                        });
+                        return;
+                    }
+                }
+
+                logger.info("Initial cluster deployment completed. Creating node agents...");
+                DashboardServer.updateStatus("ansibleStage", "kubernetes_init ✅ | htcondor ⏳");
+                createNodeAgents(); // ← создаём агентов для каждого узла
+            }
+        });
+
+        // Этап 2: слушать сообщения от узлов
+        addBehaviour(new CyclicBehaviour() {
+            @Override
+            public void action() {
+                ACLMessage msg = receive();
+                if (msg != null) {
+                    handleNodeMessage(msg);
+                } else block();
             }
         });
     }
 
-    private void startDeployment() {
-        logger.info("=== STARTING HTCONDOR CLUSTER DEPLOYMENT ===");
-        triggerNextStage(null);
-    }
+    private void createNodeAgents() {
+        try {
+            // Парсим inventory, используя this.inventory
+            InventoryParser.Inventory inv = InventoryParser.parse(this.inventory);
 
-    private void triggerNextStage(String completedAgent) {
-        int nextIndex = (completedAgent == null) ? 0 : DEPLOYMENT_SEQUENCE.indexOf(completedAgent) + 1;
-
-        if (nextIndex >= DEPLOYMENT_SEQUENCE.size()) {
-            sendDeploymentComplete();
-            return;
-        }
-
-        String nextAgent = DEPLOYMENT_SEQUENCE.get(nextIndex);
-        String command = "START_" + nextAgent.toUpperCase().replace("-", "_");
-        sendMessage(nextAgent, command);
-        logger.info("Triggered next stage: {}", nextAgent);
-    }
-
-    private void sendDeploymentComplete() {
-        ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-        msg.addReceiver(getAID());
-        msg.setContent("DEPLOYMENT_COMPLETE");
-        send(msg);
-    }
-
-    private void abortAllAgents(String failedAgent) {
-        logger.warn("Aborting all agents due to failure in: {}", failedAgent);
-        for (String agentName : DEPLOYMENT_SEQUENCE) {
-            if (!agentName.equals(failedAgent)) {
-                sendMessage(agentName, "ABORT");
-            }
-        }
-    }
-
-    private class MessageHandlerBehaviour extends CyclicBehaviour {
-        @Override
-        public void action() {
-            ACLMessage msg = receive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
-            if (msg == null) {
-                block();
-                return;
+            // Создаём агента для master-узлов
+            for (InventoryParser.Host master : inv.getGroup("master")) {
+                createNodeAgent(master.name, true);
             }
 
-            String content = msg.getContent() == null ? "" : msg.getContent();
-            String sender = msg.getSender().getLocalName();
+            // Создаём агентов для worker-узлов
+            for (InventoryParser.Host worker : inv.getGroup("workers")) {
+                createNodeAgent(worker.name, false);
+            }
 
-            logger.info("Coordinator received from {}: {}", sender, content);
-            processMessage(sender, content);
+        } catch (Exception e) {
+            logger.error("Failed to create node agents from inventory", e);
         }
     }
 
-    private void processMessage(String sender, String content) {
-        if (deploymentFinished) return;
+    private void createNodeAgent(String nodeName, boolean isMaster) {
+        try {
+            String agentType = isMaster ? MasterAgent.class.getName() : WorkerAgent.class.getName();
 
-        agentStatus.put(sender, content);
+            // Передаём аргументы агенту
+            Object[] agentArgs = new Object[]{
+                    nodeName,           // имя узла
+                    this.inventory,     // путь к inventory
+                    this.playbooksDir   // директория с плейбуками
+            };
 
-        if (content.equals("ABORT_ACK")) {
-            logger.debug("Agent {} acknowledged abort", sender);
-            return;
-        }
+            AgentController ac = getContainerController().createNewAgent(
+                    nodeName,
+                    agentType,
+                    agentArgs
+            );
+            ac.start();
 
-        if (content.contains("FAILED")) {
-            handleFailure(sender, content);
-        } else if (content.contains("COMPLETE")) {
-            handleSuccess(sender);
-        } else if (content.equals("DEPLOYMENT_COMPLETE")) {
-            handleDeploymentComplete();
-        }
-    }
+            // Сохраняем AID для отправки сообщений
+            AID agentAID = new AID(nodeName, AID.ISLOCALNAME);
+            nodeAgents.put(nodeName, agentAID);
 
-    private void handleSuccess(String agent) {
-        logger.info("Stage completed successfully: {}", agent);
-        triggerNextStage(agent);
-    }
-
-    private void handleFailure(String agent, String content) {
-        logger.error("Deployment failed at stage: {}", agent);
-        logger.error("Error details: {}", content);
-        logger.error("=== DEPLOYMENT FAILED ===");
-
-        deploymentFinished = true;
-        abortAllAgents(agent);
-        safeCountDown();
-    }
-
-    private void handleDeploymentComplete() {
-        if (deploymentFinished) return;
-        deploymentFinished = true;
-
-        logger.info("=== HTCONDOR CLUSTER DEPLOYMENT COMPLETED SUCCESSFULLY ===");
-        logger.info("=== DEPLOYMENT SUMMARY ===");
-        DEPLOYMENT_SEQUENCE.forEach(agent -> {
-            String status = agentStatus.getOrDefault(agent, "NOT STARTED");
-            logger.info("{}: {}", agent, status);
-        });
-        logger.info("=== HTCONDOR CLUSTER IS READY ===");
-        performFinalChecks();
-
-        safeCountDown();
-    }
-
-    private void safeCountDown() {
-        if (completionLatch != null && completionLatch.getCount() > 0) {
-            completionLatch.countDown();
+            logger.info("Created {} agent: {}", isMaster ? "master" : "worker", nodeName);
+        } catch (Exception e) {
+            logger.error("Failed to create agent for node: " + nodeName, e);
         }
     }
 
-    private void performFinalChecks() {
-        logger.info("Performing final cluster checks...");
-        logger.info("Final checks completed. Cluster is operational.");
-    }
+    private void handleNodeMessage(ACLMessage msg) {
+        String sender = msg.getSender().getLocalName();
+        String content = msg.getContent();
 
-    private void sendMessage(String agentName, String content) {
-        ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-        msg.addReceiver(new AID(agentName, AID.ISLOCALNAME));
-        msg.setContent(content);
-        send(msg);
-        logger.debug("Coordinator sent to {}: {}", agentName, content);
+        if (content.startsWith("ALERT:")) {
+            System.out.println("Coordinator: Received alert from " + sender + ": " + content);
+            // Реакция на сбой: перезапуск, уведомление и т.д.
+        } else if (content.equals("READY")) {
+            System.out.println("Coordinator: Node " + sender + " is ready");
+        }
     }
 }
