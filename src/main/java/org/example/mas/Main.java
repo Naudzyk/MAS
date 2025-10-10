@@ -30,7 +30,7 @@ public class Main {
 
         AgentContainer container = rt.createMainContainer(p);
 
-        DashboardServer.start(4567);
+        DashboardServer.start(4567,container);
 
         // Запуск координатора
         container.createNewAgent("coordinator", CoordinatorAgent.class.getName(),

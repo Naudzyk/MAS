@@ -22,48 +22,62 @@ public class AnsibleRunner {
      * @param timeoutMinutes таймаут в минутах
      * @return true, если успешно
      */
-    public static boolean run(String playbook, String inventoryPath, String workingDir, int timeoutMinutes) {
+    public static AnsibleResult run(String playbook, String inventoryPath, String workingDir, int timeoutMinutes) {
         try {
-            ProcessBuilder pb = new ProcessBuilder(
-                    "ansible-playbook", "-i", inventoryPath, playbook
-            );
+            ProcessBuilder pb = new ProcessBuilder("ansible-playbook", "-i", inventoryPath, playbook);
             pb.directory(new File(workingDir));
             pb.environment().put("ANSIBLE_HOST_KEY_CHECKING", "False");
             pb.redirectErrorStream(true);
 
             Process process = pb.start();
+            StringBuilder output = new StringBuilder();
 
-            // Асинхронное чтение вывода
-            CompletableFuture<String> output = CompletableFuture.supplyAsync(() -> {
-                StringBuilder sb = new StringBuilder();
-                try (BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(process.getInputStream()))) {
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        logger.info("ANSIBLE | {}", line);
-                        sb.append(line).append("\n");
-                    }
-                } catch (Exception e) {
-                    logger.error("Error reading Ansible output", e);
+            // Чтение вывода в реальном времени
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    logger.info("ANSIBLE | {}", line);
+                    output.append(line).append("\n");
                 }
-                return sb.toString();
-            });
+            }
 
             boolean finished = process.waitFor(timeoutMinutes, TimeUnit.MINUTES);
             if (!finished) {
                 process.destroyForcibly();
-                logger.warn("Ansible playbook {} timed out after {} minutes", playbook, timeoutMinutes);
-                return false;
+                return new AnsibleResult(false, "TIMEOUT", "Playbook timed out after " + timeoutMinutes + " min");
             }
 
             int exitCode = process.exitValue();
             boolean success = exitCode == 0;
-            logger.info("Ansible playbook {} completed with exit code: {}", playbook, exitCode);
-            return success;
+
+            // Анализ ошибки: сбой подключения?
+            String outputStr = output.toString();
+            if (!success) {
+                if (outputStr.contains("UNREACHABLE!") || outputStr.contains("Failed to connect")) {
+                    return new AnsibleResult(false, "CONNECTION_FAILURE", outputStr);
+                }
+                return new AnsibleResult(false, "EXECUTION_ERROR", outputStr);
+            }
+
+            return new AnsibleResult(true, "SUCCESS", outputStr);
 
         } catch (Exception e) {
-            logger.error("Failed to run Ansible playbook: " + playbook, e);
-            return false;
+            logger.error("Exception running playbook: " + playbook, e);
+            return new AnsibleResult(false, "EXCEPTION", e.getMessage());
+
+        }
+    }
+
+    // Вспомогательный класс для результата
+    public static class AnsibleResult {
+        public final boolean success;
+        public final String errorCode; // TIMEOUT, CONNECTION_FAILURE, EXECUTION_ERROR, EXCEPTION
+        public final String details;
+
+        public AnsibleResult(boolean success, String errorCode, String details) {
+            this.success = success;
+            this.errorCode = errorCode;
+            this.details = details;
         }
     }
 }

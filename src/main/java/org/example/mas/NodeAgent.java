@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public abstract class NodeAgent extends Agent {
     protected static final Logger logger = LoggerFactory.getLogger(NodeAgent.class);
 
-    protected String nodeName;      // Имя узла (для WorkerAgent) или роль (для MasterAgent)
+    protected String nodeName;      // Имя узла (для MasterAgent)
     protected String inventoryPath;
     protected String playbooksDir;
 

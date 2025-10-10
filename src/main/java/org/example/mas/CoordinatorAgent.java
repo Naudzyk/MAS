@@ -7,14 +7,18 @@ import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
 import org.example.mas.Agent.MasterAgent;
-import org.example.mas.Agent.WorkerAgent;
 import org.example.mas.utils.AnsibleRunner;
 import org.example.mas.utils.InventoryParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class CoordinatorAgent extends Agent {
     private static final Logger logger = LoggerFactory.getLogger(CoordinatorAgent.class);
@@ -55,13 +59,11 @@ public class CoordinatorAgent extends Agent {
 
                 for (String playbook : playbooks) {
                     logger.info("Running playbook: {}", playbook);
-                    if (!AnsibleRunner.run(playbook, inventory, playbooksDir, 15)) {
-                        logger.error("Deployment failed at playbook: {}", playbook);
-                        DashboardServer.updateStatus("alerts", new String[]{
-                                "htcondor-execute-rh3q: CrashLoopBackOff",
-                                "Проверьте логи пода"
-                        });
-                        return;
+                    AnsibleRunner.AnsibleResult result = AnsibleRunner.run(playbook, inventory, playbooksDir, 15);
+
+                    if (!result.success) {
+                        handlePlaybookFailure(playbook, result);
+                        return; // или продолжить с откатом
                     }
                 }
 
@@ -71,16 +73,28 @@ public class CoordinatorAgent extends Agent {
             }
         });
 
-        // Этап 2: слушать сообщения от узлов
-        addBehaviour(new CyclicBehaviour() {
-            @Override
-            public void action() {
-                ACLMessage msg = receive();
-                if (msg != null) {
-                    handleNodeMessage(msg);
-                } else block();
-            }
-        });
+
+
+// Добавьте поведение для обработки команд извне
+
+    }
+    private void handlePlaybookFailure(String playbook, AnsibleRunner.AnsibleResult result) {
+        String alert = "Playbook " + playbook + " failed: " + result.errorCode;
+        logger.error(alert + " | Details: " + result.details);
+
+        switch (result.errorCode) {
+            case "TIMEOUT":
+                sendAlert("ALERT: TIMEOUT in " + playbook + ". Check network or increase timeout.");
+                break;
+            case "CONNECTION_FAILURE":
+                sendAlert("ALERT: UNREACHABLE NODE during " + playbook + ". Verify inventory and SSH keys.");
+                break;
+            default:
+                sendAlert("ALERT: Execution failed in " + playbook + ": " + result.errorCode);
+        }
+
+        // Автоматически запускаем сбор логов при критической ошибке
+        collectDiagnosticLogs();
     }
 
     private void createNodeAgents() {
@@ -105,7 +119,7 @@ public class CoordinatorAgent extends Agent {
 
     private void createNodeAgent(String nodeName, boolean isMaster) {
         try {
-            String agentType = isMaster ? MasterAgent.class.getName() : WorkerAgent.class.getName();
+            String agentType =  MasterAgent.class.getName();
 
             // Передаём аргументы агенту
             Object[] agentArgs = new Object[]{
@@ -140,6 +154,44 @@ public class CoordinatorAgent extends Agent {
             // Реакция на сбой: перезапуск, уведомление и т.д.
         } else if (content.equals("READY")) {
             System.out.println("Coordinator: Node " + sender + " is ready");
+        }
+    }
+
+    private void sendAlert(String message) {
+        ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+        msg.addReceiver(new AID("coordinator", AID.ISLOCALNAME));
+        msg.setContent(message);
+        send(msg);
+    }
+    private void collectDiagnosticLogs() {
+        try {
+            // Собираем логи Ansible последнего запуска
+            String ansibleLog = "Last Ansible output not available"; // можно сохранять в файл из AnsibleRunner
+
+            // Собираем системные логи с master-узла
+            Process p1 = new ProcessBuilder("journalctl", "-u", "kubelet", "--since", "1 hour ago", "-n", "50").start();
+            String kubeletLog = readOutput(p1);
+
+            Process p2 = new ProcessBuilder("systemctl", "status", "containerd").start();
+            String containerdLog = readOutput(p2);
+
+            String fullLog = "=== ANSIBLE ===\n" + ansibleLog +
+                    "\n=== KUBELET ===\n" + kubeletLog +
+                    "\n=== CONTAINERD ===\n" + containerdLog;
+
+            // Сохраняем в файл и обновляем статус
+            Files.write(Paths.get("diagnostic-logs.txt"), fullLog.getBytes());
+            DashboardServer.updateStatus("diagnosticLogs", "diagnostic-logs.txt");
+            logger.info("Diagnostic logs collected to diagnostic-logs.txt");
+
+        } catch (Exception e) {
+            logger.error("Failed to collect diagnostic logs", e);
+        }
+    }
+
+    private String readOutput(Process process) throws Exception {
+        try (BufferedReader r = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            return r.lines().collect(Collectors.joining("\n"));
         }
     }
 }
