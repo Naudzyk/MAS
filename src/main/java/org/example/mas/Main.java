@@ -7,6 +7,7 @@ import jade.wrapper.AgentContainer;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.Watchable;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -15,11 +16,11 @@ public class Main {
             return;
         }
 
-        String inventory = args[0];
-        String playbooksDir = args[1];
+        String inventoryPath = Paths.get(args[0]).toAbsolutePath().toString();
+        String workingDir = Paths.get(args[1]).toAbsolutePath().toString();
 
         // Проверка файлов
-        if (!Files.exists(Paths.get(inventory)) || !Files.exists(Paths.get(playbooksDir))) {
+        if (!Files.exists(Paths.get(inventoryPath)) || !Files.exists(Paths.get(workingDir))) {
             throw new IllegalArgumentException("Inventory or playbooks dir not found");
         }
 
@@ -34,7 +35,7 @@ public class Main {
 
         // Запуск координатора
         container.createNewAgent("coordinator", CoordinatorAgent.class.getName(),
-                new Object[]{inventory, playbooksDir}).start();
+                new Object[]{inventoryPath, workingDir}).start();
 
         System.out.println("MAS started. Coordinator is initializing cluster...");
         // Ожидание завершения не требуется — система работает постоянно

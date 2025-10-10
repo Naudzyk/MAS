@@ -4,16 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;New Version&quot;">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;New Version 2&quot;">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/WorkerAgent.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/CoordinatorAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/CoordinatorAgent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/DashboardServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/DashboardServer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/NodeAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/NodeAgent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/utils/AnsibleRunner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/utils/AnsibleRunner.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/public/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -167,7 +160,9 @@
       <workItem from="1759840024590" duration="627000" />
       <workItem from="1759889389229" duration="14114000" />
       <workItem from="1759974813205" duration="594000" />
-      <workItem from="1760054813244" duration="4104000" />
+      <workItem from="1760054813244" duration="4142000" />
+      <workItem from="1760064713688" duration="472000" />
+      <workItem from="1760066309070" duration="368000" />
     </task>
     <task id="LOCAL-00001" summary="'V1'">
       <option name="closed" value="true" />
@@ -249,7 +244,15 @@
       <option name="project" value="LOCAL" />
       <updated>1759909830282</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="&quot;New Version 2&quot;">
+      <option name="closed" value="true" />
+      <created>1760062821045</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1760062821045</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -274,6 +277,7 @@
     <MESSAGE value="&quot;V5&quot;" />
     <MESSAGE value="&quot;V6&quot;" />
     <MESSAGE value="&quot;New Version&quot;" />
-    <option name="LAST_COMMIT_MESSAGE" value="&quot;New Version&quot;" />
+    <MESSAGE value="&quot;New Version 2&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="&quot;New Version 2&quot;" />
   </component>
 </project>
