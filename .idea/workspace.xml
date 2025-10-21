@@ -5,26 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;New Version 4&quot;">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/DashboardServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/DashboardServer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/MasterAgent.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/CoordinatorAgent$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/CoordinatorAgent.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/DashboardServer.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Main.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/NodeAgent$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/NodeAgent.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/utils/AnsibleRunner$AnsibleResult.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/utils/AnsibleRunner.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/utils/InventoryParser$Host.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/utils/InventoryParser$Inventory.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/utils/InventoryParser.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/public/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/public/script.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/public/style.css" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -189,6 +170,8 @@
       <workItem from="1761008831062" duration="118000" />
       <workItem from="1761008957856" duration="54000" />
       <workItem from="1761009128861" duration="48000" />
+      <workItem from="1761009272704" duration="715000" />
+      <workItem from="1761030450246" duration="301000" />
     </task>
     <task id="LOCAL-00001" summary="'V1'">
       <option name="closed" value="true" />
@@ -286,7 +269,23 @@
       <option name="project" value="LOCAL" />
       <updated>1761007330061</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="&quot;New Version 4&quot;">
+      <option name="closed" value="true" />
+      <created>1761009314198</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1761009314198</updated>
+    </task>
+    <task id="LOCAL-00014" summary="&quot;New Version 4&quot;">
+      <option name="closed" value="true" />
+      <created>1761009340713</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1761009340713</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
