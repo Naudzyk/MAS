@@ -1,9 +1,9 @@
 package org.example.mas;
 
-import com.google.gson.Gson;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import spark.Spark;
+import com.google.gson.Gson;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
