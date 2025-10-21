@@ -5,9 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;New Version 2&quot;">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,7 +38,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/Naudzyk/MAS.git&quot;,
-    &quot;accountId&quot;: &quot;427a359f-c137-4bcf-8958-737c01098ef4&quot;
+    &quot;accountId&quot;: &quot;39e75fe5-d13e-4323-909f-3f1f23af5101&quot;
   }
 }</component>
   <component name="KubernetesApiPersistence">{}</component>
@@ -59,6 +59,7 @@
   &quot;associatedIndex&quot;: 8
 }</component>
   <component name="ProjectId" id="31dHxtjXMoIBElOhyr2EIIkZoch" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -132,8 +133,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.25557.131" />
-        <option value="bundled-js-predefined-d6986cc7102b-b598e85cdad2-JavaScript-IU-252.25557.131" />
+        <option value="bundled-jdk-9823dce3aa75-28b599e66164-intellij.indexing.shared.core-IU-242.23339.11" />
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-IU-242.23339.11" />
       </set>
     </attachedChunks>
   </component>
@@ -163,6 +164,8 @@
       <workItem from="1760054813244" duration="4142000" />
       <workItem from="1760064713688" duration="472000" />
       <workItem from="1760066309070" duration="368000" />
+      <workItem from="1761005446954" duration="603000" />
+      <workItem from="1761006083782" duration="1034000" />
     </task>
     <task id="LOCAL-00001" summary="'V1'">
       <option name="closed" value="true" />
