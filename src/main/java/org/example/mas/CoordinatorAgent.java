@@ -14,7 +14,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
@@ -166,28 +168,39 @@ public class CoordinatorAgent extends Agent {
         send(msg);
     }
     private void collectDiagnosticLogs() {
+    try {
+        // 1. Используем абсолютный путь в рабочей директории
+        Path logPath = Paths.get(System.getProperty("user.dir"), "diagnostic-logs.txt");
+
+        // 2. Собираем логи
+        String kubeletLog = executeCommand("journalctl", "-u", "kubelet", "--since", "1 hour ago", "-n", "20");
+        String containerdLog = executeCommand("systemctl", "status", "containerd");
+
+        String fullLog = "=== KUBELET ===\n" + (kubeletLog != null ? kubeletLog : "N/A") +
+                        "\n\n=== CONTAINERD ===\n" + (containerdLog != null ? containerdLog : "N/A");
+
+        // 3. Сохраняем
+        Files.write(logPath, fullLog.getBytes(StandardCharsets.UTF_8));
+
+        // 4. Обновляем статус
+        DashboardServer.updateStatus("diagnosticLogs", logPath.toAbsolutePath().toString());
+        logger.info("Diagnostic logs saved to: {}", logPath);
+
+    } catch (Exception e) {
+        logger.error("Failed to collect diagnostic logs", e);
+        DashboardServer.updateStatus("diagnosticLogs", "");
+    }
+}
+
+    private String executeCommand(String... args) {
         try {
-            // Собираем логи Ansible последнего запуска
-            String ansibleLog = "Last Ansible output not available"; // можно сохранять в файл из AnsibleRunner
-
-            // Собираем системные логи с master-узла
-            Process p1 = new ProcessBuilder("journalctl", "-u", "kubelet", "--since", "1 hour ago", "-n", "50").start();
-            String kubeletLog = readOutput(p1);
-
-            Process p2 = new ProcessBuilder("systemctl", "status", "containerd").start();
-            String containerdLog = readOutput(p2);
-
-            String fullLog = "=== ANSIBLE ===\n" + ansibleLog +
-                    "\n=== KUBELET ===\n" + kubeletLog +
-                    "\n=== CONTAINERD ===\n" + containerdLog;
-
-            // Сохраняем в файл и обновляем статус
-            Files.write(Paths.get("diagnostic-logs.txt"), fullLog.getBytes());
-            DashboardServer.updateStatus("diagnosticLogs", "diagnostic-logs.txt");
-            logger.info("Diagnostic logs collected to diagnostic-logs.txt");
-
+            Process p = new ProcessBuilder(args).start();
+            try (BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+                return r.lines().collect(Collectors.joining("\n"));
+            }
         } catch (Exception e) {
-            logger.error("Failed to collect diagnostic logs", e);
+            logger.warn("Command failed: {}", String.join(" ", args), e);
+            return null;
         }
     }
 
