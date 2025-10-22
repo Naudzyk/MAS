@@ -5,6 +5,7 @@ import jade.wrapper.AgentController;
 import spark.Spark;
 import com.google.gson.Gson;
 
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -46,15 +47,15 @@ public class DashboardServer {
         });
 
         Spark.get("/logs", (req, res) -> {
-            String logFile = (String) STATUS.get("diagnosticLogs");
-            if (logFile != null && !logFile.isEmpty() && Files.exists(Paths.get(logFile))) {
-                res.type("text/plain");
-                return new String(Files.readAllBytes(Paths.get(logFile)));
-            } else {
-                res.status(404);
-                return "Logs not available";
-            }
-        });
+        String logFile = (String) STATUS.get("diagnosticLogs");
+        if (logFile != null && !logFile.isEmpty() && Files.exists(Paths.get(logFile))) {
+            res.type("text/plain; charset=utf-8");
+            return new String(Files.readAllBytes(Paths.get(logFile)), StandardCharsets.UTF_8);
+        } else {
+            res.status(404);
+            return "Logs not available. Click 'Collect logs' first.";
+        }
+    });
 
         System.out.println("Dashboard available at http://localhost:" + port);
     }
