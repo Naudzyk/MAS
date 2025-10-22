@@ -2,7 +2,6 @@ package org.example.mas;
 
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
@@ -171,16 +170,19 @@ public class CoordinatorAgent extends Agent {
     try {
         // 1. Используем абсолютный путь в рабочей директории
         Path logPath = Paths.get(System.getProperty("user.dir"), "diagnostic-logs.txt");
+        logger.info("Saving diagnostic logs to: {}", logPath.toAbsolutePath());
 
         // 2. Собираем логи
-        String kubeletLog = executeCommand("journalctl", "-u", "kubelet", "--since", "1 hour ago", "-n", "20");
+        String kubeletLog = executeCommand("journalctl", "-u", "kubelet", "--since=-1h", "-n", "50");
         String containerdLog = executeCommand("systemctl", "status", "containerd");
+        String kubectlLog = executeCommand("sudo", "kubectl", "get", "pods", "-A");
 
         String fullLog = "=== KUBELET ===\n" + (kubeletLog != null ? kubeletLog : "N/A") +
                         "\n\n=== CONTAINERD ===\n" + (containerdLog != null ? containerdLog : "N/A");
 
         // 3. Сохраняем
         Files.write(logPath, fullLog.getBytes(StandardCharsets.UTF_8));
+        logger.info("Diagnostic logs saved successfully");
 
         // 4. Обновляем статус
         DashboardServer.updateStatus("diagnosticLogs", logPath.toAbsolutePath().toString());
