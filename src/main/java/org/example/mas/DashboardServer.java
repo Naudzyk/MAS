@@ -27,15 +27,13 @@ public class DashboardServer {
         jadeContainer = container;
         Spark.port(port);
 
-        // --- API endpoints ---
+        Spark.staticFileLocation("/public");
 
-        // Получить текущий статус
         Spark.get("/api/status", (req, res) -> {
             res.type("application/json");
             return new Gson().toJson(STATUS);
         });
 
-        // Собрать диагностические логи
         Spark.post("/api/collect-logs", (req, res) -> {
             try {
                 AgentController ac = jadeContainer.getAgent("coordinator");
@@ -46,8 +44,6 @@ public class DashboardServer {
             }
         });
 
-
-        // Получить диагностические логи как файл
         Spark.get("/logs", (req, res) -> {
             String logFile = (String) STATUS.get("diagnosticLogs");
             if (logFile != null && !logFile.isEmpty() && Files.exists(Paths.get(logFile))) {
@@ -58,9 +54,6 @@ public class DashboardServer {
                 return "Logs not available";
             }
         });
-
-        // --- Статический веб-интерфейс ---
-        Spark.staticFileLocation("/public");
 
         System.out.println("Dashboard available at http://localhost:" + port);
     }
