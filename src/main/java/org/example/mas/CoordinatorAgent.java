@@ -178,7 +178,8 @@ public class CoordinatorAgent extends Agent {
         String kubectlLog = executeCommand("sudo", "kubectl", "get", "pods", "-A");
 
         String fullLog = "=== KUBELET ===\n" + (kubeletLog != null ? kubeletLog : "N/A") +
-                        "\n\n=== CONTAINERD ===\n" + (containerdLog != null ? containerdLog : "N/A");
+                        "\n\n=== CONTAINERD ===\n" + (containerdLog != null ? containerdLog : "N/A") +
+                        "\n\n=== Kub ===\n" + (kubectlLog != null ? kubectlLog : "N/A");
 
         // 3. Сохраняем
         Files.write(logPath, fullLog.getBytes(StandardCharsets.UTF_8));
