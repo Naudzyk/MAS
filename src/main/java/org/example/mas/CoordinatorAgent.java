@@ -59,6 +59,7 @@ public class CoordinatorAgent extends Agent {
 
                 for (String playbook : playbooks) {
                     logger.info("Running playbook: {}", playbook);
+                    DashboardServer.updateStatus("ansibleStage",playbook);
                     AnsibleRunner.AnsibleResult result = AnsibleRunner.run(playbook, inventory, playbooksDir, 15);
 
                     if (!result.success) {
@@ -69,6 +70,7 @@ public class CoordinatorAgent extends Agent {
 
                 logger.info("Initial cluster deployment completed. Creating node agents...");
                 DashboardServer.updateStatus("ansibleStage", "kubernetes_init ✅ | htcondor ⏳");
+                DashboardServer.updateStatus("htcondorStatus","Its working");
                 createNodeAgents(); // ← создаём агентов для каждого узла
             }
         });
