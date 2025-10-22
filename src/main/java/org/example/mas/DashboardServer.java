@@ -16,6 +16,7 @@ public class DashboardServer {
     public static final Map<String, Object> STATUS = new ConcurrentHashMap<>();
 
     static {
+        STATUS.put("", "OK");
         STATUS.put("ansibleStage", "not_started");
         STATUS.put("htcondorStatus", "unknown");
         STATUS.put("alerts", new String[0]);
