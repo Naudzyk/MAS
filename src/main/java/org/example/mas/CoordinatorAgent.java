@@ -1,9 +1,11 @@
 package org.example.mas;
 
-import jade.core.AID;
 import jade.core.Agent;
+import jade.core.AID;
+import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
+
 import jade.wrapper.AgentController;
 import org.example.mas.Agent.MasterAgent;
 import org.example.mas.utils.AnsibleRunner;
@@ -11,134 +13,136 @@ import org.example.mas.utils.InventoryParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
+
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class CoordinatorAgent extends Agent {
     private static final Logger logger = LoggerFactory.getLogger(CoordinatorAgent.class);
     private String inventory;
     private String playbooksDir;
-    private final Map<String, AID> nodeAgents = new HashMap<>();
+    private final Map<String, AID> nodeAgents = new ConcurrentHashMap<>();
 
     @Override
     protected void setup() {
-        Object[] args = getArguments();
-        if (args == null || args.length < 2) {
-            logger.error("CoordinatorAgent requires: inventoryPath, playbooksDir");
-            doDelete();
-            return;
-        }
+        logger.info("CoordinatorAgent initialized (waiting for deploy command)");
 
-        this.inventory = (String) args[0];
-        this.playbooksDir = (String) args[1];
-        logger.info("CoordinatorAgent initialized with inventory: {}, playbooksDir: {}", inventory, playbooksDir);
 
-        // === ФАЗА 1: Инициализация кластера (однократно) ===
-        addBehaviour(new OneShotBehaviour() {
+        addBehaviour(new CyclicBehaviour() {
             @Override
             public void action() {
-                logger.info("Starting initial cluster deployment...");
-
-                // Запускаем Ansible-плейбуки для полной настройки
-                String[] playbooks = {
-                        "01_system_preparation.yml",
-                        "02_containerd.yml",
-                        "03_kubernetes_install.yml",
-                        "04_kubernetes_init.yml",
-                        "05_calico_cni.yml",
-                        "06_worker_preparation.yml",
-                        "07_worker_join.yml",
-                        "08_htcondor.yml"
-                };
-
-                for (String playbook : playbooks) {
-                    logger.info("Running playbook: {}", playbook);
-                    DashboardServer.updateStatus("ansibleStage",playbook);
-                    AnsibleRunner.AnsibleResult result = AnsibleRunner.run(playbook, inventory, playbooksDir, 15);
-
-                    if (!result.success) {
-                        handlePlaybookFailure(playbook, result);
-                        return; // или продолжить с откатом
+                Object cmd = getO2AObject();
+                if (cmd instanceof String) {
+                    String command = (String) cmd;
+                    if (command.startsWith("DEPLOY:")) {
+                        String[] parts = command.substring(7).split(",", 2);
+                        if (parts.length == 2) {
+                            startDeployment(parts[0].trim(), parts[1].trim());
+                        } else {
+                            logger.error("Invalid DEPLOY command format: {}", command);
+                        }
+                    } else if ("COMMAND: COLLECT_DIAGNOSTIC_LOGS".equals(command)) {
+                        collectDiagnosticLogs();
                     }
                 }
-
-                logger.info("Initial cluster deployment completed. Creating node agents...");
-                DashboardServer.updateStatus("ansibleStage", "kubernetes_init ✅ | htcondor ⏳");
-                DashboardServer.updateStatus("htcondorStatus","Its working");
-                createNodeAgents(); // ← создаём агентов для каждого узла
+                block();
             }
         });
 
-
-
-// Добавьте поведение для обработки команд извне
-
+        addBehaviour(new CyclicBehaviour() {
+            @Override
+            public void action() {
+                ACLMessage msg = receive();
+                if (msg != null) {
+                    handleNodeMessage(msg);
+                } else {
+                    block();
+                }
+            }
+        });
     }
-    private void handlePlaybookFailure(String playbook, AnsibleRunner.AnsibleResult result) {
-        String alert = "Playbook " + playbook + " failed: " + result.errorCode;
-        logger.error(alert + " | Details: " + result.details);
 
-        switch (result.errorCode) {
-            case "TIMEOUT":
-                sendAlert("ALERT: TIMEOUT in " + playbook + ". Check network or increase timeout.");
-                break;
-            case "CONNECTION_FAILURE":
-                sendAlert("ALERT: UNREACHABLE NODE during " + playbook + ". Verify inventory and SSH keys.");
-                break;
-            default:
-                sendAlert("ALERT: Execution failed in " + playbook + ": " + result.errorCode);
+    private void startDeployment(String inventoryPath, String playbooksDir) {
+        logger.info("Starting deployment with inventory: {}, playbooks: {}", inventoryPath, playbooksDir);
+
+        if (!validatePaths(inventoryPath, playbooksDir)) {
+            sendAlert("Deployment failed: invalid paths");
+            return;
         }
 
-        // Автоматически запускаем сбор логов при критической ошибке
-        collectDiagnosticLogs();
+        this.inventory = inventoryPath;
+        this.playbooksDir = playbooksDir;
+
+        new Thread(() -> {
+            try {
+                String[] playbooks = {
+                    "01_system_preparation.yml",
+                    "02_containerd.yml",
+                    "03_kubernetes_install.yml",
+                    "04_kubernetes_init.yml",
+                    "05_calico_cni.yml",
+                    "06_worker_preparation.yml",
+                    "07_worker_join.yml",
+                    "08_htcondor.yml"
+                };
+
+                for (String playbook : playbooks) {
+                    if (!AnsibleRunner.run(playbook, inventoryPath, playbooksDir, 15).success) {
+                        sendAlert("Deployment failed at: " + playbook);
+                        return;
+                    }
+                }
+
+                logger.info("Deployment completed successfully");
+                DashboardServer.updateStatus("ansibleStage", "ALL_STAGES_COMPLETED ✅");
+
+                createNodeAgents();
+
+            } catch (Exception e) {
+                logger.error("Deployment error", e);
+                sendAlert("Deployment crashed: " + e.getMessage());
+            }
+        }).start();
+    }
+
+    private boolean validatePaths(String inventoryPath, String playbooksDir) {
+        if (!Files.exists(Paths.get(inventoryPath))) {
+            logger.error("Inventory file not found: {}", inventoryPath);
+            return false;
+        }
+        if (!Files.exists(Paths.get(playbooksDir))) {
+            logger.error("Playbooks directory not found: {}", playbooksDir);
+            return false;
+        }
+        return true;
     }
 
     private void createNodeAgents() {
         try {
-            // Парсим inventory, используя this.inventory
             InventoryParser.Inventory inv = InventoryParser.parse(this.inventory);
 
-            // Создаём агента для master-узлов
-            for (InventoryParser.Host master : inv.getGroup("master")) {
+            // Создаём ТОЛЬКО MasterAgent (мониторинг централизован)
+            for (InventoryParser.Host master : inv.getGroup("central_manager")) {
                 createNodeAgent(master.name, true);
             }
 
-            // Создаём агентов для worker-узлов
-            for (InventoryParser.Host worker : inv.getGroup("workers")) {
-                createNodeAgent(worker.name, false);
-            }
-
         } catch (Exception e) {
-            logger.error("Failed to create node agents from inventory", e);
+            logger.error("Failed to create node agents", e);
         }
     }
 
     private void createNodeAgent(String nodeName, boolean isMaster) {
         try {
-            String agentType =  MasterAgent.class.getName();
+            String agentType = MasterAgent.class.getName();
+            Object[] agentArgs = new Object[]{nodeName, this.inventory, this.playbooksDir};
 
-            // Передаём аргументы агенту
-            Object[] agentArgs = new Object[]{
-                    nodeName,           // имя узла
-                    this.inventory,     // путь к inventory
-                    this.playbooksDir   // директория с плейбуками
-            };
-
-            AgentController ac = getContainerController().createNewAgent(
-                    nodeName,
-                    agentType,
-                    agentArgs
-            );
+            AgentController ac = getContainerController().createNewAgent(nodeName, agentType, agentArgs);
             ac.start();
 
-            // Сохраняем AID для отправки сообщений
             AID agentAID = new AID(nodeName, AID.ISLOCALNAME);
             nodeAgents.put(nodeName, agentAID);
 
@@ -152,64 +156,51 @@ public class CoordinatorAgent extends Agent {
         String sender = msg.getSender().getLocalName();
         String content = msg.getContent();
 
-        if (content.startsWith("ALERT:")) {
-            System.out.println("Coordinator: Received alert from " + sender + ": " + content);
-            // Реакция на сбой: перезапуск, уведомление и т.д.
-        } else if (content.equals("READY")) {
-            System.out.println("Coordinator: Node " + sender + " is ready");
+        if (content != null && content.startsWith("ALERT:")) {
+            logger.warn("Received alert from {}: {}", sender, content);
+            DashboardServer.updateStatus("alerts", new String[]{content});
+        } else if ("READY".equals(content)) {
+            logger.info("Node {} is ready", sender);
         }
     }
 
     private void sendAlert(String message) {
-        ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-        msg.addReceiver(new AID("coordinator", AID.ISLOCALNAME));
-        msg.setContent(message);
-        send(msg);
+        logger.warn("ALERT: {}", message);
+        DashboardServer.updateStatus("alerts", new String[]{message});
     }
+
     private void collectDiagnosticLogs() {
-    try {
-        // 1. Используем абсолютный путь в рабочей директории
-        Path logPath = Paths.get(System.getProperty("user.dir"), "diagnostic-logs.txt");
-        logger.info("Saving diagnostic logs to: {}", logPath.toAbsolutePath());
+        try {
+            Path logPath = Paths.get(System.getProperty("user.dir"), "diagnostic-logs.txt");
+            logger.info("Saving diagnostic logs to: {}", logPath.toAbsolutePath());
 
-        // 2. Собираем логи
-        String kubeletLog = executeCommand("journalctl", "-u", "kubelet", "--since=-1h", "-n", "50");
-        String containerdLog = executeCommand("systemctl", "status", "containerd");
-        String kubectlLog = executeCommand("sudo", "kubectl", "get", "pods", "-A");
+            String kubeletLog = executeCommand("journalctl", "-u", "kubelet", "--since=-1h", "-n", "50");
+            String containerdLog = executeCommand("systemctl", "status", "containerd");
+            String kubectlLog = executeCommand("kubectl", "get", "pods", "-A");
 
-        String fullLog = "=== KUBELET ===\n" + (kubeletLog != null ? kubeletLog : "N/A") +
-                        "\n\n=== CONTAINERD ===\n" + (containerdLog != null ? containerdLog : "N/A") +
-                        "\n\n=== Kub ===\n" + (kubectlLog != null ? kubectlLog : "N/A");
+            String fullLog = "=== KUBELET ===\n" + (kubeletLog != null ? kubeletLog : "N/A") +
+                    "\n\n=== CONTAINERD ===\n" + (containerdLog != null ? containerdLog : "N/A") +
+                    "\n\n=== KUBECTL ===\n" + (kubectlLog != null ? kubectlLog : "N/A");
 
-        // 3. Сохраняем
-        Files.write(logPath, fullLog.getBytes(StandardCharsets.UTF_8));
-        logger.info("Diagnostic logs saved successfully");
+            Files.write(logPath, fullLog.getBytes());
+            logger.info("Diagnostic logs saved successfully");
+            DashboardServer.updateStatus("diagnosticLogs", logPath.toAbsolutePath().toString());
 
-        // 4. Обновляем статус
-        DashboardServer.updateStatus("diagnosticLogs", logPath.toAbsolutePath().toString());
-        logger.info("Diagnostic logs saved to: {}", logPath);
-
-    } catch (Exception e) {
-        logger.error("Failed to collect diagnostic logs", e);
-        DashboardServer.updateStatus("diagnosticLogs", "");
+        } catch (Exception e) {
+            logger.error("Failed to collect diagnostic logs", e);
+            DashboardServer.updateStatus("diagnosticLogs", "");
+        }
     }
-}
 
     private String executeCommand(String... args) {
         try {
             Process p = new ProcessBuilder(args).start();
-            try (BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
-                return r.lines().collect(Collectors.joining("\n"));
+            try (var reader = new java.io.BufferedReader(new java.io.InputStreamReader(p.getInputStream()))) {
+                return reader.lines().collect(java.util.stream.Collectors.joining("\n"));
             }
         } catch (Exception e) {
             logger.warn("Command failed: {}", String.join(" ", args), e);
             return null;
-        }
-    }
-
-    private String readOutput(Process process) throws Exception {
-        try (BufferedReader r = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-            return r.lines().collect(Collectors.joining("\n"));
         }
     }
 }

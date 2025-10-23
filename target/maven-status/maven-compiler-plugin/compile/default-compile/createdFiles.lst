@@ -5,9 +5,11 @@ org\example\mas\DashboardServer$DeployRequest.class
 org\example\mas\Main.class
 org\example\mas\utils\InventoryParser.class
 org\example\mas\utils\InventoryParser$Inventory.class
+org\example\mas\CoordinatorAgent$2.class
 org\example\mas\DashboardServer.class
 org\example\mas\NodeAgent.class
 org\example\mas\utils\InventoryParser$Host.class
+org\example\mas\Agent\MasterAgent$1.class
 org\example\mas\CoordinatorAgent.class
 org\example\mas\Agent\MasterAgent.class
 org\example\mas\utils\AnsibleRunner.class

@@ -5,6 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
+
+
 public class InventoryParser {
     public static Inventory parse(String inventoryPath) throws IOException {
         List<String> lines = Files.readAllLines(Paths.get(inventoryPath));
@@ -16,9 +18,8 @@ public class InventoryParser {
             if (line.isEmpty() || line.startsWith("#")) continue;
 
             if (line.startsWith("[") && line.endsWith("]")) {
-                currentGroup = line.substring(1, line.length() - 1).split(":")[0]; // игнорируем :children и т.д.
+                currentGroup = line.substring(1, line.length() - 1).split(":")[0];
             } else if (currentGroup != null) {
-                // Парсим строку вида: hostname ansible_host=IP ...
                 String[] parts = line.split("\\s+");
                 if (parts.length == 0) continue;
 
@@ -31,7 +32,6 @@ public class InventoryParser {
                         vars.put(kv[0], kv[1]);
                     }
                 }
-
                 inv.addHost(currentGroup, host, vars);
             }
         }
@@ -47,10 +47,6 @@ public class InventoryParser {
 
         public List<Host> getGroup(String groupName) {
             return groups.getOrDefault(groupName, Collections.emptyList());
-        }
-
-        public Set<String> getGroups() {
-            return groups.keySet();
         }
     }
 
