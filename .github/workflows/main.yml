@@ -1,0 +1,25 @@
+name: CI for HTCondor Cluster Deployment
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  preglight-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Ansible
+        run: sudo apt-get update && sudo apt-get insatll -y ansible 
+
+      - name: Validate inventory syntax
+        run: ansible-inventory -i inventory.ini --list
+
+      - name: Check playbook syntax
+        run: |
+          for playbook in scripts/*.yml; do
+            ansible-playbook --syntax-check -i inventory.ini "$playbook"
+          done
