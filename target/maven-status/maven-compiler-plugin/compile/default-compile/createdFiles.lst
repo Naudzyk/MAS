@@ -1,6 +1,7 @@
 org\example\mas\CoordinatorAgent$1.class
 org\example\mas\NodeAgent$1.class
 org\example\mas\utils\AnsibleRunner$AnsibleResult.class
+org\example\mas\DashboardServer$DeployRequest.class
 org\example\mas\Main.class
 org\example\mas\utils\InventoryParser.class
 org\example\mas\utils\InventoryParser$Inventory.class
