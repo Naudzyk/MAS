@@ -294,8 +294,9 @@
                 resultDiv.classList.remove('hidden');
             } catch (err) {
                 document.getElementById('deployResult').className = 'result-message result-error';
-                document.getElementById('deployResult').textContent = 'Ошибка подключения к серверу';
+                document.getElementById('deployResult').textContent = 'Ошибка подключения к серверу: ' + err.message;
                 document.getElementById('deployResult').classList.remove('hidden');
+                console.error('Deploy error:', err);
             } finally {
                 btn.disabled = false;
                 text.classList.remove('hidden');
@@ -331,8 +332,9 @@
                 document.getElementById('downloadLogsBtn').disabled = false;
             } catch (err) {
                 resultDiv.className = 'result-message result-error';
-                resultDiv.textContent = 'Ошибка подключения к серверу';
+                resultDiv.textContent = 'Ошибка подключения к серверу: ' + err.message;
                 resultDiv.classList.remove('hidden');
+                console.error('Collect logs error:', err);
             } finally {
                 btn.disabled = false;
                 text.classList.remove('hidden');
