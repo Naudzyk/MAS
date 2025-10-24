@@ -4,13 +4,25 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;New Version 7.0&quot;">
+    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;New Version 7.1&quot;">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/MasterAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/MasterAgent.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/CoordinatorAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/CoordinatorAgent.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/DashboardServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/DashboardServer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/utils/InventoryParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/utils/InventoryParser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/NodeAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/NodeAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/utils/AnsibleRunner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/utils/AnsibleRunner.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/public/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/MasterAgent.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/MasterAgent.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/CoordinatorAgent.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/CoordinatorAgent.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/DashboardServer.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/DashboardServer.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/NodeAgent$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/NodeAgent$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/NodeAgent.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/NodeAgent.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/utils/AnsibleRunner$AnsibleResult.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/utils/AnsibleRunner$AnsibleResult.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/utils/AnsibleRunner.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/utils/AnsibleRunner.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/public/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/original-MAS-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/original-MAS-1.0-SNAPSHOT.jar" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -191,7 +203,7 @@
       <workItem from="1761031559447" duration="220000" />
       <workItem from="1761033293593" duration="72000" />
       <workItem from="1761033692493" duration="808000" />
-      <workItem from="1761106796938" duration="21846000" />
+      <workItem from="1761106796938" duration="24843000" />
     </task>
     <task id="LOCAL-00001" summary="'V1'">
       <option name="closed" value="true" />
@@ -377,7 +389,15 @@
       <option name="project" value="LOCAL" />
       <updated>1761179615857</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="&quot;New Version 7.1&quot;">
+      <option name="closed" value="true" />
+      <created>1761218559710</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1761218559710</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -407,7 +427,8 @@
     <MESSAGE value="&quot;New Version 5&quot;" />
     <MESSAGE value="&quot;New Version 6&quot;" />
     <MESSAGE value="&quot;New Version 7.0&quot;" />
-    <option name="LAST_COMMIT_MESSAGE" value="&quot;New Version 7.0&quot;" />
+    <MESSAGE value="&quot;New Version 7.1&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="&quot;New Version 7.1&quot;" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

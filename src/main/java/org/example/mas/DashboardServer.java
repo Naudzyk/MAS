@@ -36,16 +36,13 @@ public class DashboardServer {
         jadeContainer = container;
         Spark.port(port);
 
-        // СТАТИЧЕСКИЕ ФАЙЛЫ — ОБЯЗАТЕЛЬНО ПЕРВЫМ!
         Spark.staticFileLocation("/public");
 
-        // API: получение статуса
         Spark.get("/api/status", (req, res) -> {
             res.type("application/json");
             return new Gson().toJson(STATUS);
         });
 
-        // API: запуск развёртывания
         Spark.post("/api/deploy", (req, res) -> {
             try {
                 DeployRequest request = new Gson().fromJson(req.body(), DeployRequest.class);
@@ -54,12 +51,10 @@ public class DashboardServer {
                     return new Gson().toJson(Map.of("error", "Master and at least one worker required"));
                 }
 
-                // Генерируем временный inventory
                 Path tempDir = Files.createTempDirectory("mas-deploy-");
                 Path inventoryPath = tempDir.resolve("inventory.ini");
-                generateInventoryFile( request.master,request.workers,request.nameHostCM,request.nameHostEX);
+                generateInventoryFile( request.master, request.workers, request.nameHostCM, request.nameHostEX, inventoryPath );
 
-                // Отправляем команду координатору
                 AgentController ac = jadeContainer.getAgent("coordinator");
                 ac.putO2AObject("DEPLOY:" + inventoryPath.toAbsolutePath() + ",scripts/", false);
 
@@ -98,7 +93,6 @@ public class DashboardServer {
 
     }
 
-    // Метод для обновления статуса из агентов
     public static void updateStatus(String key, Object value) {
         STATUS.put(key, value);
         STATUS.put("lastUpdate", System.currentTimeMillis());
@@ -110,7 +104,7 @@ public class DashboardServer {
         private List<String> nameHostEX;
     }
 
-    public static String generateInventoryFile( String masterIps,  List<String> workerIps, String nameHostCM, List<String> nameHostEX) throws Exception {
+    public static void generateInventoryFile( String masterIps,  List<String> workerIps, String nameHostCM, List<String> nameHostEX, Path outputPath) throws Exception {
         StringBuilder sb = new StringBuilder();
         sb.append("[central_manager]\n]");
         sb.append("central_manager ansible_host=").append(masterIps).append("ansible_user=").append(nameHostCM).append("\n\n");
@@ -123,7 +117,7 @@ public class DashboardServer {
                     .append("\n");
 
         }
-        return sb.toString();
+        Files.write(outputPath, sb.toString().getBytes(StandardCharsets.UTF_8));
 
 
     }
