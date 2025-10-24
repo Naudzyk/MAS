@@ -45,28 +45,41 @@ public class DashboardServer {
 
         Spark.post("/api/deploy", (req, res) -> {
             try {
+                logger.info("Received deploy request: {}", req.body());
+
                 DeployRequest request = new Gson().fromJson(req.body(), DeployRequest.class);
                 if (request.master == null || request.workers == null || request.workers.isEmpty()) {
                     res.status(400);
                     return new Gson().toJson(Map.of("error", "Master and at least one worker required"));
                 }
 
+                if (request.nameHostCM == null || request.nameHostEX == null || request.nameHostEX.isEmpty()) {
+                    res.status(400);
+                    return new Gson().toJson(Map.of("error", "Host names are required"));
+                }
+
                 Path tempDir = Files.createTempDirectory("mas-deploy-");
                 Path inventoryPath = tempDir.resolve("inventory.ini");
-                generateInventoryFile( request.master, request.workers, request.nameHostCM, request.nameHostEX, inventoryPath );
+                generateInventoryFile(request.master, request.workers, request.nameHostCM, request.nameHostEX, inventoryPath);
 
                 AgentController ac = jadeContainer.getAgent("coordinator");
+                if (ac == null) {
+                    res.status(500);
+                    return new Gson().toJson(Map.of("error", "Coordinator agent not available"));
+                }
+
                 ac.putO2AObject("DEPLOY:" + inventoryPath.toAbsolutePath() + ",scripts/", false);
 
+                logger.info("Deployment initiated successfully");
                 return new Gson().toJson(Map.of(
                     "status", "started",
                     "message", "Deployment initiated"
                 ));
             } catch (Exception e) {
+                logger.error("Deploy request failed", e);
                 res.status(500);
                 return new Gson().toJson(Map.of("error", e.getMessage()));
-            }
-        });
+            }});
 
         Spark.post("/api/collect-logs", (req, res) -> {
             try {
@@ -106,14 +119,14 @@ public class DashboardServer {
 
     public static void generateInventoryFile( String masterIps,  List<String> workerIps, String nameHostCM, List<String> nameHostEX, Path outputPath) throws Exception {
         StringBuilder sb = new StringBuilder();
-        sb.append("[central_manager]\n]");
-        sb.append("central_manager ansible_host=").append(masterIps).append("ansible_user=").append(nameHostCM).append("\n\n");
+        sb.append("[central_manager]\n");
+        sb.append("central_manager ansible_host=").append(masterIps).append(" ansible_user=").append(nameHostCM).append("\n\n");
 
         sb.append("[execute_nodes]\n");
         for(int i = 0; i < workerIps.size(); i++){
             sb.append("worker").append(i+1)
-                    .append("ansible_host=").append(workerIps.get(i))
-                    .append("ansible_user=").append(nameHostEX.get(i))
+                    .append(" ansible_host=").append(workerIps.get(i))
+                    .append(" ansible_user=").append(nameHostEX.get(i))
                     .append("\n");
 
         }
