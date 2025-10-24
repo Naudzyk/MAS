@@ -1,16 +1,13 @@
 package org.example.mas;
 
-import jade.core.AID;
+
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
-import jade.lang.acl.ACLMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.stream.Collectors;
 
+// Пока не используется
 public abstract class NodeAgent extends Agent {
     protected static final Logger logger = LoggerFactory.getLogger(NodeAgent.class);
 
@@ -53,29 +50,7 @@ public abstract class NodeAgent extends Agent {
     // Абстрактный метод — реализуется в MasterAgent и WorkerAgent
     protected abstract void checkServices();
 
-    // Универсальный метод отправки сообщения координатору
-    protected void sendToCoordinator(String content) {
-        ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-        msg.addReceiver(new AID("coordinator", AID.ISLOCALNAME));
-        msg.setContent(content);
-        send(msg);
-    }
 
-    // Вспомогательный метод для выполнения kubectl и чтения вывода
-    protected String executeKubectl(String... args) {
-        try {
-            ProcessBuilder pb = new ProcessBuilder("kubectl");
-            for (String arg : args) {
-                pb.command().add(arg);
-            }
-            Process p = pb.start();
-            try (BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(p.getInputStream()))) {
-                return reader.lines().collect(Collectors.joining("\n"));
-            }
-        } catch (Exception e) {
-            logger.warn("Failed to execute kubectl: {}", String.join(" ", args), e);
-            return null;
-        }
-    }
+
+
 }

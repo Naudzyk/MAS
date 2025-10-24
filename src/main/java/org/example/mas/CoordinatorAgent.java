@@ -93,6 +93,7 @@ public class CoordinatorAgent extends Agent {
                 for (String playbook : playbooks) {
                     if (!AnsibleRunner.run(playbook, inventoryPath, playbooksDir, 15).success) {
                         sendAlert("Deployment failed at: " + playbook);
+                        DashboardServer.updateStatus("ansibleStage",playbook);
                         return;
                     }
                 }
@@ -105,6 +106,7 @@ public class CoordinatorAgent extends Agent {
             } catch (Exception e) {
                 logger.error("Deployment error", e);
                 sendAlert("Deployment crashed: " + e.getMessage());
+                DashboardServer.updateStatus("ansibleStage","ERROR");
             }
         }).start();
     }
@@ -125,7 +127,6 @@ public class CoordinatorAgent extends Agent {
         try {
             InventoryParser.Inventory inv = InventoryParser.parse(this.inventory);
 
-            // Создаём ТОЛЬКО MasterAgent (мониторинг централизован)
             for (InventoryParser.Host master : inv.getGroup("central_manager")) {
                 createNodeAgent(master.name, true);
             }

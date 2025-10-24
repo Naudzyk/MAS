@@ -50,7 +50,6 @@ public class AnsibleRunner {
             int exitCode = process.exitValue();
             boolean success = exitCode == 0;
 
-            // Анализ ошибки: сбой подключения?
             String outputStr = output.toString();
             if (!success) {
                 if (outputStr.contains("UNREACHABLE!") || outputStr.contains("Failed to connect")) {
@@ -68,7 +67,6 @@ public class AnsibleRunner {
         }
     }
 
-    // Вспомогательный класс для результата
     public static class AnsibleResult {
         public final boolean success;
         public final String errorCode; // TIMEOUT, CONNECTION_FAILURE, EXECUTION_ERROR, EXCEPTION

@@ -34,7 +34,6 @@ public class MasterAgent extends Agent {
 
         logger.info("MasterAgent {} initialized for node: {}", getLocalName(), nodeName);
 
-        // Запуск мониторинга
         addBehaviour(new CyclicBehaviour() {
             private long lastCheck = 0;
             private static final long CHECK_INTERVAL_MS = 10_000;
@@ -55,18 +54,15 @@ public class MasterAgent extends Agent {
         try {
             boolean allHealthy = true;
 
-            // Проверка HTCondor Central Manager
             if (!isPodReady("app=htcondor-cm,role=manager")) {
                 sendAlert("HTCondor Central Manager is not ready");
                 allHealthy = false;
             }
 
-            // Проверка Execute Nodes
             if (!areAllExecuteNodesReady()) {
                 allHealthy = false;
             }
 
-            // Проверка через condor_status
             if (!isCondorClusterActive()) {
                 sendAlert("HTCondor reports no active workers");
                 allHealthy = false;

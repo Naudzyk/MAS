@@ -28,7 +28,7 @@ public class Main {
             // Запускаем веб-панель на порту 4567
             DashboardServer.start(4567, container);
 
-            // Запускаем координатора (но НЕ запускаем развёртывание!)
+            // Запускаем координатора
             container.createNewAgent("coordinator", CoordinatorAgent.class.getName(), null).start();
 
             logger.info("System is ready. Open http://localhost:4567 to deploy cluster.");
