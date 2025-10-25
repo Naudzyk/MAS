@@ -156,6 +156,7 @@
             <p>Автоматизированное развёртывание и мониторинг кластера</p>
         </header>
 
+        <!-- Форма ввода IP -->
         <div class="card" id="deploy-form-section">
             <h2>Развёртывание кластера</h2>
             <form id="deployForm">
@@ -183,16 +184,19 @@
             </form>
         </div>
 
+        <!-- Статус развёртывания -->
         <div class="card">
             <h2>Статус развёртывания</h2>
             <div id="ansible-stage" class="status-item">Ожидание запуска...</div>
         </div>
 
+        <!-- Состояние кластера -->
         <div class="card">
             <h2>Состояние кластера</h2>
             <div id="cluster-status" class="status-item">—</div>
         </div>
 
+        <!-- Управление -->
         <div class="card">
             <h2>Управление</h2>
             <button class="btn btn-secondary" onclick="collectLogs()" id="collectLogsBtn">
@@ -205,6 +209,7 @@
             <div id="logsResult" class="result-message hidden"></div>
         </div>
 
+        <!-- Оповещения -->
         <div class="card">
             <h2>Оповещения</h2>
             <div id="alerts" class="alerts-list">
@@ -216,10 +221,12 @@
     <script>
         let logsAvailable = false;
 
+        // Обновление статуса каждые 2 секунды
         function updateStatus() {
             fetch('/api/status')
                 .then(res => res.json())
                 .then(data => {
+                    // Этап развёртывания
                     const stageEl = document.getElementById('ansible-stage');
                     stageEl.textContent = data.ansibleStage || '—';
                     if (data.ansibleStage && data.ansibleStage.includes('✅')) {
@@ -230,9 +237,11 @@
                         stageEl.className = 'status-item';
                     }
 
+                    // Состояние кластера
                     const clusterEl = document.getElementById('cluster-status');
                     clusterEl.textContent = data.htcondorStatus || '—';
 
+                    // Оповещения
                     const alertsDiv = document.getElementById('alerts');
                     if (data.alerts && data.alerts.length > 0) {
                         alertsDiv.innerHTML = data.alerts.map(a =>
@@ -242,12 +251,14 @@
                         alertsDiv.innerHTML = 'Нет оповещений';
                     }
 
+                    // Обновляем доступность кнопки скачивания
                     logsAvailable = !!data.diagnosticLogs;
                     document.getElementById('downloadLogsBtn').disabled = !logsAvailable;
                 })
                 .catch(err => console.error('Ошибка обновления статуса:', err));
         }
 
+        // Отправка формы развёртывания
         document.getElementById('deployForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -257,8 +268,8 @@
             const resultDiv = document.getElementById('deployResult');
 
             btn.disabled = true;
-            text.classList.add('hidden');
-            spinner.classList.remove('hidden');
+            text.style.display = 'none';
+            spinner.style.display = 'inline-block';
 
             try {
                 const master = document.getElementById('masterIp').value.trim();
@@ -266,10 +277,18 @@
                 const masterHostName = document.getElementById('nameHostCM').value.trim();
                 const workersHostName = document.getElementById('nameHostEX').value.split(',').map(w => w.trim()).filter(w => w);
 
+                // Debug logging
+                console.log('Form data being sent:', {
+                    master,
+                    workers,
+                    masterHostName,
+                    workersHostName
+                });
+
                 const res = await fetch('/api/deploy', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ master, workers, masterHostName, workersHostName })
+                    body: JSON.stringify({ master, workers, nameHostCM: masterHostName, nameHostEX: workersHostName })
                 });
 
                 const data = await res.json();
@@ -288,11 +307,12 @@
                 console.error('Deploy error:', err);
             } finally {
                 btn.disabled = false;
-                text.classList.remove('hidden');
-                spinner.classList.add('hidden');
+                text.style.display = 'inline';
+                spinner.style.display = 'none';
             }
         });
 
+        // Сбор логов
         async function collectLogs() {
             const btn = document.getElementById('collectLogsBtn');
             const text = document.getElementById('collectLogsBtnText');
@@ -300,8 +320,8 @@
             const resultDiv = document.getElementById('logsResult');
 
             btn.disabled = true;
-            text.classList.add('hidden');
-            spinner.classList.remove('hidden');
+            text.style.display = 'none';
+            spinner.style.display = 'inline-block';
             resultDiv.classList.add('hidden');
 
             try {
@@ -325,17 +345,35 @@
                 console.error('Collect logs error:', err);
             } finally {
                 btn.disabled = false;
-                text.classList.remove('hidden');
-                spinner.classList.add('hidden');
+                text.style.display = 'inline';
+                spinner.style.display = 'none';
             }
         }
 
+        // Скачивание логов
         function downloadLogs() {
             if (logsAvailable) {
                 window.open('/logs', '_blank');
             }
         }
 
+        // Инициализация кнопок при загрузке страницы
+        function initializeButtons() {
+            // Скрываем все спиннеры
+            document.getElementById('deploySpinner').style.display = 'none';
+            document.getElementById('logsSpinner').style.display = 'none';
+
+            // Показываем текст кнопок
+            document.getElementById('deployBtnText').style.display = 'inline';
+            document.getElementById('collectLogsBtnText').style.display = 'inline';
+
+            // Включаем кнопки
+            document.getElementById('deployBtn').disabled = false;
+            document.getElementById('collectLogsBtn').disabled = false;
+        }
+
+        // Запуск обновления
+        initializeButtons();
         updateStatus();
         setInterval(updateStatus, 2500);
     </script>

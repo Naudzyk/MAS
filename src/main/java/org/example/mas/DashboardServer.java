@@ -48,12 +48,19 @@ public class DashboardServer {
                 logger.info("Received deploy request: {}", req.body());
 
                 DeployRequest request = new Gson().fromJson(req.body(), DeployRequest.class);
+
+                // Debug logging
+                logger.info("Parsed request - master: {}, workers: {}, nameHostCM: {}, nameHostEX: {}",
+                    request.master, request.workers, request.nameHostCM, request.nameHostEX);
+
                 if (request.master == null || request.workers == null || request.workers.isEmpty()) {
                     res.status(400);
                     return new Gson().toJson(Map.of("error", "Master and at least one worker required"));
                 }
 
                 if (request.nameHostCM == null || request.nameHostEX == null || request.nameHostEX.isEmpty()) {
+                    logger.warn("Host names validation failed - nameHostCM: '{}', nameHostEX: '{}'",
+                        request.nameHostCM, request.nameHostEX);
                     res.status(400);
                     return new Gson().toJson(Map.of("error", "Host names are required"));
                 }
