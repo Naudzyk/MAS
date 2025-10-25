@@ -156,7 +156,6 @@
             <p>Автоматизированное развёртывание и мониторинг кластера</p>
         </header>
 
-        <!-- Форма ввода IP -->
         <div class="card" id="deploy-form-section">
             <h2>Развёртывание кластера</h2>
             <form id="deployForm">
@@ -174,7 +173,7 @@
                 </div>
                 <div class="form-group">
                     <label for="nameHostEX">Name execute-узла (через запятую):</label>
-                    <input type="text" id="nameHostEx" placeholder="test, test2" required>
+                    <input type="text" id="nameHostEX" placeholder="test, test2" required>
                 </div>
                 <button type="submit" class="btn btn-primary" id="deployBtn">
                     <span id="deployBtnText">Развернуть кластер</span>
@@ -184,19 +183,16 @@
             </form>
         </div>
 
-        <!-- Статус развёртывания -->
         <div class="card">
             <h2>Статус развёртывания</h2>
             <div id="ansible-stage" class="status-item">Ожидание запуска...</div>
         </div>
 
-        <!-- Состояние кластера -->
         <div class="card">
             <h2>Состояние кластера</h2>
             <div id="cluster-status" class="status-item">—</div>
         </div>
 
-        <!-- Управление -->
         <div class="card">
             <h2>Управление</h2>
             <button class="btn btn-secondary" onclick="collectLogs()" id="collectLogsBtn">
@@ -209,7 +205,6 @@
             <div id="logsResult" class="result-message hidden"></div>
         </div>
 
-        <!-- Оповещения -->
         <div class="card">
             <h2>Оповещения</h2>
             <div id="alerts" class="alerts-list">
@@ -221,12 +216,10 @@
     <script>
         let logsAvailable = false;
 
-        // Обновление статуса каждые 2 секунды
         function updateStatus() {
             fetch('/api/status')
                 .then(res => res.json())
                 .then(data => {
-                    // Этап развёртывания
                     const stageEl = document.getElementById('ansible-stage');
                     stageEl.textContent = data.ansibleStage || '—';
                     if (data.ansibleStage && data.ansibleStage.includes('✅')) {
@@ -237,11 +230,9 @@
                         stageEl.className = 'status-item';
                     }
 
-                    // Состояние кластера
                     const clusterEl = document.getElementById('cluster-status');
                     clusterEl.textContent = data.htcondorStatus || '—';
 
-                    // Оповещения
                     const alertsDiv = document.getElementById('alerts');
                     if (data.alerts && data.alerts.length > 0) {
                         alertsDiv.innerHTML = data.alerts.map(a =>
@@ -251,14 +242,12 @@
                         alertsDiv.innerHTML = 'Нет оповещений';
                     }
 
-                    // Обновляем доступность кнопки скачивания
                     logsAvailable = !!data.diagnosticLogs;
                     document.getElementById('downloadLogsBtn').disabled = !logsAvailable;
                 })
                 .catch(err => console.error('Ошибка обновления статуса:', err));
         }
 
-        // Отправка формы развёртывания
         document.getElementById('deployForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -304,7 +293,6 @@
             }
         });
 
-        // Сбор логов
         async function collectLogs() {
             const btn = document.getElementById('collectLogsBtn');
             const text = document.getElementById('collectLogsBtnText');
@@ -342,14 +330,12 @@
             }
         }
 
-        // Скачивание логов
         function downloadLogs() {
             if (logsAvailable) {
                 window.open('/logs', '_blank');
             }
         }
 
-        // Запуск обновления
         updateStatus();
         setInterval(updateStatus, 2500);
     </script>

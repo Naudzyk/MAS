@@ -2,25 +2,30 @@ function updateDashboard() {
     fetch('/api/status')
         .then(response => response.json())
         .then(data => {
-            document.getElementById('ansible-status').textContent = data.ansibleStage || '—';
-            document.getElementById('htcondor-status').textContent = data.htcondorStatus || '—';
+            const ansibleStageEl = document.getElementById('ansible-stage');
+            const clusterStatusEl = document.getElementById('cluster-status');
+            const alertsDiv = document.getElementById('alerts');
 
-            const alertsList = document.getElementById('alerts-list');
-            alertsList.innerHTML = '';
-            if (data.alerts && data.alerts.length > 0) {
-                data.alerts.forEach(alert => {
-                    const li = document.createElement('li');
-                    li.textContent = alert;
-                    alertsList.appendChild(li);
-                });
+            if (ansibleStageEl) {
+                ansibleStageEl.textContent = data.ansibleStage || '—';
             }
 
-            const time = new Date(data.lastUpdate);
-            document.getElementById('last-update').textContent = time.toLocaleString();
+            if (clusterStatusEl) {
+                clusterStatusEl.textContent = data.htcondorStatus || '—';
+            }
+
+            if (alertsDiv) {
+                if (data.alerts && data.alerts.length > 0) {
+                    alertsDiv.innerHTML = data.alerts.map(a =>
+                        `<div class="status-item status-error">${a}</div>`
+                    ).join('');
+                } else {
+                    alertsDiv.innerHTML = 'Нет оповещений';
+                }
+            }
         })
         .catch(err => console.error('Ошибка загрузки данных:', err));
 }
 
-// Обновляем каждые 2 секунды
 setInterval(updateDashboard, 2000);
-updateDashboard(); // сразу при загрузке
+updateDashboard();
