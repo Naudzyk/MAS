@@ -2,6 +2,7 @@ function updateDashboard() {
     fetch('/api/status')
         .then(response => response.json())
         .then(data => {
+            // Используем правильные ID элементов из HTML
             const ansibleStageEl = document.getElementById('ansible-stage');
             const clusterStatusEl = document.getElementById('cluster-status');
             const alertsDiv = document.getElementById('alerts');
@@ -27,5 +28,6 @@ function updateDashboard() {
         .catch(err => console.error('Ошибка загрузки данных:', err));
 }
 
+// Обновляем каждые 2 секунды
 setInterval(updateDashboard, 2000);
-updateDashboard();
+updateDashboard(); // сразу при загрузке

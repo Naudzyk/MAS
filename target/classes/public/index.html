@@ -174,7 +174,7 @@
                 </div>
                 <div class="form-group">
                     <label for="nameHostEX">Name execute-узла (через запятую):</label>
-                    <input type="text" id="nameHostEx" placeholder="test, test2" required>
+                    <input type="text" id="nameHostEX" placeholder="test, test2" required>
                 </div>
                 <button type="submit" class="btn btn-primary" id="deployBtn">
                     <span id="deployBtnText">Развернуть кластер</span>
@@ -268,8 +268,8 @@
             const resultDiv = document.getElementById('deployResult');
 
             btn.disabled = true;
-            text.classList.add('hidden');
-            spinner.classList.remove('hidden');
+            text.style.display = 'none';
+            spinner.style.display = 'inline-block';
 
             try {
                 const master = document.getElementById('masterIp').value.trim();
@@ -277,10 +277,18 @@
                 const masterHostName = document.getElementById('nameHostCM').value.trim();
                 const workersHostName = document.getElementById('nameHostEX').value.split(',').map(w => w.trim()).filter(w => w);
 
+                // Debug logging
+                console.log('Form data being sent:', {
+                    master,
+                    workers,
+                    masterHostName,
+                    workersHostName
+                });
+
                 const res = await fetch('/api/deploy', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ master, workers, masterHostName, workersHostName })
+                    body: JSON.stringify({ master, workers, nameHostCM: masterHostName, nameHostEX: workersHostName })
                 });
 
                 const data = await res.json();
@@ -299,8 +307,8 @@
                 console.error('Deploy error:', err);
             } finally {
                 btn.disabled = false;
-                text.classList.remove('hidden');
-                spinner.classList.add('hidden');
+                text.style.display = 'inline';
+                spinner.style.display = 'none';
             }
         });
 
@@ -312,8 +320,8 @@
             const resultDiv = document.getElementById('logsResult');
 
             btn.disabled = true;
-            text.classList.add('hidden');
-            spinner.classList.remove('hidden');
+            text.style.display = 'none';
+            spinner.style.display = 'inline-block';
             resultDiv.classList.add('hidden');
 
             try {
@@ -337,8 +345,8 @@
                 console.error('Collect logs error:', err);
             } finally {
                 btn.disabled = false;
-                text.classList.remove('hidden');
-                spinner.classList.add('hidden');
+                text.style.display = 'inline';
+                spinner.style.display = 'none';
             }
         }
 
@@ -349,7 +357,23 @@
             }
         }
 
+        // Инициализация кнопок при загрузке страницы
+        function initializeButtons() {
+            // Скрываем все спиннеры
+            document.getElementById('deploySpinner').style.display = 'none';
+            document.getElementById('logsSpinner').style.display = 'none';
+
+            // Показываем текст кнопок
+            document.getElementById('deployBtnText').style.display = 'inline';
+            document.getElementById('collectLogsBtnText').style.display = 'inline';
+
+            // Включаем кнопки
+            document.getElementById('deployBtn').disabled = false;
+            document.getElementById('collectLogsBtn').disabled = false;
+        }
+
         // Запуск обновления
+        initializeButtons();
         updateStatus();
         setInterval(updateStatus, 2500);
     </script>
