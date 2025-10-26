@@ -79,6 +79,9 @@ public class CoordinatorAgent extends Agent {
 
         new Thread(() -> {
             try {
+                logger.info("Starting deployment thread...");
+                DashboardServer.updateStatus("ansibleStage", "Starting deployment...");
+
                 String[] playbooks = {
                     "01_system_preparation.yml",
                     "02_containerd.yml",
@@ -91,11 +94,17 @@ public class CoordinatorAgent extends Agent {
                 };
 
                 for (String playbook : playbooks) {
-                    if (!AnsibleRunner.run(playbook, inventoryPath, playbooksDir, 15).success) {
-                        sendAlert("Deployment failed at: " + playbook);
-                        DashboardServer.updateStatus("ansibleStage",playbook);
+                    logger.info("Running playbook: {}", playbook);
+                    DashboardServer.updateStatus("ansibleStage", "Running: " + playbook);
+
+                    AnsibleRunner.AnsibleResult result = AnsibleRunner.run(playbook, inventoryPath, playbooksDir, 15);
+                    if (!result.success) {
+                        logger.error("Playbook {} failed: {} - {}", playbook, result.errorCode, result.details);
+                        sendAlert("Deployment failed at: " + playbook + " - " + result.errorCode);
+                        DashboardServer.updateStatus("ansibleStage", "ERROR: " + playbook);
                         return;
                     }
+                    logger.info("Playbook {} completed successfully", playbook);
                 }
 
                 logger.info("Deployment completed successfully");
@@ -171,12 +180,18 @@ public class CoordinatorAgent extends Agent {
     }
 
     private void collectDiagnosticLogs() {
+        logger.info("Starting diagnostic logs collection...");
         try {
             Path logPath = Paths.get(System.getProperty("user.dir"), "diagnostic-logs.txt");
             logger.info("Saving diagnostic logs to: {}", logPath.toAbsolutePath());
 
+            logger.info("Collecting kubelet logs...");
             String kubeletLog = executeCommand("journalctl", "-u", "kubelet", "--since=-1h", "-n", "50");
+
+            logger.info("Collecting containerd status...");
             String containerdLog = executeCommand("systemctl", "status", "containerd");
+
+            logger.info("Collecting kubectl pod status...");
             String kubectlLog = executeCommand("kubectl", "get", "pods", "-A");
 
             String fullLog = "=== KUBELET ===\n" + (kubeletLog != null ? kubeletLog : "N/A") +
@@ -184,7 +199,7 @@ public class CoordinatorAgent extends Agent {
                     "\n\n=== KUBECTL ===\n" + (kubectlLog != null ? kubectlLog : "N/A");
 
             Files.write(logPath, fullLog.getBytes());
-            logger.info("Diagnostic logs saved successfully");
+            logger.info("Diagnostic logs saved successfully to: {}", logPath.toAbsolutePath());
             DashboardServer.updateStatus("diagnosticLogs", logPath.toAbsolutePath().toString());
 
         } catch (Exception e) {
