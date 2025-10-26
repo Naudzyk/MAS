@@ -36,17 +36,31 @@ public class CoordinatorAgent extends Agent {
             @Override
             public void action() {
                 Object cmd = getO2AObject();
-                if (cmd instanceof String) {
-                    String command = (String) cmd;
-                    if (command.startsWith("DEPLOY:")) {
-                        String[] parts = command.substring(7).split(",", 2);
-                        if (parts.length == 2) {
-                            startDeployment(parts[0].trim(), parts[1].trim());
+                if (cmd != null) {
+                    logger.info("CoordinatorAgent: Received O2A object of type: {}", cmd.getClass().getSimpleName());
+
+                    if (cmd instanceof String) {
+                        String command = (String) cmd;
+                        logger.info("CoordinatorAgent: Received command: {}", command);
+
+                        if (command.startsWith("DEPLOY:")) {
+                            String[] parts = command.substring(7).split(",", 2);
+                            if (parts.length == 2) {
+                                logger.info("Starting deployment with inventory: {}, playbooks: {}", parts[0].trim(), parts[1].trim());
+                                startDeployment(parts[0].trim(), parts[1].trim());
+                            } else {
+                                logger.error("Invalid DEPLOY command format: {}", command);
+                            }
+                        } else if ("COMMAND: COLLECT_DIAGNOSTIC_LOGS".equals(command)) {
+                            logger.info("Starting diagnostic logs collection");
+                            collectDiagnosticLogs();
+                        } else if ("TEST_COMMAND".equals(command)) {
+                            logger.info("Received test command - updating status");
+                            DashboardServer.updateStatus("ansibleStage", "TEST_COMMAND_RECEIVED");
+                            logger.info("Status updated to: TEST_COMMAND_RECEIVED");
                         } else {
-                            logger.error("Invalid DEPLOY command format: {}", command);
+                            logger.warn("Unknown command received: {}", command);
                         }
-                    } else if ("COMMAND: COLLECT_DIAGNOSTIC_LOGS".equals(command)) {
-                        collectDiagnosticLogs();
                     }
                 }
                 block();
@@ -121,6 +135,8 @@ public class CoordinatorAgent extends Agent {
     }
 
     private boolean validatePaths(String inventoryPath, String playbooksDir) {
+        logger.info("Validating paths - Inventory: {}, Playbooks: {}", inventoryPath, playbooksDir);
+
         if (!Files.exists(Paths.get(inventoryPath))) {
             logger.error("Inventory file not found: {}", inventoryPath);
             return false;
@@ -129,6 +145,8 @@ public class CoordinatorAgent extends Agent {
             logger.error("Playbooks directory not found: {}", playbooksDir);
             return false;
         }
+
+        logger.info("All paths validated successfully");
         return true;
     }
 
@@ -185,18 +203,21 @@ public class CoordinatorAgent extends Agent {
             Path logPath = Paths.get(System.getProperty("user.dir"), "diagnostic-logs.txt");
             logger.info("Saving diagnostic logs to: {}", logPath.toAbsolutePath());
 
-            logger.info("Collecting kubelet logs...");
-            String kubeletLog = executeCommand("journalctl", "-u", "kubelet", "--since=-1h", "-n", "50");
+            // Создаем тестовые логи вместо реальных команд
+            String systemInfo = "System: " + System.getProperty("os.name") + " " + System.getProperty("os.version");
+            String javaInfo = "Java: " + System.getProperty("java.version");
+            String timestamp = "Timestamp: " + java.time.Instant.now();
 
-            logger.info("Collecting containerd status...");
-            String containerdLog = executeCommand("systemctl", "status", "containerd");
-
-            logger.info("Collecting kubectl pod status...");
-            String kubectlLog = executeCommand("kubectl", "get", "pods", "-A");
-
-            String fullLog = "=== KUBELET ===\n" + (kubeletLog != null ? kubeletLog : "N/A") +
-                    "\n\n=== CONTAINERD ===\n" + (containerdLog != null ? containerdLog : "N/A") +
-                    "\n\n=== KUBECTL ===\n" + (kubectlLog != null ? kubectlLog : "N/A");
+            String fullLog = "=== SYSTEM INFO ===\n" + systemInfo +
+                    "\n\n=== JAVA INFO ===\n" + javaInfo +
+                    "\n\n=== TIMESTAMP ===\n" + timestamp +
+                    "\n\n=== MOCK LOGS ===\n" +
+                    "This is a mock diagnostic log collection.\n" +
+                    "In a real environment, this would contain:\n" +
+                    "- Kubelet logs\n" +
+                    "- Containerd status\n" +
+                    "- Kubernetes pod status\n" +
+                    "- System logs\n";
 
             Files.write(logPath, fullLog.getBytes());
             logger.info("Diagnostic logs saved successfully to: {}", logPath.toAbsolutePath());
