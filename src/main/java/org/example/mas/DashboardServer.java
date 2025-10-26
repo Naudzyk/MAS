@@ -38,18 +38,18 @@ public class DashboardServer {
 
         Spark.staticFileLocation("/public");
 
-
         Spark.get("/api/status", (req, res) -> {
             res.type("application/json");
             return new Gson().toJson(STATUS);
         });
 
-        Spark.post("/api/deploy", (req, res) -> {
+Spark.post("/api/deploy", (req, res) -> {
             try {
                 logger.info("Received deploy request: {}", req.body());
 
                 DeployRequest request = new Gson().fromJson(req.body(), DeployRequest.class);
 
+                // Debug logging
                 logger.info("Parsed request - master: {}, workers: {}, nameHostCM: {}, nameHostEX: {}",
                     request.master, request.workers, request.nameHostCM, request.nameHostEX);
 
@@ -67,9 +67,17 @@ public class DashboardServer {
 
                 Path tempDir = Files.createTempDirectory("mas-deploy-");
                 Path inventoryPath = tempDir.resolve("inventory.ini");
+                Path varsPath = tempDir.resolve("vars.yml");
+
                 logger.info("Creating inventory file at: {}", inventoryPath.toAbsolutePath());
                 generateInventoryFile(request.master, request.workers, request.nameHostCM, request.nameHostEX, inventoryPath);
                 logger.info("Inventory file created successfully");
+
+                logger.info("Creating vars file at: {}", varsPath.toAbsolutePath());
+                String condorPassword = request.condorPassword != null && !request.condorPassword.trim().isEmpty()
+                    ? request.condorPassword.trim() : "qwerty";
+                generateVarsFile(request.master, condorPassword, varsPath);
+                logger.info("Vars file created successfully");
 
                 AgentController ac = jadeContainer.getAgent("coordinator");
                 if (ac == null) {
@@ -81,7 +89,8 @@ public class DashboardServer {
                 logger.info("Found coordinator agent, sending deploy command");
 
                 String scriptsPath = Paths.get(System.getProperty("user.dir"), "scripts").toAbsolutePath().toString();
-                ac.putO2AObject("DEPLOY:" + inventoryPath.toAbsolutePath() + "," + scriptsPath, true);
+                String deployCommand = "DEPLOY:" + inventoryPath.toAbsolutePath() + "," + varsPath.toAbsolutePath() + "," + scriptsPath;
+                ac.putO2AObject(deployCommand, true);
 
                 logger.info("Deployment initiated successfully");
                 return new Gson().toJson(Map.of(
@@ -129,6 +138,7 @@ public class DashboardServer {
         private String nameHostCM;
         private List<String> workers;
         private List<String> nameHostEX;
+        private String condorPassword;
     }
 
     public static void generateInventoryFile( String masterIps,  List<String> workerIps, String nameHostCM, List<String> nameHostEX, Path outputPath) throws Exception {
@@ -147,5 +157,18 @@ public class DashboardServer {
         Files.write(outputPath, sb.toString().getBytes(StandardCharsets.UTF_8));
 
 
+    }
+
+    public static void generateVarsFile(String centralManagerIp, String condorPassword, Path outputPath) throws Exception {
+        StringBuilder sb = new StringBuilder();
+        sb.append("ansible_python_interpreter: /usr/bin/python3\n");
+        sb.append("central_manager_ip: \"").append(centralManagerIp).append("\"\n");
+        sb.append("k8s_version: \"1.30.7\"\n");
+        sb.append("pause_version: \"3.9\"\n");
+        sb.append("condor_image: \"evgenii457/htcondor2\"\n");
+        sb.append("condor_logs_dir: \"/var/log/condor\"\n");
+        sb.append("condor_cluster_password: \"").append(condorPassword).append("\"\n");
+        
+        Files.write(outputPath, sb.toString().getBytes(StandardCharsets.UTF_8));
     }
 }

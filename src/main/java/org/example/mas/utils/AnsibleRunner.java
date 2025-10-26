@@ -24,7 +24,9 @@ public class AnsibleRunner {
      */
     public static AnsibleResult run(String playbook, String inventoryPath, String workingDir, int timeoutMinutes) {
         try {
-            ProcessBuilder pb = new ProcessBuilder("ansible-playbook", "-i", inventoryPath, playbook);
+            // Используем vars.yml из той же директории где находятся playbooks
+            ProcessBuilder pb = new ProcessBuilder("ansible-playbook", "-i", inventoryPath, 
+                "--extra-vars", "@vars.yml", playbook);
             pb.directory(new File(workingDir));
             pb.environment().put("ANSIBLE_HOST_KEY_CHECKING", "False");
             pb.redirectErrorStream(true);
