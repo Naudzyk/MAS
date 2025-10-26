@@ -176,6 +176,10 @@
                     <label for="nameHostEX">Name execute-узла (через запятую):</label>
                     <input type="text" id="nameHostEX" placeholder="test, test2" required>
                 </div>
+                <div class="form-group">
+                    <label for="condorPassword">Пароль кластера HTCondor (опционально):</label>
+                    <input type="text" id="condorPassword" placeholder="qwerty (по умолчанию)">
+                </div>
                 <button type="submit" class="btn btn-primary" id="deployBtn">
                     <span id="deployBtnText">Развернуть кластер</span>
                     <span id="deploySpinner" class="spinner hidden"></span>
@@ -276,19 +280,27 @@
                 const workers = document.getElementById('workerIps').value.split(',').map(w => w.trim()).filter(w => w);
                 const masterHostName = document.getElementById('nameHostCM').value.trim();
                 const workersHostName = document.getElementById('nameHostEX').value.split(',').map(w => w.trim()).filter(w => w);
+                const condorPassword = document.getElementById('condorPassword').value.trim();
 
                 // Debug logging
                 console.log('Form data being sent:', {
                     master,
                     workers,
                     masterHostName,
-                    workersHostName
+                    workersHostName,
+                    condorPassword
                 });
 
                 const res = await fetch('/api/deploy', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ master, workers, nameHostCM: masterHostName, nameHostEX: workersHostName })
+                    body: JSON.stringify({ 
+                        master, 
+                        workers, 
+                        nameHostCM: masterHostName, 
+                        nameHostEX: workersHostName,
+                        condorPassword: condorPassword || null
+                    })
                 });
 
                 const data = await res.json();
@@ -362,11 +374,11 @@
             // Скрываем все спиннеры
             document.getElementById('deploySpinner').style.display = 'none';
             document.getElementById('logsSpinner').style.display = 'none';
-
+            
             // Показываем текст кнопок
             document.getElementById('deployBtnText').style.display = 'inline';
             document.getElementById('collectLogsBtnText').style.display = 'inline';
-
+            
             // Включаем кнопки
             document.getElementById('deployBtn').disabled = false;
             document.getElementById('collectLogsBtn').disabled = false;
