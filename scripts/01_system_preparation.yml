@@ -1,0 +1,30 @@
+---
+- name: System Preparation
+  hosts: all
+  become: yes
+  tasks:
+    - name: Update system packages
+      package:
+        name: "*"
+        state: latest
+      when: ansible_os_family == "RedHat"
+    
+    - name: Install basic packages
+      package:
+        name:
+          - curl
+          - wget
+          - vim
+          - htop
+        state: present
+      
+    - name: Set hostname
+      hostname:
+        name: "{{ inventory_hostname }}"
+        
+    - name: Create test file
+      copy:
+        content: "System prepared successfully on {{ inventory_hostname }}"
+        dest: /tmp/system_prepared.txt
+        mode: '0644'
+

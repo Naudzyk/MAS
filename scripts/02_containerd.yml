@@ -1,0 +1,23 @@
+---
+- name: Install Containerd
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install containerd
+      package:
+        name: containerd
+        state: present
+      when: ansible_os_family == "RedHat"
+      
+    - name: Start and enable containerd
+      systemd:
+        name: containerd
+        state: started
+        enabled: yes
+        
+    - name: Create test file
+      copy:
+        content: "Containerd installed on {{ inventory_hostname }}"
+        dest: /tmp/containerd_installed.txt
+        mode: '0644'
+

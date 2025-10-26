@@ -1,0 +1,28 @@
+---
+- name: Initialize Kubernetes Cluster
+  hosts: central_manager
+  become: yes
+  tasks:
+    - name: Initialize Kubernetes cluster
+      command: kubeadm init --pod-network-cidr=192.168.0.0/16
+      register: init_result
+      
+    - name: Create .kube directory
+      file:
+        path: /root/.kube
+        state: directory
+        mode: '0755'
+        
+    - name: Copy admin config
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: /root/.kube/config
+        remote_src: yes
+        mode: '0644'
+        
+    - name: Create test file
+      copy:
+        content: "Kubernetes cluster initialized on {{ inventory_hostname }}"
+        dest: /tmp/kubernetes_initialized.txt
+        mode: '0644'
+

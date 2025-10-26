@@ -1,0 +1,18 @@
+---
+- name: Install Calico CNI
+  hosts: central_manager
+  become: yes
+  tasks:
+    - name: Apply Calico manifest
+      command: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+      
+    - name: Wait for nodes to be ready
+      command: kubectl get nodes
+      register: nodes_result
+      
+    - name: Create test file
+      copy:
+        content: "Calico CNI installed on {{ inventory_hostname }}"
+        dest: /tmp/calico_installed.txt
+        mode: '0644'
+

@@ -1,0 +1,33 @@
+---
+- name: Install HTCondor
+  hosts: all
+  become: yes
+  tasks:
+    - name: Add HTCondor repository
+      yum_repository:
+        name: htcondor
+        description: HTCondor Repository
+        baseurl: https://research.cs.wisc.edu/htcondor/yum/repo.d/htcondor-development-rhel7.repo
+        gpgkey: https://research.cs.wisc.edu/htcondor/yum/RPM-GPG-KEY-HTCondor
+        gpgcheck: yes
+        enabled: yes
+      when: ansible_os_family == "RedHat"
+      
+    - name: Install HTCondor
+      package:
+        name: condor
+        state: present
+      when: ansible_os_family == "RedHat"
+      
+    - name: Start and enable HTCondor
+      systemd:
+        name: condor
+        state: started
+        enabled: yes
+        
+    - name: Create test file
+      copy:
+        content: "HTCondor installed on {{ inventory_hostname }}"
+        dest: /tmp/htcondor_installed.txt
+        mode: '0644'
+
