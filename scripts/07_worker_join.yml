@@ -1,0 +1,22 @@
+---
+- name: Join Worker Nodes to Cluster
+  hosts: execute_nodes
+  become: yes
+  tasks:
+    - name: Get join command from master
+      uri:
+        url: "http://{{ hostvars[groups['central_manager'][0]]['ansible_host'] }}:8080/join"
+        method: GET
+        return_content: yes
+      register: join_command
+      
+    - name: Join cluster
+      command: "{{ join_command.content }}"
+      when: join_command.content is defined
+      
+    - name: Create test file
+      copy:
+        content: "Worker joined cluster: {{ inventory_hostname }}"
+        dest: /tmp/worker_joined.txt
+        mode: '0644'
+

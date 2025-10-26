@@ -1,0 +1,30 @@
+---
+- name: Install Kubernetes
+  hosts: all
+  become: yes
+  tasks:
+    - name: Add Kubernetes repository
+      yum_repository:
+        name: kubernetes
+        description: Kubernetes Repository
+        baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+        gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg
+        gpgcheck: yes
+        enabled: yes
+      when: ansible_os_family == "RedHat"
+      
+    - name: Install kubeadm, kubelet, kubectl
+      package:
+        name:
+          - kubeadm
+          - kubelet
+          - kubectl
+        state: present
+      when: ansible_os_family == "RedHat"
+      
+    - name: Create test file
+      copy:
+        content: "Kubernetes installed on {{ inventory_hostname }}"
+        dest: /tmp/kubernetes_installed.txt
+        mode: '0644'
+
