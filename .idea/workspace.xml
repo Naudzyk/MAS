@@ -6,6 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;New Version 7.2&quot;">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/CoordinatorAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/CoordinatorAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/DashboardServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/DashboardServer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Main.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -190,6 +193,7 @@
       <workItem from="1761271240617" duration="2530000" />
       <workItem from="1761393890877" duration="631000" />
       <workItem from="1761396098174" duration="2208000" />
+      <workItem from="1761452780173" duration="3655000" />
     </task>
     <task id="LOCAL-00001" summary="'V1'">
       <option name="closed" value="true" />

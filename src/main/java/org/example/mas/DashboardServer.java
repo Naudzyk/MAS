@@ -38,6 +38,7 @@ public class DashboardServer {
 
         Spark.staticFileLocation("/public");
 
+
         Spark.get("/api/status", (req, res) -> {
             res.type("application/json");
             return new Gson().toJson(STATUS);
@@ -49,7 +50,6 @@ public class DashboardServer {
 
                 DeployRequest request = new Gson().fromJson(req.body(), DeployRequest.class);
 
-                // Debug logging
                 logger.info("Parsed request - master: {}, workers: {}, nameHostCM: {}, nameHostEX: {}",
                     request.master, request.workers, request.nameHostCM, request.nameHostEX);
 
@@ -67,15 +67,21 @@ public class DashboardServer {
 
                 Path tempDir = Files.createTempDirectory("mas-deploy-");
                 Path inventoryPath = tempDir.resolve("inventory.ini");
+                logger.info("Creating inventory file at: {}", inventoryPath.toAbsolutePath());
                 generateInventoryFile(request.master, request.workers, request.nameHostCM, request.nameHostEX, inventoryPath);
+                logger.info("Inventory file created successfully");
 
                 AgentController ac = jadeContainer.getAgent("coordinator");
                 if (ac == null) {
+                    logger.error("Coordinator agent not found!");
                     res.status(500);
                     return new Gson().toJson(Map.of("error", "Coordinator agent not available"));
                 }
 
-                ac.putO2AObject("DEPLOY:" + inventoryPath.toAbsolutePath() + ",scripts/", false);
+                logger.info("Found coordinator agent, sending deploy command");
+
+                String scriptsPath = Paths.get(System.getProperty("user.dir"), "scripts").toAbsolutePath().toString();
+                ac.putO2AObject("DEPLOY:" + inventoryPath.toAbsolutePath() + "," + scriptsPath, true);
 
                 logger.info("Deployment initiated successfully");
                 return new Gson().toJson(Map.of(
@@ -86,12 +92,13 @@ public class DashboardServer {
                 logger.error("Deploy request failed", e);
                 res.status(500);
                 return new Gson().toJson(Map.of("error", e.getMessage()));
-            }});
+            }
+        });
 
         Spark.post("/api/collect-logs", (req, res) -> {
             try {
                 AgentController ac = jadeContainer.getAgent("coordinator");
-                ac.putO2AObject("COMMAND: COLLECT_DIAGNOSTIC_LOGS", false);
+                ac.putO2AObject("COMMAND: COLLECT_DIAGNOSTIC_LOGS", true);
                 return "{\"status\":\"started\",\"message\":\"Diagnostic logs collection initiated\"}";
             } catch (Exception e) {
                 return "{\"error\":\"" + e.getMessage() + "\"}";
