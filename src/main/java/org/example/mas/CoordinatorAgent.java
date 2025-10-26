@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CoordinatorAgent extends Agent {
     private static final Logger logger = LoggerFactory.getLogger(CoordinatorAgent.class);
     private String inventory;
+    private String varsPath;
     private String playbooksDir;
     private final Map<String, AID> nodeAgents = new ConcurrentHashMap<>();
 
@@ -38,26 +39,23 @@ public class CoordinatorAgent extends Agent {
                 Object cmd = getO2AObject();
                 if (cmd != null) {
                     logger.info("CoordinatorAgent: Received O2A object of type: {}", cmd.getClass().getSimpleName());
-
+                    
                     if (cmd instanceof String) {
                         String command = (String) cmd;
                         logger.info("CoordinatorAgent: Received command: {}", command);
-
+                        
                         if (command.startsWith("DEPLOY:")) {
-                            String[] parts = command.substring(7).split(",", 2);
-                            if (parts.length == 2) {
-                                logger.info("Starting deployment with inventory: {}, playbooks: {}", parts[0].trim(), parts[1].trim());
-                                startDeployment(parts[0].trim(), parts[1].trim());
+                            String[] parts = command.substring(7).split(",", 3);
+                            if (parts.length == 3) {
+                                logger.info("Starting deployment with inventory: {}, vars: {}, playbooks: {}", 
+                                    parts[0].trim(), parts[1].trim(), parts[2].trim());
+                                startDeployment(parts[0].trim(), parts[1].trim(), parts[2].trim());
                             } else {
-                                logger.error("Invalid DEPLOY command format: {}", command);
+                                logger.error("Invalid DEPLOY command format. Expected 3 parts, got: {}", parts.length);
                             }
                         } else if ("COMMAND: COLLECT_DIAGNOSTIC_LOGS".equals(command)) {
                             logger.info("Starting diagnostic logs collection");
                             collectDiagnosticLogs();
-                        } else if ("TEST_COMMAND".equals(command)) {
-                            logger.info("Received test command - updating status");
-                            DashboardServer.updateStatus("ansibleStage", "TEST_COMMAND_RECEIVED");
-                            logger.info("Status updated to: TEST_COMMAND_RECEIVED");
                         } else {
                             logger.warn("Unknown command received: {}", command);
                         }
@@ -80,7 +78,7 @@ public class CoordinatorAgent extends Agent {
         });
     }
 
-    private void startDeployment(String inventoryPath, String playbooksDir) {
+    private void startDeployment(String inventoryPath, String varsPath, String playbooksDir) {
         logger.info("Starting deployment with inventory: {}, playbooks: {}", inventoryPath, playbooksDir);
 
         if (!validatePaths(inventoryPath, playbooksDir)) {
@@ -89,13 +87,27 @@ public class CoordinatorAgent extends Agent {
         }
 
         this.inventory = inventoryPath;
+        this.varsPath = varsPath;
         this.playbooksDir = playbooksDir;
 
         new Thread(() -> {
             try {
                 logger.info("Starting deployment thread...");
                 DashboardServer.updateStatus("ansibleStage", "Starting deployment...");
-
+                
+                // Копируем vars.yml в директорию playbooks
+                logger.info("Copying vars.yml from {} to {}", varsPath, playbooksDir);
+                try {
+                    Path sourceVars = Paths.get(varsPath);
+                    Path targetVars = Paths.get(playbooksDir, "vars.yml");
+                    Files.copy(sourceVars, targetVars, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                    logger.info("vars.yml copied successfully");
+                } catch (Exception e) {
+                    logger.error("Failed to copy vars.yml", e);
+                    sendAlert("Failed to copy vars.yml: " + e.getMessage());
+                    return;
+                }
+                
                 String[] playbooks = {
                     "01_system_preparation.yml",
                     "02_containerd.yml",
@@ -110,7 +122,7 @@ public class CoordinatorAgent extends Agent {
                 for (String playbook : playbooks) {
                     logger.info("Running playbook: {}", playbook);
                     DashboardServer.updateStatus("ansibleStage", "Running: " + playbook);
-
+                    
                     AnsibleRunner.AnsibleResult result = AnsibleRunner.run(playbook, inventoryPath, playbooksDir, 15);
                     if (!result.success) {
                         logger.error("Playbook {} failed: {} - {}", playbook, result.errorCode, result.details);
@@ -136,7 +148,7 @@ public class CoordinatorAgent extends Agent {
 
     private boolean validatePaths(String inventoryPath, String playbooksDir) {
         logger.info("Validating paths - Inventory: {}, Playbooks: {}", inventoryPath, playbooksDir);
-
+        
         if (!Files.exists(Paths.get(inventoryPath))) {
             logger.error("Inventory file not found: {}", inventoryPath);
             return false;
@@ -145,7 +157,7 @@ public class CoordinatorAgent extends Agent {
             logger.error("Playbooks directory not found: {}", playbooksDir);
             return false;
         }
-
+        
         logger.info("All paths validated successfully");
         return true;
     }
@@ -207,7 +219,7 @@ public class CoordinatorAgent extends Agent {
             String systemInfo = "System: " + System.getProperty("os.name") + " " + System.getProperty("os.version");
             String javaInfo = "Java: " + System.getProperty("java.version");
             String timestamp = "Timestamp: " + java.time.Instant.now();
-
+            
             String fullLog = "=== SYSTEM INFO ===\n" + systemInfo +
                     "\n\n=== JAVA INFO ===\n" + javaInfo +
                     "\n\n=== TIMESTAMP ===\n" + timestamp +

@@ -6,15 +6,15 @@ function updateDashboard() {
             const ansibleStageEl = document.getElementById('ansible-stage');
             const clusterStatusEl = document.getElementById('cluster-status');
             const alertsDiv = document.getElementById('alerts');
-
+            
             if (ansibleStageEl) {
                 ansibleStageEl.textContent = data.ansibleStage || '—';
             }
-
+            
             if (clusterStatusEl) {
                 clusterStatusEl.textContent = data.htcondorStatus || '—';
             }
-
+            
             if (alertsDiv) {
                 if (data.alerts && data.alerts.length > 0) {
                     alertsDiv.innerHTML = data.alerts.map(a =>

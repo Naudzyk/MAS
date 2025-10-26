@@ -7,9 +7,6 @@ import jade.wrapper.AgentContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.Watchable;
 
 public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
@@ -25,8 +22,10 @@ public class Main {
 
             AgentContainer container = rt.createMainContainer(p);
 
+            // Запускаем веб-панель на порту 4567
             DashboardServer.start(4567, container);
 
+            // Запускаем CoordinatorAgent
             container.createNewAgent("coordinator", CoordinatorAgent.class.getName(), null).start();
 
             logger.info("System is ready. Open http://localhost:4567 to deploy cluster.");
@@ -38,4 +37,3 @@ public class Main {
         }
     }
 }
-
