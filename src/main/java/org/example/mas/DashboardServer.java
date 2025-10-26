@@ -38,28 +38,58 @@ public class DashboardServer {
 
         Spark.staticFileLocation("/public");
 
+        // Тестовый endpoint для проверки работы
+        Spark.get("/api/test", (req, res) -> {
+            try {
+                AgentController ac = jadeContainer.getAgent("coordinator");
+                if (ac == null) {
+                    return new Gson().toJson(Map.of("error", "Coordinator agent not found"));
+                }
+                return new Gson().toJson(Map.of("status", "coordinator_found", "agent", ac.getName()));
+            } catch (Exception e) {
+                return new Gson().toJson(Map.of("error", e.getMessage()));
+            }
+        });
+
+        // Тестовый endpoint для проверки O2A
+        Spark.get("/api/test-o2a", (req, res) -> {
+            try {
+                AgentController ac = jadeContainer.getAgent("coordinator");
+                if (ac == null) {
+                    return new Gson().toJson(Map.of("error", "Coordinator agent not found"));
+                }
+                logger.info("Sending test O2A command");
+                ac.putO2AObject("TEST_COMMAND", true);
+                logger.info("Test O2A command sent");
+                return new Gson().toJson(Map.of("status", "test_o2a_sent"));
+            } catch (Exception e) {
+                logger.error("Test O2A failed", e);
+                return new Gson().toJson(Map.of("error", e.getMessage()));
+            }
+        });
+
         Spark.get("/api/status", (req, res) -> {
             res.type("application/json");
             return new Gson().toJson(STATUS);
         });
 
-Spark.post("/api/deploy", (req, res) -> {
+        Spark.post("/api/deploy", (req, res) -> {
             try {
                 logger.info("Received deploy request: {}", req.body());
 
                 DeployRequest request = new Gson().fromJson(req.body(), DeployRequest.class);
-
+                
                 // Debug logging
-                logger.info("Parsed request - master: {}, workers: {}, nameHostCM: {}, nameHostEX: {}",
+                logger.info("Parsed request - master: {}, workers: {}, nameHostCM: {}, nameHostEX: {}", 
                     request.master, request.workers, request.nameHostCM, request.nameHostEX);
-
+                
                 if (request.master == null || request.workers == null || request.workers.isEmpty()) {
                     res.status(400);
                     return new Gson().toJson(Map.of("error", "Master and at least one worker required"));
                 }
 
                 if (request.nameHostCM == null || request.nameHostEX == null || request.nameHostEX.isEmpty()) {
-                    logger.warn("Host names validation failed - nameHostCM: '{}', nameHostEX: '{}'",
+                    logger.warn("Host names validation failed - nameHostCM: '{}', nameHostEX: '{}'", 
                         request.nameHostCM, request.nameHostEX);
                     res.status(400);
                     return new Gson().toJson(Map.of("error", "Host names are required"));
@@ -68,13 +98,13 @@ Spark.post("/api/deploy", (req, res) -> {
                 Path tempDir = Files.createTempDirectory("mas-deploy-");
                 Path inventoryPath = tempDir.resolve("inventory.ini");
                 Path varsPath = tempDir.resolve("vars.yml");
-
+                
                 logger.info("Creating inventory file at: {}", inventoryPath.toAbsolutePath());
                 generateInventoryFile(request.master, request.workers, request.nameHostCM, request.nameHostEX, inventoryPath);
                 logger.info("Inventory file created successfully");
-
+                
                 logger.info("Creating vars file at: {}", varsPath.toAbsolutePath());
-                String condorPassword = request.condorPassword != null && !request.condorPassword.trim().isEmpty()
+                String condorPassword = request.condorPassword != null && !request.condorPassword.trim().isEmpty() 
                     ? request.condorPassword.trim() : "qwerty";
                 generateVarsFile(request.master, condorPassword, varsPath);
                 logger.info("Vars file created successfully");
@@ -85,12 +115,14 @@ Spark.post("/api/deploy", (req, res) -> {
                     res.status(500);
                     return new Gson().toJson(Map.of("error", "Coordinator agent not available"));
                 }
-
+                
                 logger.info("Found coordinator agent, sending deploy command");
 
                 String scriptsPath = Paths.get(System.getProperty("user.dir"), "scripts").toAbsolutePath().toString();
                 String deployCommand = "DEPLOY:" + inventoryPath.toAbsolutePath() + "," + varsPath.toAbsolutePath() + "," + scriptsPath;
+                logger.info("Sending deploy command: {}", deployCommand);
                 ac.putO2AObject(deployCommand, true);
+                logger.info("O2A command sent successfully");
 
                 logger.info("Deployment initiated successfully");
                 return new Gson().toJson(Map.of(
