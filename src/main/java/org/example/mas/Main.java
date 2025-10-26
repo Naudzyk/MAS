@@ -19,6 +19,7 @@ public class Main {
             Profile p = new ProfileImpl();
             p.setParameter(Profile.MAIN_HOST, "localhost");
             p.setParameter(Profile.GUI, "false");
+            p.setParameter(Profile.LOCAL_PORT, "1097"); // Изменяем порт
 
             AgentContainer container = rt.createMainContainer(p);
 
@@ -26,7 +27,21 @@ public class Main {
             DashboardServer.start(4567, container);
 
             // Запускаем CoordinatorAgent
-            container.createNewAgent("coordinator", CoordinatorAgent.class.getName(), null).start();
+            logger.info("Creating CoordinatorAgent...");
+            try {
+                AgentController coordinatorController = container.createNewAgent("coordinator", CoordinatorAgent.class.getName(), null);
+                logger.info("CoordinatorAgent created successfully");
+                logger.info("Starting CoordinatorAgent...");
+                coordinatorController.start();
+                logger.info("CoordinatorAgent started successfully");
+                
+                // Проверяем, что агент действительно запущен
+                Thread.sleep(1000); // Даем время агенту запуститься
+                logger.info("CoordinatorAgent status: {}", coordinatorController.getState());
+            } catch (Exception e) {
+                logger.error("Failed to create or start CoordinatorAgent", e);
+                throw e;
+            }
 
             logger.info("System is ready. Open http://localhost:4567 to deploy cluster.");
             logger.info("Deployment will be started only after clicking 'Deploy' button.");

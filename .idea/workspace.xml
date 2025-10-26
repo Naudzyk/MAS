@@ -5,8 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;New Version 7.2&quot;">
-      <change beforePath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/original-MAS-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/original-MAS-1.0-SNAPSHOT.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -193,7 +192,7 @@
       <workItem from="1761396098174" duration="2208000" />
       <workItem from="1761452780173" duration="4988000" />
       <workItem from="1761461188631" duration="41000" />
-      <workItem from="1761461304188" duration="335000" />
+      <workItem from="1761461304188" duration="1931000" />
     </task>
     <task id="LOCAL-00001" summary="'V1'">
       <option name="closed" value="true" />
@@ -459,7 +458,15 @@
       <option name="project" value="LOCAL" />
       <updated>1761461518004</updated>
     </task>
-    <option name="localTasksCounter" value="34" />
+    <task id="LOCAL-00034" summary="&quot;New Version 7.2&quot;">
+      <option name="closed" value="true" />
+      <created>1761461655487</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1761461655487</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

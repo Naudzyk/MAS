@@ -36,6 +36,7 @@ public class CoordinatorAgent extends Agent {
         addBehaviour(new CyclicBehaviour() {
             @Override
             public void action() {
+                logger.info("CoordinatorAgent: Checking for O2A commands...");
                 Object cmd = getO2AObject();
                 if (cmd != null) {
                     logger.info("CoordinatorAgent: Received O2A object of type: {}", cmd.getClass().getSimpleName());
@@ -46,20 +47,28 @@ public class CoordinatorAgent extends Agent {
                         
                         if (command.startsWith("DEPLOY:")) {
                             String[] parts = command.substring(7).split(",", 3);
+                            logger.info("DEPLOY command parts: {}", java.util.Arrays.toString(parts));
                             if (parts.length == 3) {
                                 logger.info("Starting deployment with inventory: {}, vars: {}, playbooks: {}", 
                                     parts[0].trim(), parts[1].trim(), parts[2].trim());
                                 startDeployment(parts[0].trim(), parts[1].trim(), parts[2].trim());
                             } else {
                                 logger.error("Invalid DEPLOY command format. Expected 3 parts, got: {}", parts.length);
+                                logger.error("Command was: {}", command);
                             }
                         } else if ("COMMAND: COLLECT_DIAGNOSTIC_LOGS".equals(command)) {
                             logger.info("Starting diagnostic logs collection");
                             collectDiagnosticLogs();
+                        } else if ("TEST_COMMAND".equals(command)) {
+                            logger.info("Received TEST_COMMAND - updating status");
+                            DashboardServer.updateStatus("ansibleStage", "TEST_COMMAND_RECEIVED");
+                            logger.info("Status updated to: TEST_COMMAND_RECEIVED");
                         } else {
                             logger.warn("Unknown command received: {}", command);
                         }
                     }
+                } else {
+                    logger.info("No O2A command received - waiting...");
                 }
                 block();
             }
