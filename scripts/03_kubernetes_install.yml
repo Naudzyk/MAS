@@ -1,30 +1,145 @@
----
-- name: Install Kubernetes
+- name: Install Kubernetes components
   hosts: all
+  gather_facts: yes
   become: yes
-  tasks:
-    - name: Add Kubernetes repository
-      yum_repository:
-        name: kubernetes
-        description: Kubernetes Repository
-        baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
-        gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg
-        gpgcheck: yes
-        enabled: yes
-      when: ansible_os_family == "RedHat"
-      
-    - name: Install kubeadm, kubelet, kubectl
-      package:
-        name:
-          - kubeadm
-          - kubelet
-          - kubectl
-        state: present
-      when: ansible_os_family == "RedHat"
-      
-    - name: Create test file
-      copy:
-        content: "Kubernetes installed on {{ inventory_hostname }}"
-        dest: /tmp/kubernetes_installed.txt
-        mode: '0644'
+  vars_files:
+    - vars.yml
 
+  tasks:
+    - name: Ensure keyring dir exists
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: "0755"
+
+    - name: Configure containerd (SystemdCgroup=true + pause {{ pause_version }})
+      ansible.builtin.shell: |
+        mkdir -p /etc/containerd
+        containerd config default > /etc/containerd/config.toml
+        sed -ri 's#(SystemdCgroup = )false#\1true#g' /etc/containerd/config.toml
+        sed -ri 's#sandbox_image = ".*"#sandbox_image = "registry.k8s.io/pause:{{ pause_version }}"#' /etc/containerd/config.toml
+        systemctl daemon-reload
+        systemctl enable --now containerd
+
+    - name: Add Kubernetes apt key (pkgs.k8s.io)
+      ansible.builtin.shell: |
+        mkdir -p /etc/apt/keyrings
+        curl -fsSL https://pkgs.k8s.io/core:/stable:/v{{ k8s_version.split('.')[0] }}.{{ k8s_version.split('.')[1] }}/deb/Release.key \
+          | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+      args:
+        creates: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+    - name: Add Kubernetes apt repo (v{{ k8s_version.split('.')[0] }}.{{ k8s_version.split('.')[1] }})
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v{{ k8s_version.split('.')[0] }}.{{ k8s_version.split('.')[1] }}/deb/ /"
+        filename: kubernetes
+        state: present
+
+
+    - name: Make KUBECONFIG global
+      copy:
+        dest: /etc/profile.d/kubectl.sh
+        mode: "0644"
+        content: |
+          expert KUBECONFIG=/etc/kubernetes/admin.conf
+      when: "'central_manager' in group_names"
+      delegate_to: central_manager
+      run_once: true
+
+
+
+    - name: apt update after repo add
+      apt:
+        update_cache: yes
+
+    - name: Unhold kube* (allow align/downgrade)
+      command: apt-mark unhold kubelet kubeadm kubectl
+      changed_when: false
+      ignore_errors: true
+
+    - name: Detect exact package versions for {{ k8s_version }}
+      shell: |
+        set -e
+        for pkg in kubeadm kubelet kubectl; do
+          ver=$(apt-cache madison $pkg | awk '/{{ k8s_version }}-/{print $3; exit}')
+          if [ -z "$ver" ]; then echo "NO_VERSION_FOR_{{ k8s_version }}" >&2; exit 1; fi
+          echo "$pkg=$ver"
+        done
+      register: k8s_pkg_versions
+      changed_when: false
+
+    - name: Install exact k8s {{ k8s_version }} (allow downgrade)
+      apt:
+        name: "{{ item }}"
+        state: present
+        allow_downgrade: yes
+      loop: "{{ k8s_pkg_versions.stdout_lines }}"
+
+    - name: Hold kube*
+      command: apt-mark hold kubelet kubeadm kubectl
+      changed_when: false
+
+    - name: Remove conflicting kubernetes binaries from /usr/local/bin
+      file:
+        path: "/usr/local/bin/{{ item }}"
+        state: absent
+      loop:
+        - kubeadm
+        - kubelet
+        - kubectl
+
+    - name: Verify kube* versions (system binaries)
+      shell: |
+        set -e
+        echo "kubeadm: $(/usr/bin/kubeadm version -o=short)"
+        echo "kubelet: $(/usr/bin/kubelet --version)"
+        echo "kubectl: $(/usr/bin/kubectl version --client -o=json | jq -r .clientVersion.gitVersion)"
+      register: k8s_bin_versions
+      changed_when: false
+
+    - name: Show versions
+      debug:
+        var: k8s_bin_versions.stdout_lines
+
+    - name: Disable swap
+      shell: |
+        swapoff -a || true
+        sed -i.bak '/\sswap\s/ s/^/#/' /etc/fstab
+
+    - name: Set preferred node IP regex
+      set_fact:
+        k8s_preferred_regex: "{{ k8s_preferred_regex | default('^192\\.168\\.56\\.') }}"
+
+    - name: Detect node IP by routing to API endpoint
+      shell: ip -4 route get {{ central_manager_ip }} | awk '{for(i=1;i<=NF;i++) if($i=="src"){print $(i+1); exit}}'
+      register: route_ip
+      changed_when: false
+      failed_when: route_ip.rc != 0 and (route_ip.stdout | trim) == ""
+
+    - name: Compute kubelet node-ip (route -> default fallback)
+      set_fact:
+        k8s_node_ip: "{{ (route_ip.stdout | trim) | default(ansible_default_ipv4.address, true) }}"
+
+    - name: Ensure kubelet uses auto-detected node-ip
+      copy:
+        dest: /etc/default/kubelet
+        content: |
+          KUBELET_EXTRA_ARGS="--node-ip={{ k8s_node_ip }}"
+      notify: Restart kubelet
+
+    - name: Remove conflicting kubelet override (standalone mode)
+      file:
+        path: /etc/systemd/system/kubelet.service.d/10-kubelet.conf
+        state: absent
+
+    - name: Enable kubelet
+      systemd:
+        name: kubelet
+        enabled: yes
+
+  handlers:
+    - name: Restart kubelet
+      systemd:
+        name: kubelet
+        state: restarted
+        daemon_reload: yes

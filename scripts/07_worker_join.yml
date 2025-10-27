@@ -1,22 +1,103 @@
----
-- name: Join Worker Nodes to Cluster
-  hosts: execute_nodes
+- name: Join worker nodes to Kubernetes cluster
+  hosts: all
+  gather_facts: yes
   become: yes
+  vars_files:
+    - vars.yml
+
   tasks:
-    - name: Get join command from master
-      uri:
-        url: "http://{{ hostvars[groups['central_manager'][0]]['ansible_host'] }}:8080/join"
-        method: GET
-        return_content: yes
-      register: join_command
-      
-    - name: Join cluster
-      command: "{{ join_command.content }}"
-      when: join_command.content is defined
-      
-    - name: Create test file
-      copy:
-        content: "Worker joined cluster: {{ inventory_hostname }}"
-        dest: /tmp/worker_joined.txt
-        mode: '0644'
+    - name: Stop kubelet on workers
+      when: inventory_hostname == groups['central_manager'][0]
+      run_once: true
+      delegate_to: "{{ item }}"
+      shell: systemctl stop kubelet || true
+      loop: "{{ groups['execute_nodes'] | default([]) }}"
+
+    - name: Unmount kubelet mounts on workers
+      when: inventory_hostname == groups['central_manager'][0]
+      run_once: true
+      delegate_to: "{{ item }}"
+      shell: |
+        for m in $(mount | awk '/\/var\/lib\/kubelet/ {print $3}' | sort -r); do umount -f "$m" || true; done
+      args:
+        executable: /bin/bash
+      loop: "{{ groups['execute_nodes'] | default([]) }}"
+
+    - name: kubeadm reset on workers
+      when: inventory_hostname == groups['central_manager'][0]
+      run_once: true
+      delegate_to: "{{ item }}"
+      command: /usr/bin/kubeadm reset -f
+      ignore_errors: true
+      loop: "{{ groups['execute_nodes'] | default([]) }}"
+
+    - name: Remove kube/kubelet PKI and configs on workers
+      when: inventory_hostname == groups['central_manager'][0]
+      run_once: true
+      delegate_to: "{{ item }}"
+      shell: |
+        rm -rf /etc/kubernetes/pki \
+               /etc/kubernetes/kubelet.conf \
+               /etc/kubernetes/bootstrap-kubelet.conf \
+               /var/lib/kubelet/pki \
+               /var/lib/kubelet/config.yaml || true
+      args:
+        executable: /bin/bash
+      loop: "{{ groups['execute_nodes'] | default([]) }}"
+
+    - name: Clean CNI state on workers
+      when: inventory_hostname == groups['central_manager'][0]
+      run_once: true
+      delegate_to: "{{ item }}"
+      shell: rm -rf /etc/cni/net.d/* /var/lib/cni/* || true
+      loop: "{{ groups['execute_nodes'] | default([]) }}"
+
+    - name: Restart containerd and kubelet on workers
+      when: inventory_hostname == groups['central_manager'][0]
+      run_once: true
+      delegate_to: "{{ item }}"
+      shell: |
+        systemctl restart containerd || true
+        systemctl restart kubelet || true
+      loop: "{{ groups['execute_nodes'] | default([]) }}"
+
+    - name: Get join command (control-plane)
+      command: /usr/bin/kubeadm token create --print-join-command
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+      register: join_cmd
+      when: "'central_manager' in group_names"
+      run_once: true
+      delegate_to: central_manager
+
+    - name: Build full join command using system kubeadm
+      set_fact:
+        join_command_full: "{{ join_cmd.stdout | trim | regex_replace('^kubeadm','/usr/bin/kubeadm') }}"
+      when: join_cmd is defined
+      run_once: true
+      delegate_to: central_manager
+
+    - name: Join workers to cluster (single driver)
+      when:
+        - inventory_hostname == groups['central_manager'][0]
+        - groups['execute_nodes'] is defined
+        - (groups['execute_nodes'] | length) > 0
+        - join_command_full is defined
+      run_once: true
+      delegate_to: "{{ item }}"
+      shell: "{{ join_command_full }}"
+      args:
+        executable: /bin/bash
+      loop: "{{ groups['execute_nodes'] }}"
+
+    - name: Wait for nodes Ready
+      command: /usr/bin/kubectl get nodes -o jsonpath='{.items[*].status.conditions[?(@.type=="Ready")].status}'
+      environment:
+        KUBECONFIG: /root/.kube/config
+      register: nodes_status
+      retries: 60
+      delay: 10
+      until: "'True' in nodes_status.stdout"
+      when: "'central_manager' in group_names"
+      delegate_to: central_manager
 

@@ -1,18 +1,98 @@
----
-- name: Install Calico CNI
-  hosts: central_manager
+- name: Configure Calico CNI networking
+  hosts: all
+  gather_facts: yes
   become: yes
+  vars_files:
+    - vars.yml
+
   tasks:
-    - name: Apply Calico manifest
-      command: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
-      
-    - name: Wait for nodes to be ready
-      command: kubectl get nodes
-      register: nodes_result
-      
-    - name: Create test file
-      copy:
-        content: "Calico CNI installed on {{ inventory_hostname }}"
-        dest: /tmp/calico_installed.txt
-        mode: '0644'
+    - name: Detect node IP by routing to API endpoint
+      shell: ip -4 route get {{ central_manager_ip }} | awk '{for(i=1;i<=NF;i++) if($i=="src"){print $(i+1); exit}}'
+      register: route_ip
+      changed_when: false
+      failed_when: route_ip.rc != 0 and (route_ip.stdout | trim) == ""
+
+    - name: Compute kubelet node-ip (route -> default fallback)
+      set_fact:
+        k8s_node_ip: "{{ (route_ip.stdout | trim) | default(ansible_default_ipv4.address, true) }}"
+
+    - name: Uninstall Flannel namespace (if present)
+      command: /usr/bin/kubectl delete ns kube-flannel --ignore-not-found
+      environment:
+        KUBECONFIG: /root/.kube/config
+      when: "'central_manager' in group_names"
+      delegate_to: central_manager
+      run_once: true
+
+    - name: Wipe CNI state on all nodes (before Calico)
+      shell: |
+        rm -rf /etc/cni/net.d/* /var/lib/cni/* || true
+        systemctl restart kubelet
+      become: yes
+
+    - name: Ensure localhost entries in /etc/hosts
+      lineinfile:
+        path: /etc/hosts
+        create: yes
+        line: "{{ item }}"
+        state: present
+      loop:
+        - "127.0.0.1 localhost"
+        - "::l localhost ip6-localhost ip6-loopback"
+
+
+
+    - name: Ensure node hostname resolves (optinal but recommended)
+      lineinfile:
+        path: /etc/hosts
+        line: "{{ k8s_node_ip }} {{ inventory_hostname }}"
+        state: present
+
+
+    - name: Insatall CNI plugins required by kubelet
+      apt:
+        name: kubernetes-cni
+        state: present
+
+
+    - name: Install Calico CNI
+      command: /usr/bin/kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.3/manifests/calico.yaml
+      environment:
+        KUBECONFIG: /root/.kube/config
+      when: "'central_manager' in group_names"
+      delegate_to: central_manager
+      run_once: true
+
+    - name: Ensure vxlan module loads on boot
+      lineinfile:
+        path: /etc/modules-load.d/k8s.conf
+        line: vxlan
+        create: yes
+
+    - name: Load vxlan now
+      shell: modprobe vxlan || true
+
+
+    - name: Configure calico-node env (IP autodetect + VXLAN + NAT)
+      command: >
+        /usr/bin/kubectl -n kube-system set env ds/calico-node
+        IP_AUTODETECTION_METHOD=kubernetes-internal-ip
+        CALICO_IPV4POOL_CIDR=10.244.0.0/16
+        CALICO_IPV4POOL_VXLAN=Always
+        CALICO_IPV4POOL_IPIP=Never
+        CALICO_IPV6POOL_NAT_OUTGOING=false
+        CALICO_IPV4POOL_NAT_OUTGOING=true
+      environment:
+        KUBECONFIG: /root/.kube/config
+      when: "'central_manager' in group_names"
+      delegate_to: central_manager
+      run_once: true
+
+    - name: Wait for calico-node rollout
+      command: /usr/bin/kubectl -n kube-system rollout status ds/calico-node --timeout=300s
+      environment:
+        KUBECONFIG: /root/.kube/config
+      when: "'central_manager' in group_names"
+      delegate_to: central_manager
+      run_once: true
 

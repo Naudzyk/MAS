@@ -24,7 +24,7 @@ public class Main {
             AgentContainer container = rt.createMainContainer(p);
 
             // Запускаем веб-панель на порту 4567
-            DashboardServer.start(4567, container);
+            DashboardServer.start(4568, container);
 
             // Запускаем CoordinatorAgent
             logger.info("Creating CoordinatorAgent...");

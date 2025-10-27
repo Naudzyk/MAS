@@ -1,23 +1,21 @@
----
-- name: Install Containerd
+- name: Install and configure containerd
   hosts: all
+  gather_facts: yes
   become: yes
+  vars_files:
+    - vars.yml
+
   tasks:
     - name: Install containerd
-      package:
+      apt:
         name: containerd
         state: present
-      when: ansible_os_family == "RedHat"
-      
-    - name: Start and enable containerd
-      systemd:
-        name: containerd
-        state: started
-        enabled: yes
-        
-    - name: Create test file
-      copy:
-        content: "Containerd installed on {{ inventory_hostname }}"
-        dest: /tmp/containerd_installed.txt
-        mode: '0644'
 
+    - name: Configure containerd (SystemdCgroup=true + pause {{ pause_version }})
+      shell: |
+        mkdir -p /etc/containerd
+        containerd config default > /etc/containerd/config.toml
+        sed -ri 's#(SystemdCgroup = )false#\1true#g' /etc/containerd/config.toml
+        sed -ri 's#sandbox_image = "registry\.(k8s\.io|aliyuncs\.com)/google_containers/pause:[0-9\.]+"#sandbox_image = "registry.aliyuncs.com/google_containers/pause:{{ pause_version }}"#g' /etc/containerd/config.toml || true
+        systemctl daemon-reload
+        systemctl enable --now containerd
