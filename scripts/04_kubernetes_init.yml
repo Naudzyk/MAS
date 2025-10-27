@@ -1,28 +1,60 @@
----
-- name: Initialize Kubernetes Cluster
-  hosts: central_manager
+- name: Install Kubernetes components
+  hosts: all
+  gather_facts: yes
   become: yes
-  tasks:
-    - name: Initialize Kubernetes cluster
-      command: kubeadm init --pod-network-cidr=192.168.0.0/16
-      register: init_result
-      
-    - name: Create .kube directory
-      file:
-        path: /root/.kube
-        state: directory
-        mode: '0755'
-        
-    - name: Copy admin config
-      copy:
-        src: /etc/kubernetes/admin.conf
-        dest: /root/.kube/config
-        remote_src: yes
-        mode: '0644'
-        
-    - name: Create test file
-      copy:
-        content: "Kubernetes cluster initialized on {{ inventory_hostname }}"
-        dest: /tmp/kubernetes_initialized.txt
-        mode: '0644'
+  vars_files:
+    - vars.yml
 
+  tasks:
+    - name: Reset any existing cluster (all nodes)
+      command: /usr/bin/kubeadm reset -f
+      ignore_errors: true
+
+    - name: Clean CNI leftovers (all nodes)
+      shell: |
+        rm -rf /etc/cni/net.d/* /var/lib/cni/* /var/lib/kubelet/pki/* || true
+
+    - name: Restart containerd and kubelet after reset (all nodes)
+      shell: |
+        systemctl restart containerd
+        systemctl restart kubelet
+
+    - name: Pre-pull images for kubeadm (control-plane only)
+      command: /usr/bin/kubeadm config images pull --kubernetes-version v{{ k8s_version }} --image-repository registry.aliyuncs.com/google_containers
+      when: "'central_manager' in group_names"
+      run_once: true
+      delegate_to: central_manager
+
+    - name: kubeadm init on control-plane
+      command: >
+        /usr/bin/kubeadm init
+        --kubernetes-version v{{ k8s_version }}
+        --control-plane-endpoint {{ central_manager_ip }}
+        --apiserver-advertise-address={{ central_manager_ip }}
+        --pod-network-cidr=10.244.0.0/16
+        --image-repository registry.aliyuncs.com/google_containers
+        --v=5
+      register: init_out
+      when: "'central_manager' in group_names"
+      run_once: true
+      delegate_to: central_manager
+
+    - name: Setup kubeconfig for root and usermaster on control-plane
+      shell: |
+        mkdir -p /root/.kube
+        cp -f /etc/kubernetes/admin.conf /root/.kube/config
+        chown -R root:root /root/.kube
+        mkdir -p /home/usermaster/.kube
+        cp -f /etc/kubernetes/admin.conf /home/usermaster/.kube/config
+        chown usermaster:usermaster /home/usermaster/.kube/config
+        chmod 600 /home/usermaster/.kube/config
+      when: "'central_manager' in group_names"
+      delegate_to: central_manager
+
+
+  handlers:
+    - name: Restart kubelet
+      systemd:
+        name: kubelet
+        state: restarted
+        daemon_reload: yes

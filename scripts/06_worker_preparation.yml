@@ -1,20 +1,47 @@
----
-- name: Prepare Worker Nodes
-  hosts: execute_nodes
+- name: Prepare worker nodes for Kubernetes
+  hosts: all
+  gather_facts: yes
   become: yes
+  vars_files:
+    - vars.yml
+
   tasks:
-    - name: Install kubeadm, kubelet, kubectl
-      package:
-        name:
-          - kubeadm
-          - kubelet
-          - kubectl
-        state: present
-      when: ansible_os_family == "RedHat"
-        
-    - name: Create test file
-      copy:
-        content: "Worker node prepared: {{ inventory_hostname }}"
-        dest: /tmp/worker_prepared.txt
-        mode: '0644'
+    - name: kubeadm reset on workers
+      command: /usr/bin/kubeadm reset -f
+      ignore_errors: true
+      loop: "{{ groups['execute_nodes'] | default([]) }}"
+      loop_control:
+        loop_var: execute_node
+      delegate_to: "{{ execute_node }}"
+
+    - name: Remove kube/kubelet PKI and configs on workers
+      shell: |
+        rm -rf /etc/kubernetes/pki \
+               /etc/kubernetes/kubelet.conf \
+               /etc/kubernetes/bootstrap-kubelet.conf \
+               /var/lib/kubelet/pki \
+               /var/lib/kubelet/config.yaml || true
+      args:
+        executable: /bin/bash
+      loop: "{{ groups['execute_nodes'] | default([]) }}"
+      loop_control:
+        loop_var: execute_node
+      delegate_to: "{{ execute_node }}"
+
+    - name: Clean CNI state on workers
+      shell: |
+        rm -rf /etc/cni/net.d/* /var/lib/cni/* || true
+      loop: "{{ groups['execute_nodes'] | default([]) }}"
+      loop_control:
+        loop_var: execute_node
+      delegate_to: "{{ execute_node }}"
+
+    - name: Restart containerd and kubelet on workers
+      shell: |
+        systemctl restart containerd
+        systemctl restart kubelet
+      loop: "{{ groups['execute_nodes'] | default([]) }}"
+      loop_control:
+        loop_var: execute_node
+      delegate_to: "{{ execute_node }}"
 

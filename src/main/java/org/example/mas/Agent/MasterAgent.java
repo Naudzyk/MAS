@@ -1,7 +1,5 @@
 package org.example.mas.Agent;
 
-
-
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import org.example.mas.DashboardServer;

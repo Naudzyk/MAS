@@ -29,17 +29,22 @@
             <url>https://repo.maven.apache.org/maven2</url>
         </repository>
 
+	<repository>
+	    <id>jitpack.io</id>
+	    <url>https://jitpack.io</url>
+	</repository>
+
 
     </repositories>
 
 
     <dependencies>
-        <!-- JADE -->
         <dependency>
-            <groupId>com.tilab.jade</groupId>
+            <groupId>com.gitlab.jade-project</groupId>
             <artifactId>jade</artifactId>
-            <version>4.5.0</version>
+            <version>master-SNAPSHOT</version>
         </dependency>
+
 
         <!-- SLF4J API + Logback (биндинг логгера) -->
         <dependency>
@@ -95,6 +100,7 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
 
     <build>
         <resources>

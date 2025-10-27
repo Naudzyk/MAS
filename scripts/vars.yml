@@ -1,0 +1,7 @@
+ansible_python_interpreter: /usr/bin/python3
+central_manager_ip: "{{CENTRAL_MANAGER_IP}}"
+k8s_version: "1.30.7"
+pause_version: "3.9"
+condor_image: "evgenii457/htcondor2"
+condor_logs_dir: "/var/log/condor"
+condor_cluster_password: "{{CONDOR_PASSWORD}}"
