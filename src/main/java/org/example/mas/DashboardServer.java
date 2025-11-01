@@ -101,8 +101,8 @@ public class DashboardServer {
                 Path projectBaseDir = Paths.get("").toAbsolutePath();
                 logger.info("Project base directory: {}", projectBaseDir);
                 Path scriptsDir = projectBaseDir.resolve("scripts");
-                Path templateInventory = scriptsDir.resolve("inventory_template.ini");
-                Path templateVars = scriptsDir.resolve("vars_template.yml");
+                Path templateInventory = scriptsDir.resolve("inventory.ini");
+                Path templateVars = scriptsDir.resolve("vars.yml");
 
                 if (!Files.exists(templateInventory) || !Files.exists(templateVars)) {
                      logger.error("Template files not found in scripts/ directory: inventory_template.ini or vars_template.yml");
@@ -273,17 +273,17 @@ public class DashboardServer {
         // Заполняем секцию [central_manager]
         sb.append("[central_manager]\n");
         String cmHostName = "central_manager";
-        String cmUserName = request.nameHostCM != null && !request.nameHostCM.isEmpty() ? request.nameHostCM : "vboxuser";
-        sb.append(cmHostName).append(" ansible_host=").append(request.master).append(" ansible_user=").append(cmUserName).append("\n\n");
+        String cmUserName = request.getNameHostCM() != null && !request.getNameHostCM().isEmpty() ? request.getNameHostCM() : "vboxuser";
+        sb.append(cmHostName).append(" ansible_host=").append(request.getMaster()).append(" ansible_user=").append(cmUserName).append("\n\n");
 
         // Заполняем секцию [execute_nodes]
         sb.append("[execute_nodes]\n");
-        if (request.workers != null && request.nameHostEX != null) {
-            int minWorkers = Math.min(request.workers.size(), request.nameHostEX.size());
+        if (request.getWorkers() != null && request.getNameHostEX() != null) {
+            int minWorkers = Math.min(request.getWorkers().size(), request.getNameHostEX().size());
             for (int i = 0; i < minWorkers; i++) {
                 String workerAlias = "worker" + (i + 1);
-                String workerIp = request.workers.get(i);
-                String workerUser = request.nameHostEX.get(i);
+                String workerIp = request.getWorkers().get(i);
+                String workerUser = request.getNameHostEX().get(i);
                 sb.append(workerAlias)
                   .append(" ansible_host=").append(workerIp)
                   .append(" ansible_user=").append(workerUser)
@@ -291,11 +291,11 @@ public class DashboardServer {
             }
         }
         // Если workers больше, чем nameHostEX, используем имя пользователя по умолчанию
-        if (request.workers != null && request.nameHostEX != null && request.workers.size() > request.nameHostEX.size()) {
-             for (int i = request.nameHostEX.size(); i < request.workers.size(); i++) {
+        if (request.getWorkers() != null && request.getNameHostEX() != null && request.getWorkers().size() > request.getNameHostEX().size()) {
+             for (int i = request.getNameHostEX().size(); i < request.getWorkers().size(); i++) {
                  String workerAlias = "worker" + (i + 1);
-                 String workerIp = request.workers.get(i);
-                 String workerUser = "kuber"; // Пользователь по умолчанию
+                 String workerIp = request.getWorkers().get(i);
+                 String workerUser = "kuber";
                  sb.append(workerAlias)
                    .append(" ansible_host=").append(workerIp)
                    .append(" ansible_user=").append(workerUser)
@@ -315,8 +315,8 @@ public class DashboardServer {
         String result = templateContent;
 
         // Заменяем известные переменные
-        result = replacePlaceholder(result, "CENTRAL_MANAGER_IP", request.master);
-        String password = request.condorPassword != null && !request.condorPassword.isEmpty() ? request.condorPassword : "qwerty";
+        result = replacePlaceholder(result, "CENTRAL_MANAGER_IP", request.getMaster());
+        String password = request.getCondorPassword() != null && !request.getCondorPassword().isEmpty() ? request.getCondorPassword() : "qwerty";
         result = replacePlaceholder(result, "CONDOR_PASSWORD", password);
 
         // Можно добавить замену других переменных, если они есть в шаблоне
@@ -331,11 +331,10 @@ public class DashboardServer {
      * Использует Pattern.quote для экранирования специальных символов в ключе.
      */
     private static String replacePlaceholder(String content, String placeholderKey, String value) {
-        if (value == null) value = ""; // Защита от NullPointerException
-        // Создаем паттерн для поиска {{placeholderKey}} (с учетом регистра)
+        if (value == null) value = "";
         Pattern pattern = Pattern.compile(Pattern.quote("{{" + placeholderKey + "}}"));
         Matcher matcher = pattern.matcher(content);
-        return matcher.replaceAll(Matcher.quoteReplacement(value)); // quoteReplacement экранирует $ и \
+        return matcher.replaceAll(Matcher.quoteReplacement(value));
     }
 
 }
