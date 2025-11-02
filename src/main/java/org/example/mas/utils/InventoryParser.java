@@ -7,7 +7,32 @@ import java.util.*;
 
 
 
-public class InventoryParser {
+public  class InventoryParser {
+    public static class Inventory {
+        private final Map<String, List<Host>> groups = new HashMap<>();
+
+        public void addHost(String group, String hostname, Map<String, String> vars) {
+            groups.computeIfAbsent(group, k -> new ArrayList<>()).add(new Host(hostname, vars));
+        }
+
+        public List<Host> getGroup(String groupName) {
+            return groups.getOrDefault(groupName, Collections.emptyList());
+        }
+            public List<Host> getAllHosts() {
+            List<Host> hosts = new ArrayList<>();
+            Set<String> hostNames = new HashSet<>();
+
+            for(List<Host> hostsInGroup : this.groups.values()) {
+                for (Host host : hostsInGroup) {
+                    if(!hostNames.contains(host.name)){
+                        hosts.add(host);
+                        hostNames.add(host.name);
+                    }
+                }
+            }
+            return hosts;
+    }
+    }
     public static Inventory parse(String inventoryPath) throws IOException {
         List<String> lines = Files.readAllLines(Paths.get(inventoryPath));
         Inventory inv = new Inventory();
@@ -38,17 +63,8 @@ public class InventoryParser {
         return inv;
     }
 
-    public static class Inventory {
-        private final Map<String, List<Host>> groups = new HashMap<>();
 
-        public void addHost(String group, String hostname, Map<String, String> vars) {
-            groups.computeIfAbsent(group, k -> new ArrayList<>()).add(new Host(hostname, vars));
-        }
 
-        public List<Host> getGroup(String groupName) {
-            return groups.getOrDefault(groupName, Collections.emptyList());
-        }
-    }
 
     public static class Host {
         public final String name;

@@ -1,0 +1,75 @@
+- name: Установка Prometheus
+  hosts: central_manager
+  become: yes
+  tasks:
+    - name: Скачиваем Prometheus
+      get_url:
+        url: https://github.com/prometheus/prometheus/releases/download/v2.50.0/prometheus-2.50.0.linux-amd64.tar.gz
+        dest: /tmp/prometheus.tar.gz
+
+    - name: Распаковка Prometheus
+      unarchive:
+        src: /tmp/prometheus.tar.gz
+        dest: /tmp/
+        remote_src: yes
+
+    - name: Перемещаем в binary
+      copy:
+        src: /tmp/prometheus-2.50.0.linux-amd64/prometheus
+        dest: /usr/local/bin/prometheus
+        mode: '0755'
+        remote_src: yes
+
+    - name: Создаём пользователя prometheus
+      user:
+        name: prometheus
+        system: yes
+        shell: /usr/sbin/nologin
+        home: /var/lib/prometheus
+
+    - name: Создаем директории для prometheus
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: prometheus
+        group: prometheus
+        mode: '0755'
+      loop:
+        - /etc/prometheus
+        - /var/lib/prometheus
+
+    - name: Копируем конфиг prometheus.yml
+      template:
+        src: prometheus.yml.j2
+        dest: /etc/prometheus/prometheus.yml
+        owner: prometheus
+        group: prometheus
+        mode: '0644'
+
+    - name: Создаем systemd unit для Prometheus
+      copy:
+        dest: /etc/systemd/system/prometheus.service
+        content: |
+          [Unit]
+          Description=Prometheus
+          After=network.target
+
+          [Service]
+          User=prometheus
+          Group=prometheus
+          Type=simple
+          ExecStart=/usr/local/bin/prometheus \
+            --config.file /etc/prometheus/prometheus.yml \
+            --storage.tsdb.path /var/lib/prometheus/ \
+            --web.console.templates=/etc/prometheus/consoles \
+            --web.console.libraries=/etc/prometheus/console_libraries
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Запускаем Prometheus Server
+      systemd:
+        name: prometheus
+        enabled: yes
+        state: started
+        deamon_reload: yes

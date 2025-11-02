@@ -1,17 +1,31 @@
 package org.example.mas.Agent;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.TickerBehaviour;
+import jade.lang.acl.ACLMessage;
 import org.example.mas.DashboardServer;
+import org.example.mas.utils.InventoryParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
 public class MasterAgent extends Agent {
+    private final HttpClient httpClient = HttpClient.newHttpClient();
     private static final Logger logger = LoggerFactory.getLogger(MasterAgent.class);
     private String nodeName;
     private String inventoryPath;
@@ -20,127 +34,154 @@ public class MasterAgent extends Agent {
     @Override
     protected void setup() {
         Object[] args = getArguments();
-        if (args == null || args.length < 3) {
-            logger.error("MasterAgent requires: nodeName, inventoryPath, playbooksDir");
-            doDelete();
-            return;
-        }
-
         this.nodeName = (String) args[0];
         this.inventoryPath = (String) args[1];
         this.playbooksDir = (String) args[2];
 
         logger.info("MasterAgent {} initialized for node: {}", getLocalName(), nodeName);
 
-        addBehaviour(new CyclicBehaviour() {
-            private long lastCheck = 0;
-            private static final long CHECK_INTERVAL_MS = 10_000;
-
+        addBehaviour(new TickerBehaviour(this, 10_000) { // Каждые 10 секунд
             @Override
-            public void action() {
-                long now = System.currentTimeMillis();
-                if (now - lastCheck >= CHECK_INTERVAL_MS) {
-                    checkServices();
-                    lastCheck = now;
-                }
-                block(1000);
+            protected void onTick() {
+                checkNodeHealth();
+                collectMetrics();
             }
         });
     }
-
-    protected void checkServices() {
-        try {
-            boolean allHealthy = true;
-
-            if (!isPodReady("app=htcondor-cm,role=manager")) {
-                sendAlert("HTCondor Central Manager is not ready");
-                allHealthy = false;
-            }
-
-            if (!areAllExecuteNodesReady()) {
-                allHealthy = false;
-            }
-
-            if (!isCondorClusterActive()) {
-                sendAlert("HTCondor reports no active workers");
-                allHealthy = false;
-            }
-
-            if (allHealthy) {
-                logger.info("HTCondor cluster is fully healthy");
-                DashboardServer.updateStatus("htcondorStatus", "HEALTHY");
-            }
-
-        } catch (Exception e) {
-            logger.error("Error in MasterAgent health check", e);
-            sendAlert("MasterAgent monitoring failed: " + e.getMessage());
+    private void collectMetrics() {
+    try {
+        String nodeIp = getNodeIpFromInventory(nodeName);
+        if (nodeIp == null) {
+            logger.warn("IP for node {} not found", nodeName);
+            return;
         }
+
+        String prometheusUrl = "http://localhost:9090";
+
+        String cpuQuery = "100 - (avg by (instance) (rate(node_cpu_seconds_total{instance=\"" + nodeIp + ":9100\",mode=\"idle\"}[1m])) * 100)";
+        JsonObject cpuResponse = queryPrometheus(prometheusUrl, cpuQuery);
+        double cpuLoad = parsePrometheusValue(cpuResponse);
+
+        String memQuery = "(node_memory_MemTotal_bytes{instance=\"" + nodeIp + ":9100\"} - node_memory_MemAvailable_bytes{instance=\"" + nodeIp + ":9100\"}) / node_memory_MemTotal_bytes{instance=\"" + nodeIp + ":9100\"} * 100";
+        JsonObject memResponse = queryPrometheus(prometheusUrl, memQuery);
+        double memUsage = parsePrometheusValue(memResponse);
+
+        String diskQuery = "(node_filesystem_size_bytes{instance=\"" + nodeIp + ":9100\",fstype!=\"tmpfs\",mountpoint=\"/\"} - node_filesystem_free_bytes{instance=\"" + nodeIp + ":9100\",fstype!=\"tmpfs\",mountpoint=\"/\"}) / node_filesystem_size_bytes{instance=\"" + nodeIp + ":9100\",fstype!=\"tmpfs\",mountpoint=\"/\"} * 100";
+        JsonObject diskResponse = queryPrometheus(prometheusUrl, diskQuery);
+        double diskUsage = parsePrometheusValue(diskResponse);
+
+        Map<String, Object> metrics = new HashMap<>();
+        metrics.put("cpuLoad", String.format("%.2f", cpuLoad));
+        metrics.put("memoryUsage", String.format("%.2f", memUsage));
+        metrics.put("diskUsage", String.format("%.2f", diskUsage));
+        metrics.put("timestamp", System.currentTimeMillis());
+
+        DashboardServer.updateStatus("metrics_" + nodeName, metrics);
+        logger.info("Collected metrics for {}: CPU: {}%, MEM: {}%, DISK: {}%", nodeName, cpuLoad, memUsage, diskUsage);
+
+    } catch (Exception e) {
+        logger.error("Failed to collect metrics for node: " + nodeName, e);
+    }
+    }
+    private JsonObject queryPrometheus(String baseUrl, String query) throws Exception {
+    String encodedQuery = java.net.URLEncoder.encode(query, "UTF-8");
+    String url = baseUrl + "/api/v1/query?query=" + encodedQuery;
+
+    HttpRequest request = HttpRequest.newBuilder()
+        .uri(URI.create(url))
+        .timeout(Duration.ofSeconds(10))
+        .build();
+
+    HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+    if (response.statusCode() != 200) {
+        throw new RuntimeException("Prometheus returned HTTP " + response.statusCode());
     }
 
-    private boolean isPodReady(String labelSelector) {
-        try {
-            Process p = new ProcessBuilder("kubectl", "get", "pod", "-l", labelSelector,
-                    "-o", "jsonpath={.items[0].status.containerStatuses[0].ready}").start();
-            String ready = readOutput(p).trim();
-            return "true".equals(ready);
-        } catch (Exception e) {
-            return false;
-        }
-    }
+    return JsonParser.parseString(response.body()).getAsJsonObject();
+}
 
-    private boolean areAllExecuteNodesReady() {
-        try {
-            Process p1 = new ProcessBuilder("kubectl", "get", "pod", "-l", "app=htcondor-ex,role=execute",
-                    "-o", "jsonpath={.items[*].metadata.name}").start();
-            String names = readOutput(p1).trim();
-            if (names.isEmpty()) {
-                sendAlert("No HTCondor Execute Nodes found");
-                return false;
-            }
-
-            String[] podNames = names.split(" ");
-            for (String podName : podNames) {
-                Process p2 = new ProcessBuilder("kubectl", "get", "pod", podName,
-                        "-o", "jsonpath={.status.containerStatuses[0].ready}").start();
-                String ready = readOutput(p2).trim();
-                if (!"true".equals(ready)) {
-                    Process p3 = new ProcessBuilder("kubectl", "logs", podName, "--tail=30").start();
-                    String logs = readOutput(p3);
-                    sendAlert("Execute Node " + podName + " is not ready. Logs:\n" + logs);
-                    return false;
+private double parsePrometheusValue(JsonObject response) {
+    try {
+        if ("success".equals(response.get("status").getAsString())) {
+            JsonObject data = response.getAsJsonObject("data");
+            if (data.has("result") && data.getAsJsonArray("result").size() > 0) {
+                JsonObject result = data.getAsJsonArray("result").get(0).getAsJsonObject();
+                if (result.has("value") && result.getAsJsonArray("value").size() > 1) {
+                    return result.getAsJsonArray("value").get(1).getAsDouble();
                 }
             }
-            return true;
-        } catch (Exception e) {
-            logger.error("Failed to check Execute Nodes", e);
-            return false;
         }
+    } catch (Exception e) {
+        logger.warn("Failed to parse Prometheus value", e);
     }
+    return 0.0;
+}
 
-    private boolean isCondorClusterActive() {
+    private void checkNodeHealth() {
         try {
-            Process p1 = new ProcessBuilder("kubectl", "get", "pod", "-l", "app=htcondor-cm,role=manager",
-                    "-o", "name").start();
-            String podRef = readOutput(p1).trim();
-            if (podRef.isEmpty()) return false;
-            String podName = podRef.split("/")[1];
-            Process p2 = new ProcessBuilder("kubectl", "exec", podName, "--", "condor_status", "-compact").start();
-            String output = readOutput(p2);
-            return output != null && output.contains("Total Owner");
+            String nodeIp = getNodeIpFromInventory(nodeName);
+            if (nodeIp == null) {
+                logger.warn("IP for node {} not found in inventory", nodeName);
+                return;
+            }
+
+            String prometheusUrl = "http://localhost:9090";
+            String query = "avg(rate(node_cpu_seconds_total{instance=\"" + nodeIp + ":9100\",mode!=\"idle\"}[1m]))";
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(prometheusUrl + "/api/v1/query?query=" + java.net.URLEncoder.encode(query, "UTF-8")))
+                .timeout(Duration.ofSeconds(10))
+                .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                logger.warn("Prometheus returned status {}: {}", response.statusCode(), response.body());
+                return;
+            }
+
+            JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
+            if ("success".equals(json.get("status").getAsString())) {
+                double cpuLoad = json.getAsJsonObject("data")
+                    .getAsJsonArray("result")
+                    .get(0)
+                    .getAsJsonObject()
+                    .get("value")
+                    .getAsJsonArray()
+                    .get(1)
+                    .getAsDouble();
+
+                logger.info("CPU load on {}: {:.2f}%", nodeName, cpuLoad * 100);
+                if (cpuLoad > 0.9) {
+                    sendAlert("High CPU load on " + nodeName + ": " + String.format("%.2f%%", cpuLoad * 100));
+                }
+            } else {
+                logger.warn("Prometheus query failed: {}", json.get("error").getAsString());
+            }
+
         } catch (Exception e) {
-            logger.warn("Failed to run condor_status", e);
-            return false;
+            logger.error("Failed to check node health via Prometheus", e);
         }
     }
 
-    private String readOutput(Process process) throws Exception {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-            return reader.lines().collect(Collectors.joining("\n"));
+    private String getNodeIpFromInventory(String nodeName) {
+        try {
+            InventoryParser.Inventory inv = InventoryParser.parse(inventoryPath);
+            for (InventoryParser.Host host : inv.getAllHosts()) {
+                if (host.name.equals(nodeName)) {
+                    return host.getHost();
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to parse inventory", e);
         }
+        return null;
     }
 
     private void sendAlert(String message) {
-        logger.warn("Sent alert: {}", message);
-        DashboardServer.updateStatus("alerts", new String[]{message});
+        logger.warn("ALERT: {}", message);
+        ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+        msg.addReceiver(new AID("coordinator", AID.ISLOCALNAME));
+        msg.setContent("ALERT: " + message);
+        send(msg);
     }
 }

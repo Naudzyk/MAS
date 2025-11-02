@@ -1,0 +1,11 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'nodes'
+    static_configs:
+    - targets: [
+        {% for host in groups['all'] %}
+        '{{ hostvars[host]["ansible_default_ipv4"]["address"] }}:9100'{% if not loop.last %},{% endif %}
+        {% endfor %}
+      ]

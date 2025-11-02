@@ -4,16 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;New Version 7.8&quot;">
+    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version not Web 8&quot;">
+      <change afterPath="$PROJECT_DIR$/scripts/09_prometheus.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/10_prometheus_server.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/prometheus.yml.j2" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/CoordinatorAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/CoordinatorAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/inventory.ini" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/inventory.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/vars.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/vars.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/MasterAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/MasterAgent.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/DashboardServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/DashboardServer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/utils/InventoryParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/utils/InventoryParser.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/public/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/public/script.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/public/script.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/CoordinatorAgent$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/CoordinatorAgent$2.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/CoordinatorAgent.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/CoordinatorAgent.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/public/script.js" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/public/script.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/Main.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -210,7 +213,7 @@
       <workItem from="1761559570415" duration="4584000" />
       <workItem from="1761626636796" duration="1621000" />
       <workItem from="1761741179965" duration="80000" />
-      <workItem from="1761992120329" duration="16364000" />
+      <workItem from="1761992120329" duration="23782000" />
     </task>
     <task id="LOCAL-00001" summary="'V1'">
       <option name="closed" value="true" />
@@ -524,11 +527,22 @@
       <option name="project" value="LOCAL" />
       <updated>1762057470929</updated>
     </task>
-    <option name="localTasksCounter" value="40" />
+    <task id="LOCAL-00040" summary="&quot;Version not Web 8&quot;">
+      <option name="closed" value="true" />
+      <created>1762070151618</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1762070151618</updated>
+    </task>
+    <option name="localTasksCounter" value="41" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.j2" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -560,7 +574,8 @@
     <MESSAGE value="&quot;New Version 7.6&quot;" />
     <MESSAGE value="&quot;New Version 7.7&quot;" />
     <MESSAGE value="&quot;New Version 7.8&quot;" />
-    <option name="LAST_COMMIT_MESSAGE" value="&quot;New Version 7.8&quot;" />
+    <MESSAGE value="&quot;Version not Web 8&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="&quot;Version not Web 8&quot;" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
