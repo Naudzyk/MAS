@@ -42,58 +42,6 @@
             color: #495057;
             font-size: 20px;
         }
-        .form-group {
-            margin-bottom: 16px;
-        }
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 600;
-            color: #495057;
-        }
-        input[type="text"] {
-            width: 100%;
-            padding: 10px 14px;
-            border: 1px solid #ced4da;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.2s;
-        }
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #0d6efd;
-            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
-        }
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .btn-primary {
-            background: #0d6efd;
-            color: white;
-        }
-        .btn-primary:hover {
-            background: #0b5ed7;
-        }
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-        .btn-secondary:hover {
-            background: #5c636a;
-        }
-        .btn-success {
-            background: #198754;
-            color: white;
-        }
-        .btn-success:hover {
-            background: #157347;
-        }
         .status-item {
             padding: 12px;
             margin-bottom: 10px;
@@ -112,6 +60,11 @@
             background: #f8d7da;
             color: #721c24;
         }
+        .status-warning {
+            border-left-color: #ffc107;
+            background: #fff3cd;
+            color: #856404;
+        }
         .alerts-list {
             max-height: 200px;
             overflow-y: auto;
@@ -119,17 +72,30 @@
         .hidden {
             display: none;
         }
-        .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-right: 10px;
+            margin-bottom: 10px;
         }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #5c636a;
+        }
+        .btn-success {
+            background: #198754;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #157347;
         }
         .result-message {
             padding: 12px;
@@ -153,44 +119,12 @@
     <div class="container">
         <header>
             <h1>🔬 HTCondor Cluster Dashboard</h1>
-            <p>Автоматизированное развёртывание и мониторинг кластера</p>
+            <p>Автоматическое развёртывание и мониторинг кластера</p>
         </header>
-
-        <!-- Форма ввода IP -->
-        <div class="card" id="deploy-form-section">
-            <h2>Развёртывание кластера</h2>
-            <form id="deployForm">
-                <div class="form-group">
-                    <label for="masterIp">IP-адрес master-узла (Central Manager):</label>
-                    <input type="text" id="masterIp" placeholder="192.168.56.107" required>
-                </div>
-                <div class="form-group">
-                    <label for="nameHostCM">Name master-узла (Central Manager):</label>
-                    <input type="text" id="nameHostCM" placeholder="vboxuser" required>
-                </div>
-                <div class="form-group">
-                    <label for="workerIps">IP-адреса worker-узлов (через запятую):</label>
-                    <input type="text" id="workerIps" placeholder="192.168.56.105, 192.168.56.106" required>
-                </div>
-                <div class="form-group">
-                    <label for="nameHostEX">Name execute-узла (через запятую):</label>
-                    <input type="text" id="nameHostEX" placeholder="test, test2" required>
-                </div>
-                <div class="form-group">
-                    <label for="condorPassword">Пароль кластера HTCondor (опционально):</label>
-                    <input type="text" id="condorPassword" placeholder="qwerty">
-                </div>
-                <button type="submit" class="btn btn-primary" id="deployBtn">
-                    <span id="deployBtnText">Развернуть кластер</span>
-                    <span id="deploySpinner" class="spinner hidden"></span>
-                </button>
-                <div id="deployResult" class="result-message hidden"></div>
-            </form>
-        </div>
 
         <!-- Статус развёртывания -->
         <div class="card">
-            <h2>Статус развёртывания</h2>
+            <h2>🔧 Статус развёртывания</h2>
             <div id="ansible-stage" class="status-item">Ожидание запуска...</div>
         </div>
 
@@ -204,8 +138,7 @@
         <div class="card">
             <h2>Управление</h2>
             <button class="btn btn-secondary" onclick="collectLogs()" id="collectLogsBtn">
-                <span id="collectLogsBtnText">Собрать диагностические логи</span>
-                <span id="logsSpinner" class="spinner hidden"></span>
+                Собрать диагностические логи
             </button>
             <button class="btn btn-success" onclick="downloadLogs()" id="downloadLogsBtn" disabled>
                 Скачать логи
@@ -220,6 +153,18 @@
                 Нет оповещений
             </div>
         </div>
+
+        <!-- (Опционально) История этапов -->
+        <!--
+        <div class="card">
+            <h2>🕒 История этапов</h2>
+            <div id="stage-history">
+                <div class="status-item">[00:00:01] system-prep-agent:  COMPLETE</div>
+                <div class="status-item">[00:05:23] containerd-agent:  COMPLETE</div>
+                ...
+            </div>
+        </div>
+        -->
     </div>
 
     <script>
@@ -235,21 +180,30 @@
                     stageEl.textContent = data.ansibleStage || '—';
                     if (data.ansibleStage && data.ansibleStage.includes('✅')) {
                         stageEl.className = 'status-item status-success';
-                    } else if (data.ansibleStage && data.ansibleStage.includes('ERROR')) {
+                    } else if (data.ansibleStage && data.ansibleStage.includes('❌')) {
                         stageEl.className = 'status-item status-error';
+                    } else if (data.ansibleStage && data.ansibleStage.includes('⚠️')) {
+                        stageEl.className = 'status-item status-warning';
                     } else {
                         stageEl.className = 'status-item';
                     }
 
                     // Состояние кластера
                     const clusterEl = document.getElementById('cluster-status');
-                    clusterEl.textContent = data.htcondorStatus || '—';
+                    clusterEl.textContent = data.clusterStatus || '—';
+                    if (data.clusterStatus === 'READY') {
+                        clusterEl.className = 'status-item status-success';
+                    } else if (data.clusterStatus && data.clusterStatus.includes('FAILED')) {
+                        clusterEl.className = 'status-item status-error';
+                    } else {
+                        clusterEl.className = 'status-item';
+                    }
 
                     // Оповещения
                     const alertsDiv = document.getElementById('alerts');
-                    if (data.alerts && data.alerts.length > 0) {
-                        alertsDiv.innerHTML = data.alerts.map(a =>
-                            `<div class="status-item status-error">${a}</div>`
+                    if (data.alerts && Array.isArray(data.alerts) && data.alerts.length > 0) {
+                        alertsDiv.innerHTML = data.alerts.map(alert =>
+                            `<div class="status-item status-error">${alert}</div>`
                         ).join('');
                     } else {
                         alertsDiv.innerHTML = 'Нет оповещений';
@@ -262,78 +216,13 @@
                 .catch(err => console.error('Ошибка обновления статуса:', err));
         }
 
-        // Отправка формы развёртывания
-        document.getElementById('deployForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const btn = document.getElementById('deployBtn');
-            const text = document.getElementById('deployBtnText');
-            const spinner = document.getElementById('deploySpinner');
-            const resultDiv = document.getElementById('deployResult');
-
-            btn.disabled = true;
-            text.style.display = 'none';
-            spinner.style.display = 'inline-block';
-
-            try {
-                const master = document.getElementById('masterIp').value.trim();
-                const workers = document.getElementById('workerIps').value.split(',').map(w => w.trim()).filter(w => w);
-                const masterHostName = document.getElementById('nameHostCM').value.trim();
-                const workersHostName = document.getElementById('nameHostEX').value.split(',').map(w => w.trim()).filter(w => w);
-                const condorPassword = document.getElementById('condorPassword').value.trim();
-
-                console.log('Form data being sent:', {
-                    master,
-                    workers,
-                    masterHostName,
-                    workersHostName,
-                    condorPassword
-                });
-
-                const res = await fetch('/api/deploy', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        master, 
-                        workers, 
-                        nameHostCM: masterHostName, 
-                        nameHostEX: workersHostName,
-                        condorPassword: condorPassword || null
-                    })
-                });
-
-                const data = await res.json();
-                if (res.ok) {
-                    resultDiv.className = 'result-message result-success hidden';
-                    resultDiv.textContent = 'Развёртывание запущено! Следите за статусом ниже.';
-                } else {
-                    resultDiv.className = 'result-message result-error hidden';
-                    resultDiv.textContent = `Ошибка: ${data.error || 'Неизвестная ошибка'}`;
-                }
-                resultDiv.classList.remove('hidden');
-            } catch (err) {
-                document.getElementById('deployResult').className = 'result-message result-error';
-                document.getElementById('deployResult').textContent = 'Ошибка подключения к серверу: ' + err.message;
-                document.getElementById('deployResult').classList.remove('hidden');
-                console.error('Deploy error:', err);
-            } finally {
-                btn.disabled = false;
-                text.style.display = 'inline';
-                spinner.style.display = 'none';
-            }
-        });
-
         // Сбор логов
         async function collectLogs() {
             const btn = document.getElementById('collectLogsBtn');
-            const text = document.getElementById('collectLogsBtnText');
-            const spinner = document.getElementById('logsSpinner');
             const resultDiv = document.getElementById('logsResult');
 
             btn.disabled = true;
-            text.style.display = 'none';
-            spinner.style.display = 'inline-block';
-            resultDiv.classList.add('hidden');
+            btn.textContent = 'Сбор логов...';
 
             try {
                 const res = await fetch('/api/collect-logs', { method: 'POST' });
@@ -341,23 +230,19 @@
 
                 if (res.ok) {
                     resultDiv.className = 'result-message result-success';
-                    resultDiv.textContent = 'Логи собраны. Нажмите "Скачать логи".';
+                    resultDiv.textContent = data.message || 'Логи собраны. Готовы к скачиванию.';
                 } else {
                     resultDiv.className = 'result-message result-error';
                     resultDiv.textContent = `Ошибка: ${data.error || 'Не удалось собрать логи'}`;
                 }
                 resultDiv.classList.remove('hidden');
-                logsAvailable = true;
-                document.getElementById('downloadLogsBtn').disabled = false;
             } catch (err) {
                 resultDiv.className = 'result-message result-error';
-                resultDiv.textContent = 'Ошибка подключения к серверу: ' + err.message;
+                resultDiv.textContent = 'Ошибка подключения к серверу';
                 resultDiv.classList.remove('hidden');
-                console.error('Collect logs error:', err);
             } finally {
                 btn.disabled = false;
-                text.style.display = 'inline';
-                spinner.style.display = 'none';
+                btn.textContent = 'Собрать диагностические логи';
             }
         }
 
@@ -368,25 +253,9 @@
             }
         }
 
-        // Инициализация кнопок при загрузке страницы
-        function initializeButtons() {
-            // Скрываем все спиннеры
-            document.getElementById('deploySpinner').style.display = 'none';
-            document.getElementById('logsSpinner').style.display = 'none';
-            
-            // Показываем текст кнопок
-            document.getElementById('deployBtnText').style.display = 'inline';
-            document.getElementById('collectLogsBtnText').style.display = 'inline';
-            
-            // Включаем кнопки
-            document.getElementById('deployBtn').disabled = false;
-            document.getElementById('collectLogsBtn').disabled = false;
-        }
-
         // Запуск обновления
-        initializeButtons();
         updateStatus();
-        setInterval(updateStatus, 2500);
+        setInterval(updateStatus, 2000);
     </script>
 </body>
 </html>

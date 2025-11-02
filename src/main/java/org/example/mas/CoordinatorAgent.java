@@ -3,6 +3,7 @@ package org.example.mas;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
 import org.example.mas.Agent.MasterAgent;
@@ -11,342 +12,183 @@ import org.example.mas.utils.InventoryParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class CoordinatorAgent extends Agent {
     private static final Logger logger = LoggerFactory.getLogger(CoordinatorAgent.class);
-    private String inventoryPath; // Путь к inventory.ini, полученный от DashboardServer
-    private String varsPath;      // Путь к vars.yml, полученный от DashboardServer
-    private String playbooksDir;  // Путь к папке scripts, полученный от DashboardServer
-    private final Map<String, AID> nodeAgents = new ConcurrentHashMap<>();
+    private String inventory;
+    private String playbooksDir;
+    private final Map<String, AID> nodeAgents = new HashMap<>();
 
     @Override
     protected void setup() {
-        logger.info("CoordinatorAgent (JADE 4.5) initializing...");
-
-        DashboardServer.updateStatus("ansibleStage", "WAITING_FOR_DEPLOY_COMMAND");
-        DashboardServer.updateStatus("clusterStatus", "NOT_DEPLOYED");
-        DashboardServer.updateStatus("alerts", new String[0]);
-
-        addBehaviour(new CyclicBehaviour() {
-            @Override
-            public void action() {
-                logger.trace("🔄 CoordinatorAgent checking for O2A objects...");
-                Object cmd = getO2AObject();
-                if (cmd != null) {
-                    logger.info("CoordinatorAgent: Received O2A object of type: {}", cmd.getClass().getSimpleName());
-                    if (cmd instanceof String) {
-                        String command = (String) cmd;
-                        logger.info("CoordinatorAgent: Processing command: {}", command);
-
-                        if (command.startsWith("DEPLOY:")) {
-                            String[] parts = command.substring(7).split(",", 3);
-                            logger.debug("DEPLOY command parts: {}", java.util.Arrays.toString(parts));
-                            if (parts.length == 3) {
-                                String inventoryPath = "/home/vboxuser/MasForUser/MAS/scripts/inventory.ini";
-                                String varsPath = "/home/vboxuser/MasForUser/MAS/scripts/vars.yml";
-                                String playbooksDir = "/home/vboxuser/MasForUser/MAS/scripts";
-                                logger.info("Initiating deployment with inventory: {}, vars: {}, playbooks dir: {}", inventoryPath, varsPath, playbooksDir);
-                                startDeployment(inventoryPath, varsPath, playbooksDir);
-                            } else {
-                                String errorMsg = "Invalid DEPLOY command format. Expected 'DEPLOY:path1,path2,path3', got: " + command;
-                                logger.error(errorMsg);
-                                sendAlert("Deployment failed: " + errorMsg);
-                                DashboardServer.updateStatus("clusterStatus", "DEPLOYMENT_FAILED_INVALID_COMMAND");
-                            }
-                        } else if ("COMMAND: COLLECT_DIAGNOSTIC_LOGS".equals(command)) {
-                            logger.info("Initiating diagnostic logs collection");
-                            collectDiagnosticLogs();
-                        } else if ("TEST_COMMAND".equals(command)) {
-                            logger.info("Received TEST_COMMAND - updating status");
-                            DashboardServer.updateStatus("testStatus", "TEST_COMMAND_RECEIVED");
-                            logger.info("Status updated to: TEST_COMMAND_RECEIVED");
-                            sendAlert("TEST_COMMAND processed by CoordinatorAgent");
-                        } else {
-                            String warnMsg = "Unknown O2A command received: " + command;
-                            logger.warn(warnMsg);
-                            sendAlert("Warning: " + warnMsg);
-                        }
-                    } else {
-                         String warnMsg = "Received unexpected O2A object type: " + cmd.getClass().getSimpleName();
-                         logger.warn(warnMsg);
-                         sendAlert("Warning: " + warnMsg);
-                    }
-                }else {
-                    logger.trace("📭 No O2A object received");
-                }
-                block();
-            }
-        });
-
-        addBehaviour(new CyclicBehaviour() {
-            @Override
-            public void action() {
-                ACLMessage msg = receive();
-                if (msg != null) {
-                    handleNodeMessage(msg);
-                } else {
-                    block();
-                }
-            }
-        });
-
-        logger.info("CoordinatorAgent (JADE 4.5) initialized and waiting for O2A commands.");
-    }
-
-    /**
-     * Запускает процесс развёртывания кластера.
-     * @param inventoryPath Путь к файлу inventory.ini
-     * @param varsPath Путь к файлу vars.yml
-     * @param playbooksDir Путь к директории с Ansible плейбуками (scripts)
-     */
-    private void startDeployment(String inventoryPath, String varsPath, String playbooksDir) {
-        logger.info("Starting deployment sequence...");
-        logger.info("Inventory file: {}", inventoryPath);
-        logger.info("Vars file: {}", varsPath);
-        logger.info("Playbooks directory: {}", playbooksDir);
-
-        if (!validatePaths(inventoryPath, playbooksDir)) { // varsPath - временный файл, может не существовать как файл на диске, но Ansible его использует
-             String errorMsg = "Deployment failed: Invalid paths provided by DashboardServer.";
-             logger.error(errorMsg);
-             sendAlert(errorMsg);
-             DashboardServer.updateStatus("ansibleStage", "ERROR: Invalid paths");
-             DashboardServer.updateStatus("clusterStatus", "DEPLOYMENT_FAILED_INVALID_PATHS");
-             return;
+        Object[] args = getArguments();
+        if (args == null || args.length < 2) {
+            logger.error("CoordinatorAgent requires: inventoryPath, playbooksDir");
+            doDelete();
+            return;
         }
 
-        this.inventoryPath = inventoryPath;
-        this.varsPath = varsPath;
-        this.playbooksDir = playbooksDir;
+        this.inventory = (String) args[0];
+        this.playbooksDir = (String) args[1];
+        logger.info("CoordinatorAgent initialized with inventory: {}, playbooksDir: {}", inventory, playbooksDir);
 
-        new Thread(() -> {
-            try {
-                logger.info("Deployment thread started.");
-                DashboardServer.updateStatus("ansibleStage", "🚀 Deployment started...");
-                DashboardServer.updateStatus("clusterStatus", "DEPLOYING");
+        // === ФАЗА 1: Инициализация кластера (однократно) ===
+        addBehaviour(new OneShotBehaviour() {
+            @Override
+            public void action() {
+                logger.info("Starting initial cluster deployment...");
 
-                // 3. Копируем временный vars.yml в директорию playbooks
-                // Это необходимо, так как Ansible обычно ожидает vars.yml внутри своей рабочей директории
-                logger.info("Copying temporary vars.yml from {} to {}", varsPath, playbooksDir);
-                try {
-                    Path sourceVars = Paths.get(varsPath);
-                    Path targetVars = Paths.get(playbooksDir, "vars.yml");
-                    // Используем REPLACE_EXISTING на случай, если файл уже существует
-                    Files.copy(sourceVars, targetVars, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                    logger.info("vars.yml copied successfully to playbooks directory");
-                } catch (Exception e) {
-                    String errorMsg = "Failed to copy vars.yml to playbooks directory: " + e.getMessage();
-                    logger.error(errorMsg, e);
-                    sendAlert(errorMsg);
-                    DashboardServer.updateStatus("ansibleStage", "ERROR: Failed to copy vars.yml");
-                    DashboardServer.updateStatus("clusterStatus", "DEPLOYMENT_FAILED_COPY_VARS");
-                    return;
-                }
-
-                // 4. Список плейбуков для выполнения по порядку
+                // Запускаем Ansible-плейбуки для полной настройки
                 String[] playbooks = {
-                    "01_system_preparation.yml",
-                    "02_containerd.yml",
-                    "03_kubernetes_install.yml",
-                    "04_kubernetes_init.yml",
-                    "05_calico_cni.yml",
-                    "06_worker_preparation.yml",
-                    "07_worker_join.yml",
-                    "08_htcondor.yml"
+                        "01_system_preparation.yml",
+                        "02_containerd.yml",
+                        "03_kubernetes_install.yml",
+                        "04_kubernetes_init.yml",
+                        "05_calico_cni.yml",
+                        "06_worker_preparation.yml",
+                        "07_worker_join.yml",
+                        "08_htcondor.yml"
                 };
 
-                // 5. Последовательное выполнение плейбуков
                 for (String playbook : playbooks) {
-                    logger.info("Running Ansible playbook: {}", playbook);
-                    DashboardServer.updateStatus("ansibleStage", " Running: " + playbook);
-
-                    // Выполняем плейбук с таймаутом 15 минут (или другим, по усмотрению)
-                    AnsibleRunner.AnsibleResult result = AnsibleRunner.run(playbook, inventoryPath, playbooksDir, 15);
+                    logger.info("Running playbook: {}", playbook);
+                    DashboardServer.updateStatus("ansibleStage",playbook);
+                    AnsibleRunner.AnsibleResult result = AnsibleRunner.run(playbook, inventory, playbooksDir, 15);
 
                     if (!result.success) {
-                        String errorMsg = "Deployment failed at playbook '" + playbook + "': " + result.errorCode;
-                        logger.error("{} - Details: {}", errorMsg, result.details);
-                        sendAlert(errorMsg);
-                        DashboardServer.updateStatus("ansibleStage", " ERROR: " + playbook);
-                        DashboardServer.updateStatus("clusterStatus", "DEPLOYMENT_FAILED_PLAYBOOK");
-                        return;
+                        handlePlaybookFailure(playbook, result);
+                        return; // или продолжить с откатом
                     }
-                    logger.info(" Playbook '{}' completed successfully.", playbook);
                 }
 
-                // 6. Все плейбуки выполнены успешно
-                logger.info(" All Ansible playbooks executed successfully. Deployment complete.");
-                DashboardServer.updateStatus("ansibleStage", " ALL_STAGES_COMPLETED");
-                DashboardServer.updateStatus("clusterStatus", "READY");
-                DashboardServer.updateStatus("alerts", new String[]{"Deployment successful!"}); // Информационное сообщение
-
-                // 7. Создаём агенты мониторинга (MasterAgent'ы)
-                createNodeAgents();
-
-            } catch (Exception e) {
-                String errorMsg = "Deployment process crashed unexpectedly: " + e.getMessage();
-                logger.error(" {}", errorMsg, e);
-                sendAlert(errorMsg);
-                DashboardServer.updateStatus("ansibleStage", " CRASHED");
-                DashboardServer.updateStatus("clusterStatus", "DEPLOYMENT_CRASHED");
+                logger.info("Initial cluster deployment completed. Creating node agents...");
+                DashboardServer.updateStatus("ansibleStage", "kubernetes_init ✅ | htcondor ⏳");
+                DashboardServer.updateStatus("htcondorStatus","Its working");
+                createNodeAgents(); // ← создаём агентов для каждого узла
             }
-        }, "DeploymentThread-" + System.currentTimeMillis()).start(); // Имя потока для удобства отладки
+        });
+
+
+
+// Добавьте поведение для обработки команд извне
+
     }
+    private void handlePlaybookFailure(String playbook, AnsibleRunner.AnsibleResult result) {
+        String alert = "Playbook " + playbook + " failed: " + result.errorCode;
+        logger.error(alert + " | Details: " + result.details);
 
-    /**
-     * Проверяет существование необходимых файлов и директорий.
-     */
-    private boolean validatePaths(String inventoryPath, String playbooksDir) {
-        logger.info("Validating deployment paths...");
-        boolean isValid = true;
-
-        if (!Files.exists(Paths.get(inventoryPath))) {
-            logger.error(" Inventory file NOT FOUND: {}", inventoryPath);
-            isValid = false;
-        } else {
-            logger.info(" Inventory file found: {}", inventoryPath);
+        switch (result.errorCode) {
+            case "TIMEOUT":
+                sendAlert("ALERT: TIMEOUT in " + playbook + ". Check network or increase timeout.");
+                break;
+            case "CONNECTION_FAILURE":
+                sendAlert("ALERT: UNREACHABLE NODE during " + playbook + ". Verify inventory and SSH keys.");
+                break;
+            default:
+                sendAlert("ALERT: Execution failed in " + playbook + ": " + result.errorCode);
         }
 
-        if (!Files.exists(Paths.get(playbooksDir))) {
-            logger.error(" Playbooks directory NOT FOUND: {}", playbooksDir);
-            isValid = false;
-        } else {
-            logger.info(" Playbooks directory found: {}", playbooksDir);
-        }
-
-        return isValid;
+        // Автоматически запускаем сбор логов при критической ошибке
+        collectDiagnosticLogs();
     }
 
     private void createNodeAgents() {
         try {
-            logger.info("Creating monitoring agents...");
-            InventoryParser.Inventory inv = InventoryParser.parse(this.inventoryPath);
+            InventoryParser.Inventory inv = InventoryParser.parse(this.inventory);
 
-            // Создаём MasterAgent только для узлов группы central_manager
-            for (InventoryParser.Host master : inv.getGroup("central_manager")) {
-                 createNodeAgent(master.name, true);
+            for (InventoryParser.Host master : inv.getGroup("master")) {
+                createNodeAgent(master.name, true);
             }
 
+            for (InventoryParser.Host worker : inv.getGroup("workers")) {
+                createNodeAgent(worker.name, false);
+            }
 
-            logger.info("Monitoring agents creation process finished.");
         } catch (Exception e) {
-            String errorMsg = "Failed to create monitoring agents: " + e.getMessage();
-            logger.error("{}", errorMsg, e);
-            sendAlert(errorMsg);
+            logger.error("Failed to create node agents from inventory", e);
         }
     }
 
-    /**
-     * Создаёт и запускает одного агента (MasterAgent) для конкретного узла.
-     */
     private void createNodeAgent(String nodeName, boolean isMaster) {
         try {
-            logger.info("Creating {} agent for node: {}", isMaster ? "MasterAgent" : "NodeAgent", nodeName);
-            String agentType = MasterAgent.class.getName();
-            Object[] agentArgs = new Object[]{nodeName, this.inventoryPath, this.playbooksDir};
+            String agentType =  MasterAgent.class.getName();
 
-            AgentController ac = getContainerController().createNewAgent(nodeName, agentType, agentArgs);
+            Object[] agentArgs = new Object[]{
+                    nodeName,
+                    this.inventory,
+                    this.playbooksDir
+            };
+
+            AgentController ac = getContainerController().createNewAgent(
+                    nodeName,
+                    agentType,
+                    agentArgs
+            );
             ac.start();
 
             AID agentAID = new AID(nodeName, AID.ISLOCALNAME);
             nodeAgents.put(nodeName, agentAID);
 
-            logger.info("Successfully created and started {} agent: {}", isMaster ? "Master" : "Node", nodeName);
+            logger.info("Created {} agent: {}", isMaster ? "master" : "worker", nodeName);
         } catch (Exception e) {
-            String errorMsg = "Failed to create/start agent for node '" + nodeName + "': " + e.getMessage();
-            logger.error(" {}", errorMsg, e);
-            sendAlert(errorMsg);
+            logger.error("Failed to create agent for node: " + nodeName, e);
         }
     }
 
-    /**
-     * Обрабатывает входящие ACL сообщения от других агентов.
-     */
-    private void handleNodeMessage(ACLMessage msg) {
-        String sender = msg.getSender().getLocalName();
-        String content = msg.getContent();
-
-        if (content != null) {
-            if (content.startsWith("ALERT:")) {
-                logger.warn(" Received ALERT from '{}': {}", sender, content);
-                // Передаём алерт на веб-панель
-                DashboardServer.updateStatus("alerts", new String[]{content});
-            } else if ("READY".equals(content)) {
-                logger.info(" Node '{}' reported ready.", sender);
-                // Можно обновить статус узла или выполнить дальнейшие действия
-            } else {
-                 logger.debug("Received message from '{}': {}", sender, content);
-            }
-        } else {
-             logger.debug("Received empty message from '{}'", sender);
-        }
-    }
-
-    /**
-     * Отправляет сообщение-оповещение на веб-панель.
-     */
     private void sendAlert(String message) {
-        logger.warn(" SENDING ALERT: {}", message);
-        // Получаем текущие алерты
-        Object currentAlertsObj = DashboardServer.STATUS.get("alerts");
-        String[] currentAlerts;
-        if (currentAlertsObj instanceof String[]) {
-            currentAlerts = (String[]) currentAlertsObj;
-        } else {
-            currentAlerts = new String[0];
-        }
-
-        // Создаём новый массив с добавленным сообщением
-        String[] newAlerts = new String[currentAlerts.length + 1];
-        System.arraycopy(currentAlerts, 0, newAlerts, 0, currentAlerts.length);
-        newAlerts[newAlerts.length - 1] = message;
-
-        // Обновляем статус
-        DashboardServer.updateStatus("alerts", newAlerts);
+        ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+        msg.addReceiver(new AID("coordinator", AID.ISLOCALNAME));
+        msg.setContent(message);
+        send(msg);
     }
-
-    /**
-     * Собирает диагностические логи (заглушка/пример).
-     */
     private void collectDiagnosticLogs() {
-        logger.info("Starting diagnostic logs collection (stub implementation)...");
+    try {
+        // 1. Используем абсолютный путь в рабочей директории
+        Path logPath = Paths.get(System.getProperty("user.dir"), "diagnostic-logs.txt");
+        logger.info("Saving diagnostic logs to: {}", logPath.toAbsolutePath());
+
+        // 2. Собираем логи
+        String kubeletLog = executeCommand("journalctl", "-u", "kubelet", "--since=-1h", "-n", "50");
+        String containerdLog = executeCommand("systemctl", "status", "containerd");
+        String kubectlLog = executeCommand("sudo", "kubectl", "get", "pods", "-A");
+
+        String fullLog = "=== KUBELET ===\n" + (kubeletLog != null ? kubeletLog : "N/A") +
+                        "\n\n=== CONTAINERD ===\n" + (containerdLog != null ? containerdLog : "N/A");
+
+        // 3. Сохраняем
+        Files.write(logPath, fullLog.getBytes(StandardCharsets.UTF_8));
+        logger.info("Diagnostic logs saved successfully");
+
+        // 4. Обновляем статус
+        DashboardServer.updateStatus("diagnosticLogs", logPath.toAbsolutePath().toString());
+        logger.info("Diagnostic logs saved to: {}", logPath);
+
+    } catch (Exception e) {
+        logger.error("Failed to collect diagnostic logs", e);
+        DashboardServer.updateStatus("diagnosticLogs", "");
+    }
+}
+
+    private String executeCommand(String... args) {
         try {
-            Path logPath = Paths.get(System.getProperty("user.dir"), "collected-diagnostic-logs.txt");
-            logger.info("Saving diagnostic logs to: {}", logPath.toAbsolutePath());
-
-            String systemInfo = "System: " + System.getProperty("os.name") + " " + System.getProperty("os.version");
-            String javaInfo = "Java: " + System.getProperty("java.version");
-            String timestamp = "Collected at: " + java.time.Instant.now();
-
-            String fullLog = "=== SYSTEM INFO ===\n" + systemInfo +
-                    "\n\n=== JAVA INFO ===\n" + javaInfo +
-                    "\n\n=== COLLECTION TIMESTAMP ===\n" + timestamp +
-                    "\n\n=== DIAGNOSTIC LOGS (Stub) ===\n" +
-                    "This is a stub implementation.\n" +
-                    "In a full implementation, this would gather:\n" +
-                    "- Kubelet logs\n" +
-                    "- Containerd status (`systemctl status containerd`)\n" +
-                    "- Kubernetes pod status (`kubectl get pods -A`)\n" +
-                    "- System logs (`journalctl -u kubelet`)\n" +
-                    "- HTCondor status (`condor_status`)\n";
-
-            Files.write(logPath, fullLog.getBytes());
-            logger.info(" Diagnostic logs (stub) saved successfully to: {}", logPath.toAbsolutePath());
-            // Сообщаем веб-панели о новом файле логов
-            DashboardServer.updateStatus("diagnosticLogs", logPath.toAbsolutePath().toString());
-            sendAlert("Diagnostic logs collected and saved.");
-
+            Process p = new ProcessBuilder(args).start();
+            try (BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+                return r.lines().collect(Collectors.joining("\n"));
+            }
         } catch (Exception e) {
-            String errorMsg = "Failed to collect diagnostic logs: " + e.getMessage();
-            logger.error(" {}", errorMsg, e);
-            sendAlert(errorMsg);
-            DashboardServer.updateStatus("diagnosticLogs", ""); // Очищаем путь, если ошибка
+            logger.warn("Command failed: {}", String.join(" ", args), e);
+            return null;
         }
     }
-
 
 }
