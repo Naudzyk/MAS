@@ -105,24 +105,20 @@ public class DashboardServer {
                 Path templateVars = scriptsDir.resolve("vars.yml");
 
                 if (!Files.exists(templateInventory) || !Files.exists(templateVars)) {
-                     logger.error("Template files not found in scripts/ directory: inventory_template.ini or vars_template.yml");
+                     logger.error("Template files not found in scripts/ directory: inventory.ini or vars.yml");
                      res.status(500);
-                     return new Gson().toJson(Collections.singletonMap("error", "Required template files (inventory_template.ini, vars_template.yml) not found in 'scripts' directory."));
+                     return new Gson().toJson(Collections.singletonMap("error", "Required template files (inventory.ini, vars.yml) not found in 'scripts' directory."));
                 }
 
-                Path tempDir = Files.createTempDirectory("mas-deploy-");
-                logger.info("Created temporary directory: {}", tempDir);
-                Path filledInventoryPath = tempDir.resolve("inventory.ini");
-                Path filledVarsPath = tempDir.resolve("vars.yml");
-
-                String inventoryContent = Files.readString(templateInventory, StandardCharsets.UTF_8);
-                inventoryContent = fillInventoryContent(inventoryContent, request);
-                Files.writeString(filledInventoryPath, inventoryContent, StandardCharsets.UTF_8);
+                String filledInventoryPath = "/home/vboxuser/MasForUser/MAS/scripts/inventory.ini";
+//                String inventoryContent = fillInventoryContent(request);
+//                Files.writeString(Path.of(filledInventoryPath), inventoryContent, StandardCharsets.UTF_8);
                 logger.info("Filled inventory.ini written to: {}", filledInventoryPath);
 
-                String varsContent = Files.readString(templateVars, StandardCharsets.UTF_8);
-                varsContent = fillVarsContent(varsContent, request);
-                Files.writeString(filledVarsPath, varsContent, StandardCharsets.UTF_8);
+
+                String filledVarsPath = "/home/vboxuser/MasForUser/MAS/scripts/vars.yml";
+//                String varsContent = fillVarsContent(request);
+//                Files.writeString(Path.of(filledVarsPath), varsContent, StandardCharsets.UTF_8);
                 logger.info("Filled vars.yml written to: {}", filledVarsPath);
 
 
@@ -133,7 +129,7 @@ public class DashboardServer {
                     return new Gson().toJson(Collections.singletonMap("error", "Coordinator agent is not running"));
                 }
 
-                String deployCommand = "DEPLOY:" + filledInventoryPath.toAbsolutePath() + "," + filledVarsPath.toAbsolutePath() + "," + scriptsDir.toAbsolutePath();
+                String deployCommand = "DEPLOY:" + filledInventoryPath + "," + filledVarsPath + "," + scriptsDir.toAbsolutePath();
                 logger.info("Sending deploy command to coordinator agent: {}", deployCommand);
                 ac.putO2AObject(deployCommand, false);
 
@@ -141,8 +137,7 @@ public class DashboardServer {
                 updateStatus("clusterStatus", "DEPLOYING");
                 return new Gson().toJson(Map.of(
                     "status", "started",
-                    "message", "Deployment process initiated",
-                    "tempDir", tempDir.toString()
+                    "message", "Deployment process initiated"
                 ));
 
             } catch (JsonSyntaxException e) {
@@ -267,16 +262,14 @@ public class DashboardServer {
      * Предполагается, что в шаблоне есть секции [central_manager] и [execute_nodes],
      * и они будут полностью заменены.
      */
-    private static String fillInventoryContent(String templateContent, DeployRequest request) {
+    private static String fillInventoryContent( DeployRequest request) {
         StringBuilder sb = new StringBuilder();
 
-        // Заполняем секцию [central_manager]
         sb.append("[central_manager]\n");
         String cmHostName = "central_manager";
         String cmUserName = request.getNameHostCM() != null && !request.getNameHostCM().isEmpty() ? request.getNameHostCM() : "vboxuser";
         sb.append(cmHostName).append(" ansible_host=").append(request.getMaster()).append(" ansible_user=").append(cmUserName).append("\n\n");
 
-        // Заполняем секцию [execute_nodes]
         sb.append("[execute_nodes]\n");
         if (request.getWorkers() != null && request.getNameHostEX() != null) {
             int minWorkers = Math.min(request.getWorkers().size(), request.getNameHostEX().size());
@@ -290,7 +283,6 @@ public class DashboardServer {
                   .append("\n");
             }
         }
-        // Если workers больше, чем nameHostEX, используем имя пользователя по умолчанию
         if (request.getWorkers() != null && request.getNameHostEX() != null && request.getWorkers().size() > request.getNameHostEX().size()) {
              for (int i = request.getNameHostEX().size(); i < request.getWorkers().size(); i++) {
                  String workerAlias = "worker" + (i + 1);
@@ -307,29 +299,17 @@ public class DashboardServer {
     }
 
 
-    /**
-     * Заполняет содержимое vars.yml данными из запроса.
-     * Предполагается, что в шаблоне vars.yml есть переменные в формате {{VAR_NAME}}.
-     */
+
     private static String fillVarsContent(String templateContent, DeployRequest request) {
         String result = templateContent;
 
-        // Заменяем известные переменные
         result = replacePlaceholder(result, "CENTRAL_MANAGER_IP", request.getMaster());
         String password = request.getCondorPassword() != null && !request.getCondorPassword().isEmpty() ? request.getCondorPassword() : "qwerty";
         result = replacePlaceholder(result, "CONDOR_PASSWORD", password);
 
-        // Можно добавить замену других переменных, если они есть в шаблоне
-        // Например, если в vars_template.yml есть k8s_version: "{{K8S_VERSION}}"
-        // result = replacePlaceholder(result, "K8S_VERSION", "1.30.7");
-
         return result;
     }
 
-    /**
-     * Вспомогательный метод для замены {{PLACEHOLDER}} на значение.
-     * Использует Pattern.quote для экранирования специальных символов в ключе.
-     */
     private static String replacePlaceholder(String content, String placeholderKey, String value) {
         if (value == null) value = "";
         Pattern pattern = Pattern.compile(Pattern.quote("{{" + placeholderKey + "}}"));
