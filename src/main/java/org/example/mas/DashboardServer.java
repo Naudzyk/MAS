@@ -42,21 +42,17 @@ public class DashboardServer {
         jadeContainer = container;
         Spark.port(port);
 
-        // ВАЖНО: staticFileLocation ДОЛЖЕН быть ПЕРВЫМ, до любых get/post
         Spark.staticFileLocation("/public");
 
         logger.info("Dashboard server started successfully on port {}", port);
         System.out.println("Dashboard available at http://localhost:" + port);
 
-        // --- API Endpoints ---
 
-        // GET /api/status - Получить текущий статус
         Spark.get("/api/status", (req, res) -> {
             res.type("application/json");
             return new Gson().toJson(STATUS);
         });
 
-        // POST /api/collect-logs - Собрать диагностические логи
         Spark.post("/api/collect-logs", (req, res) -> {
             res.type("application/json");
             try {
@@ -81,7 +77,6 @@ public class DashboardServer {
             }
         });
 
-        // GET /logs - Получить содержимое диагностических логов
         Spark.get("/logs", (req, res) -> {
             String logFilePath = (String) STATUS.get("diagnosticLogs");
             if (logFilePath != null && !logFilePath.isEmpty()) {
@@ -96,7 +91,6 @@ public class DashboardServer {
             return "Logs not available. Click 'Collect logs' first.";
         });
 
-        // --- Тестовые Endpoints (необязательные) ---
         Spark.get("/api/test", (req, res) -> {
             res.type("application/json");
             try {
@@ -130,7 +124,20 @@ public class DashboardServer {
                 return new Gson().toJson(Collections.singletonMap("error", e.getMessage()));
             }
         });
-        // --- Конец Тестовых Endpoints ---
+        Spark.get("/api/metrics/:nodeName", (req,res) -> {
+            String nodeName = req.params(":nodeName");
+            res.type("application/json");
+
+            Object metric = STATUS.get("metric " + nodeName);
+            if(metric != null) {
+                return new Gson().toJson(metric);
+            } else {
+                res.status(404);
+                return new Gson().toJson(Collections.singletonMap("error", "Metric not found"));
+            }
+
+
+        });
     }
 
     /**

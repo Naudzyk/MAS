@@ -30,6 +30,39 @@
             color: #0d6efd;
             margin-bottom: 10px;
         }
+        .metric-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .metric-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        .metric-label {
+            font-size: 14px;
+        }
+        .metric-value {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .metric-high {
+            color: #dc3545;
+        }
+        .metric-medium {
+            color: #ffc107;
+        }
+        .metric-normal {
+            color: #28a745;
+        }
         .card {
             background: white;
             padding: 20px;
@@ -132,6 +165,12 @@
         <div class="card">
             <h2>Состояние кластера</h2>
             <div id="cluster-status" class="status-item">—</div>
+        </div>
+        <div class="card">
+            <h2> Метрики узлов</h2>
+            <div id="metrics-container">
+                <div class="metric-placeholder">Загрузка метрик...</div>
+            </div>
         </div>
 
         <!-- Управление -->
@@ -253,9 +292,78 @@
             }
         }
 
-        // Запуск обновления
         updateStatus();
         setInterval(updateStatus, 2000);
     </script>
+    <script>
+async function updateMetrics() {
+    try {
+
+        const nodeNames = ['central_manager', 'worker1', 'worker2']; // Заменить на динамическое получение
+
+        const container = document.getElementById('metrics-container');
+        container.innerHTML = ''; // Очищаем контейнер
+
+        for (const nodeName of nodeNames) {
+            try {
+                const res = await fetch(`/api/metrics/${nodeName}`);
+                if (res.ok) {
+                    const metrics = await res.json();
+                    const card = document.createElement('div');
+                    card.className = 'metric-card';
+
+                    // Определяем классы для цветовой индикации
+                    const cpuClass = getMetricClass(parseFloat(metrics.cpuLoad));
+                    const memClass = getMetricClass(parseFloat(metrics.memoryUsage));
+                    const diskClass = getMetricClass(parseFloat(metrics.diskUsage));
+
+                    card.innerHTML = `
+                        <div class="metric-title">${nodeName}</div>
+                        <div class="metric-row">
+                            <span class="metric-label">CPU:</span>
+                            <span class="metric-value ${cpuClass}">${metrics.cpuLoad}%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Память:</span>
+                            <span class="metric-value ${memClass}">${metrics.memoryUsage}%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Диск:</span>
+                            <span class="metric-value ${diskClass}">${metrics.diskUsage}%</span>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                } else {
+                    // Если метрики недоступны
+                    const card = document.createElement('div');
+                    card.className = 'metric-card';
+                    card.innerHTML = `
+                        <div class="metric-title">${nodeName}</div>
+                        <div class="metric-row">
+                            <span class="metric-label">Статус:</span>
+                            <span class="metric-value">Нет данных</span>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                }
+            } catch (e) {
+                console.error(`Failed to fetch metrics for ${nodeName}`, e);
+            }
+        }
+    } catch (e) {
+        console.error('Failed to update metrics', e);
+    }
+}
+
+function getMetricClass(value) {
+    if (value > 90) return 'metric-high';
+    if (value > 75) return 'metric-medium';
+    return 'metric-normal';
+}
+
+// Вызываем обновление метрик каждые 10 секунд
+setInterval(updateMetrics, 10000);
+updateMetrics();
+</script>
 </body>
 </html>
