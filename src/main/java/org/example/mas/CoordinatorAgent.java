@@ -46,11 +46,11 @@ public class CoordinatorAgent extends Agent {
                             String[] parts = command.substring(7).split(",", 3);
                             logger.debug("DEPLOY command parts: {}", java.util.Arrays.toString(parts));
                             if (parts.length == 3) {
-                                String invPath = parts[0].trim();
-                                String vPath = parts[1].trim();
-                                String pbDir = parts[2].trim();
-                                logger.info("Initiating deployment with inventory: {}, vars: {}, playbooks dir: {}", invPath, vPath, pbDir);
-                                startDeployment(invPath, vPath, pbDir);
+                                String inventoryPath = "/home/vboxuser/MasForUser/MAS/scripts/inventory.ini";
+                                String varsPath = "/home/vboxuser/MasForUser/MAS/scripts/vars.yml";
+                                String playbooksDir = "/home/vboxuser/MasForUser/MAS/scripts";
+                                logger.info("Initiating deployment with inventory: {}, vars: {}, playbooks dir: {}", inventoryPath, varsPath, playbooksDir);
+                                startDeployment(inventoryPath, varsPath, playbooksDir);
                             } else {
                                 String errorMsg = "Invalid DEPLOY command format. Expected 'DEPLOY:path1,path2,path3', got: " + command;
                                 logger.error(errorMsg);

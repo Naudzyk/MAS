@@ -178,7 +178,7 @@
                 </div>
                 <div class="form-group">
                     <label for="condorPassword">Пароль кластера HTCondor (опционально):</label>
-                    <input type="text" id="condorPassword" placeholder="qwerty (по умолчанию)">
+                    <input type="text" id="condorPassword" placeholder="qwerty">
                 </div>
                 <button type="submit" class="btn btn-primary" id="deployBtn">
                     <span id="deployBtnText">Развернуть кластер</span>
@@ -282,7 +282,6 @@
                 const workersHostName = document.getElementById('nameHostEX').value.split(',').map(w => w.trim()).filter(w => w);
                 const condorPassword = document.getElementById('condorPassword').value.trim();
 
-                // Debug logging
                 console.log('Form data being sent:', {
                     master,
                     workers,
