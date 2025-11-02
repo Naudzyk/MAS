@@ -127,11 +127,14 @@ public class DashboardServer {
                     logger.error("Coordinator agent not found!");
                     res.status(500);
                     return new Gson().toJson(Collections.singletonMap("error", "Coordinator agent is not running"));
+                } else {
+                    logger.info("Coordinator agent is running");
                 }
 
                 String deployCommand = "DEPLOY:" + filledInventoryPath + "," + filledVarsPath + "," + scriptsDir.toAbsolutePath();
                 logger.info("Sending deploy command to coordinator agent: {}", deployCommand);
                 ac.putO2AObject(deployCommand, false);
+                logger.info("📤 Sent O2A command to coordinator: {}", deployCommand);
 
                 logger.info("Deployment initiated successfully");
                 updateStatus("clusterStatus", "DEPLOYING");
@@ -203,21 +206,23 @@ public class DashboardServer {
             }
         });
 
+        // В DashboardServer.start()
         Spark.get("/api/test-o2a", (req, res) -> {
-            res.type("application/json");
             try {
                 AgentController ac = jadeContainer.getAgent("coordinator");
                 if (ac == null) {
-                    logger.error("Coordinator agent not found for test O2A!");
+                    logger.error("❌ Test O2A: Coordinator agent not found!");
+                    res.status(500);
                     return new Gson().toJson(Collections.singletonMap("error", "Coordinator agent not found"));
                 }
-                logger.info("Sending TEST_COMMAND O2A to coordinator");
+                logger.info("✅ Test O2A: Sending TEST_COMMAND to coordinator");
                 ac.putO2AObject("TEST_COMMAND", false);
-                logger.info("TEST_COMMAND O2A sent");
-                return new Gson().toJson(Collections.singletonMap("status", "sent"));
+                logger.info("📤 Test O2A: TEST_COMMAND sent");
+                return new Gson().toJson(Collections.singletonMap("status", "TEST_COMMAND_SENT"));
             } catch (Exception e) {
-                logger.error("Test O2A command failed", e);
-                return new Gson().toJson(Collections.singletonMap("error", e.getMessage()));
+                logger.error("💥 Test O2A failed", e);
+                res.status(500);
+                return new Gson().toJson(Collections.singletonMap("error", "Test O2A failed: " + e.getMessage()));
             }
         });
 

@@ -35,6 +35,7 @@ public class CoordinatorAgent extends Agent {
         addBehaviour(new CyclicBehaviour() {
             @Override
             public void action() {
+                logger.trace("🔄 CoordinatorAgent checking for O2A objects...");
                 Object cmd = getO2AObject();
                 if (cmd != null) {
                     logger.info("CoordinatorAgent: Received O2A object of type: {}", cmd.getClass().getSimpleName());
@@ -75,6 +76,8 @@ public class CoordinatorAgent extends Agent {
                          logger.warn(warnMsg);
                          sendAlert("Warning: " + warnMsg);
                     }
+                }else {
+                    logger.trace("📭 No O2A object received");
                 }
                 block();
             }

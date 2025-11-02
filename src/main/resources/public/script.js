@@ -29,5 +29,5 @@ function updateDashboard() {
 }
 
 // Обновляем каждые 2 секунды
-setInterval(updateDashboard, 2000);
+setInterval(updateDashboard, 5000);
 updateDashboard(); // сразу при загрузке
