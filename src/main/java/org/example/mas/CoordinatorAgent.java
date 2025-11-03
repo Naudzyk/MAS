@@ -40,13 +40,11 @@ public class CoordinatorAgent extends Agent {
         this.playbooksDir = (String) args[1];
         logger.info("CoordinatorAgent initialized with inventory: {}, playbooksDir: {}", inventory, playbooksDir);
 
-        // === ФАЗА 1: Инициализация кластера (однократно) ===
         addBehaviour(new OneShotBehaviour() {
             @Override
             public void action() {
                 logger.info("Starting initial cluster deployment...");
 
-                // Запускаем Ansible-плейбуки для полной настройки
                 String[] playbooks = {
                         "01_system_preparation.yml",
                         "02_containerd.yml",
@@ -67,12 +65,12 @@ public class CoordinatorAgent extends Agent {
 
                     if (!result.success) {
                         handlePlaybookFailure(playbook, result);
-                        return; // или продолжить с откатом
+                        return;
                     }
                 }
 
                 logger.info("Initial cluster deployment completed. Creating node agents...");
-                DashboardServer.updateStatus("ansibleStage", "kubernetes_init ✅ | htcondor ⏳");
+                DashboardServer.updateStatus("ansibleStage", "kubernetes_init | htcondor ");
                 DashboardServer.updateStatus("htcondorStatus","Its working");
                 DashboardServer.updateStatus("clusterStatus","DEPLOY");
                 createNodeAgents();
