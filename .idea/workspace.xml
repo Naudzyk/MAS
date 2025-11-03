@@ -4,12 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version not Web 8.2.1&quot;">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/condor_config.execute-config.j2" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/condor_config.execute-config.j2" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/condor_config.manager-config.j2" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/condor_config.manager-config.j2" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/utils/AnsibleRunner$AnsibleResult.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/utils/AnsibleRunner$AnsibleResult.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/utils/AnsibleRunner.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/utils/AnsibleRunner.class" afterDir="false" />
+    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version not Web 8.3&quot;">
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/CoordinatorAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/CoordinatorAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/DashboardServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/DashboardServer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/public/index.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -210,7 +208,7 @@
       <workItem from="1762163280011" duration="26000" />
       <workItem from="1762163494299" duration="39000" />
       <workItem from="1762163678547" duration="14000" />
-      <workItem from="1762164122576" duration="3717000" />
+      <workItem from="1762164122576" duration="5218000" />
     </task>
     <task id="LOCAL-00001" summary="'V1'">
       <option name="closed" value="true" />
@@ -556,7 +554,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762167204113</updated>
     </task>
-    <option name="localTasksCounter" value="44" />
+    <task id="LOCAL-00044" summary="&quot;Version not Web 8.3&quot;">
+      <option name="closed" value="true" />
+      <created>1762167925832</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1762167925832</updated>
+    </task>
+    <option name="localTasksCounter" value="45" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -599,7 +605,8 @@
     <MESSAGE value="&quot;Version not Web 8.1 add prometheus&quot;" />
     <MESSAGE value="&quot;Version not Web 8.2&quot;" />
     <MESSAGE value="&quot;Version not Web 8.2.1&quot;" />
-    <option name="LAST_COMMIT_MESSAGE" value="&quot;Version not Web 8.2.1&quot;" />
+    <MESSAGE value="&quot;Version not Web 8.3&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="&quot;Version not Web 8.3&quot;" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

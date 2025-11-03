@@ -65,14 +65,15 @@ public class CoordinatorAgent extends Agent {
 
                     if (!result.success) {
                         handlePlaybookFailure(playbook, result);
+                        DashboardServer.updateStatus("ansibleStage", "Ошибка");
+                        DashboardServer.updateStatus("clusterStatus","Ошибка");
                         return;
                     }
                 }
 
                 logger.info("Initial cluster deployment completed. Creating node agents...");
-                DashboardServer.updateStatus("ansibleStage", "kubernetes_init | htcondor ");
-                DashboardServer.updateStatus("htcondorStatus","Its working");
-                DashboardServer.updateStatus("clusterStatus","DEPLOY");
+                DashboardServer.updateStatus("ansibleStage", "Успешное разворачивание кластера");
+                DashboardServer.updateStatus("clusterStatus","DEPLOY CLUSTER");
                 createNodeAgents();
             }
         });

@@ -28,6 +28,7 @@ public class DashboardServer {
         STATUS.put("alerts", new String[0]);
         STATUS.put("diagnosticLogs", "");
         STATUS.put("lastUpdate", System.currentTimeMillis());
+        STATUS.put("metric_", "ANALAZY");
     }
 
     /**
@@ -125,7 +126,7 @@ public class DashboardServer {
             String nodeName = req.params(":nodeName");
             res.type("application/json");
 
-            Object metric = STATUS.get("metric " + nodeName);
+            Object metric = STATUS.get("metric_" + nodeName);
             if(metric != null) {
                 return new Gson().toJson(metric);
             } else {
