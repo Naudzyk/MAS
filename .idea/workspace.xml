@@ -4,14 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version not Web 8.1 add prometheus&quot;">
+    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version not Web 8.2&quot;">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/prometheus.yml.j2" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/prometheus.yml.j2" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/CoordinatorAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/CoordinatorAgent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/MasterAgent$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/MasterAgent$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/MasterAgent.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/MasterAgent.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/utils/InventoryParser$Host.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/utils/InventoryParser$Host.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/utils/InventoryParser$Inventory.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/utils/InventoryParser$Inventory.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/utils/InventoryParser.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/utils/InventoryParser.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/utils/AnsibleRunner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/utils/AnsibleRunner.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/CoordinatorAgent$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/CoordinatorAgent$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/CoordinatorAgent.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/CoordinatorAgent.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -212,7 +211,7 @@
       <workItem from="1762163280011" duration="26000" />
       <workItem from="1762163494299" duration="39000" />
       <workItem from="1762163678547" duration="14000" />
-      <workItem from="1762164122576" duration="1256000" />
+      <workItem from="1762164122576" duration="3015000" />
     </task>
     <task id="LOCAL-00001" summary="'V1'">
       <option name="closed" value="true" />
@@ -542,7 +541,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762083158675</updated>
     </task>
-    <option name="localTasksCounter" value="42" />
+    <task id="LOCAL-00042" summary="&quot;Version not Web 8.2&quot;">
+      <option name="closed" value="true" />
+      <created>1762165632386</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1762165632386</updated>
+    </task>
+    <option name="localTasksCounter" value="43" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -583,7 +590,8 @@
     <MESSAGE value="&quot;New Version 7.8&quot;" />
     <MESSAGE value="&quot;Version not Web 8&quot;" />
     <MESSAGE value="&quot;Version not Web 8.1 add prometheus&quot;" />
-    <option name="LAST_COMMIT_MESSAGE" value="&quot;Version not Web 8.1 add prometheus&quot;" />
+    <MESSAGE value="&quot;Version not Web 8.2&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="&quot;Version not Web 8.2&quot;" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

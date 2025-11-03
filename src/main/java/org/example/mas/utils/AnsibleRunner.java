@@ -24,8 +24,7 @@ public class AnsibleRunner {
      */
     public static AnsibleResult run(String playbook, String inventoryPath, String workingDir, int timeoutMinutes) {
         try {
-            // Используем vars.yml из той же директории где находятся playbooks
-            ProcessBuilder pb = new ProcessBuilder("ansible-playbook", "-i", inventoryPath, 
+            ProcessBuilder pb = new ProcessBuilder("ansible-playbook", "-i", inventoryPath,
                 "--extra-vars", "@vars.yml", playbook);
             pb.directory(new File(workingDir));
             pb.environment().put("ANSIBLE_HOST_KEY_CHECKING", "False");
@@ -34,7 +33,6 @@ public class AnsibleRunner {
             Process process = pb.start();
             StringBuilder output = new StringBuilder();
 
-            // Чтение вывода в реальном времени
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
