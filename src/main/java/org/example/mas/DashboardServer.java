@@ -20,11 +20,9 @@ public class DashboardServer {
     private static final Logger logger = LoggerFactory.getLogger(DashboardServer.class);
     private static AgentContainer jadeContainer;
 
-    // Общее состояние системы, обновляемое агентами
     public static final Map<String, Object> STATUS = new ConcurrentHashMap<>();
 
     static {
-        // Инициализация начального статуса
         STATUS.put("ansibleStage", "WAITING_FOR_DEPLOYMENT_START");
         STATUS.put("clusterStatus", "NOT_DEPLOYED");
         STATUS.put("alerts", new String[0]);
@@ -63,7 +61,6 @@ public class DashboardServer {
                     return new Gson().toJson(Collections.singletonMap("error", "Coordinator agent is not running"));
                 }
                 logger.info("Sending 'COLLECT_DIAGNOSTIC_LOGS' command to coordinator agent");
-                // Отправляем команду через O2A
                 ac.putO2AObject("COMMAND: COLLECT_DIAGNOSTIC_LOGS", false); // false = неблокирующий
                 logger.info("'COLLECT_DIAGNOSTIC_LOGS' command sent");
                 return new Gson().toJson(Map.of(

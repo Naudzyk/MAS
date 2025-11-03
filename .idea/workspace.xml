@@ -4,19 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version not Web 8&quot;">
-      <change afterPath="$PROJECT_DIR$/scripts/09_prometheus.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/10_prometheus_server.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/prometheus.yml.j2" afterDir="false" />
+    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version not Web 8.1 add prometheus&quot;">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/inventory.ini" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/inventory.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/vars.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/vars.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/MasterAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/MasterAgent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/DashboardServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/DashboardServer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/utils/InventoryParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/utils/InventoryParser.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/public/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/Main.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/CoordinatorAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/CoordinatorAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/MasterAgent$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/MasterAgent$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/MasterAgent.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/MasterAgent.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/utils/InventoryParser$Host.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/utils/InventoryParser$Host.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/utils/InventoryParser$Inventory.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/utils/InventoryParser$Inventory.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/utils/InventoryParser.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/utils/InventoryParser.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -213,7 +208,11 @@
       <workItem from="1761559570415" duration="4584000" />
       <workItem from="1761626636796" duration="1621000" />
       <workItem from="1761741179965" duration="80000" />
-      <workItem from="1761992120329" duration="23782000" />
+      <workItem from="1761992120329" duration="23961000" />
+      <workItem from="1762163280011" duration="26000" />
+      <workItem from="1762163494299" duration="39000" />
+      <workItem from="1762163678547" duration="14000" />
+      <workItem from="1762164122576" duration="1256000" />
     </task>
     <task id="LOCAL-00001" summary="'V1'">
       <option name="closed" value="true" />
@@ -535,7 +534,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762070151618</updated>
     </task>
-    <option name="localTasksCounter" value="41" />
+    <task id="LOCAL-00041" summary="&quot;Version not Web 8.1 add prometheus&quot;">
+      <option name="closed" value="true" />
+      <created>1762083158675</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1762083158675</updated>
+    </task>
+    <option name="localTasksCounter" value="42" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -575,7 +582,8 @@
     <MESSAGE value="&quot;New Version 7.7&quot;" />
     <MESSAGE value="&quot;New Version 7.8&quot;" />
     <MESSAGE value="&quot;Version not Web 8&quot;" />
-    <option name="LAST_COMMIT_MESSAGE" value="&quot;Version not Web 8&quot;" />
+    <MESSAGE value="&quot;Version not Web 8.1 add prometheus&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="&quot;Version not Web 8.1 add prometheus&quot;" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

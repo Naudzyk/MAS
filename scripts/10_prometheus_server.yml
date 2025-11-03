@@ -72,4 +72,4 @@
         name: prometheus
         enabled: yes
         state: started
-        deamon_reload: yes
+        daemon_reload: yes
