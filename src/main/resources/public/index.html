@@ -209,7 +209,6 @@
     <script>
         let logsAvailable = false;
 
-        // Обновление статуса каждые 2 секунды
         function updateStatus() {
             fetch('/api/status')
                 .then(res => res.json())
@@ -299,7 +298,7 @@
 async function updateMetrics() {
     try {
 
-        const nodeNames = ['central_manager', 'worker1', 'worker2']; // Заменить на динамическое получение
+        const nodeNames = ['central_manager', 'worker1']; // Заменить на динамическое получение
 
         const container = document.getElementById('metrics-container');
         container.innerHTML = ''; // Очищаем контейнер
@@ -334,7 +333,6 @@ async function updateMetrics() {
                     `;
                     container.appendChild(card);
                 } else {
-                    // Если метрики недоступны
                     const card = document.createElement('div');
                     card.className = 'metric-card';
                     card.innerHTML = `
