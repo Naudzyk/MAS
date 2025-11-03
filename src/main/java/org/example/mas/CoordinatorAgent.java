@@ -2,7 +2,6 @@ package org.example.mas;
 
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
@@ -20,7 +19,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class CoordinatorAgent extends Agent {
@@ -57,7 +55,9 @@ public class CoordinatorAgent extends Agent {
                         "05_calico_cni.yml",
                         "06_worker_preparation.yml",
                         "07_worker_join.yml",
-                        "08_htcondor.yml"
+                        "08_htcondor.yml",
+                        "09_prometheus.yml",
+                        "10_prometheus_server.yml"
                 };
 
                 for (String playbook : playbooks) {
@@ -74,13 +74,13 @@ public class CoordinatorAgent extends Agent {
                 logger.info("Initial cluster deployment completed. Creating node agents...");
                 DashboardServer.updateStatus("ansibleStage", "kubernetes_init ✅ | htcondor ⏳");
                 DashboardServer.updateStatus("htcondorStatus","Its working");
-                createNodeAgents(); // ← создаём агентов для каждого узла
+                DashboardServer.updateStatus("clusterStatus","DEPLOY");
+                createNodeAgents();
             }
         });
 
 
 
-// Добавьте поведение для обработки команд извне
 
     }
     private void handlePlaybookFailure(String playbook, AnsibleRunner.AnsibleResult result) {
@@ -98,7 +98,6 @@ public class CoordinatorAgent extends Agent {
                 sendAlert("ALERT: Execution failed in " + playbook + ": " + result.errorCode);
         }
 
-        // Автоматически запускаем сбор логов при критической ошибке
         collectDiagnosticLogs();
     }
 
@@ -153,11 +152,9 @@ public class CoordinatorAgent extends Agent {
     }
     private void collectDiagnosticLogs() {
     try {
-        // 1. Используем абсолютный путь в рабочей директории
         Path logPath = Paths.get(System.getProperty("user.dir"), "diagnostic-logs.txt");
         logger.info("Saving diagnostic logs to: {}", logPath.toAbsolutePath());
 
-        // 2. Собираем логи
         String kubeletLog = executeCommand("journalctl", "-u", "kubelet", "--since=-1h", "-n", "50");
         String containerdLog = executeCommand("systemctl", "status", "containerd");
         String kubectlLog = executeCommand("sudo", "kubectl", "get", "pods", "-A");
@@ -165,11 +162,9 @@ public class CoordinatorAgent extends Agent {
         String fullLog = "=== KUBELET ===\n" + (kubeletLog != null ? kubeletLog : "N/A") +
                         "\n\n=== CONTAINERD ===\n" + (containerdLog != null ? containerdLog : "N/A");
 
-        // 3. Сохраняем
         Files.write(logPath, fullLog.getBytes(StandardCharsets.UTF_8));
         logger.info("Diagnostic logs saved successfully");
 
-        // 4. Обновляем статус
         DashboardServer.updateStatus("diagnosticLogs", logPath.toAbsolutePath().toString());
         logger.info("Diagnostic logs saved to: {}", logPath);
 
