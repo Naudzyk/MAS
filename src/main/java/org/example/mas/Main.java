@@ -53,8 +53,8 @@ public class Main {
             logger.info("Deployment will be started only after clicking 'Deploy' button.");
 
 
-            Object[] coordinatorArgs = new Object[]{inventory, scripts};
-            container.createNewAgent("coordinator", CoordinatorAgent.class.getName(), coordinatorArgs).start();
+            container.createNewAgent("coordinator", CoordinatorAgent.class.getName(),
+                new Object[]{inventory, scripts}).start();
         } catch (Exception e){
             logger.error("Failed to start system", e);
             System.exit(1);
