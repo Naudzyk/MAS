@@ -1,16 +1,18 @@
 package org.example.mas.Service.Agent;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.spi.CurrencyNameProvider;
+
 
 @Service
 public class StatusService {
-    Map<String, Object> metrics = new HashMap<>();
     private final Map<String,Object> status = new ConcurrentHashMap<>();
+
+    private static StatusService instance;
 
     public StatusService() {
         status.put("ansibleStage", "WAITING_FOR_DEPLOYMENT_START");
@@ -19,6 +21,11 @@ public class StatusService {
         status.put("diagnosticLogs", "");
         status.put("lastUpdate", System.currentTimeMillis());
         status.put("metric_", "ANALAZY");
+
+        StatusService.instance = this;
+    }
+       public static StatusService getInstance() {
+        return instance;
     }
 
     public Map<String, Object> getStatus() {
@@ -34,7 +41,12 @@ public class StatusService {
     }
 
     public void update(String key, Map<String, Object> metrics) {
-        status.put(key, metrics );
+        status.put(key, metrics);
+    }
+
+    public void update(String key,Object value) {
+        status.put(key, value);
+        status.put("lastUpdate", System.currentTimeMillis());
     }
 
 

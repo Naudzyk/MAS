@@ -4,22 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version Spring-Web 8.5&quot;">
+    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version Spring-Web 8.7&quot;">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Main.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/utils/AnsibleRunner$AnsibleResult.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/utils/AnsibleRunner.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/utils/InventoryParser$Host.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/utils/InventoryParser$Inventory.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/utils/InventoryParser.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/public/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/public/script.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/public/style.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-archiver/pom.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Controller/LoggerController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Controller/LoggerController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Service/Agent/CoordinatorAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Service/Agent/CoordinatorAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Service/Agent/StatusService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Service/Agent/StatusService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar.original" beforeDir="false" afterPath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar.original" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Controller/LoggerController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/Controller/LoggerController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Service/Agent/CoordinatorAgent$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/Service/Agent/CoordinatorAgent$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Service/Agent/StatusService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/Service/Agent/StatusService.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -228,31 +222,8 @@
       <workItem from="1762163280011" duration="26000" />
       <workItem from="1762163494299" duration="39000" />
       <workItem from="1762163678547" duration="14000" />
-      <workItem from="1762164122576" duration="18418000" />
-    </task>
-    <task id="LOCAL-00001" summary="'V1'">
-      <option name="closed" value="true" />
-      <created>1756464007140</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1756464007140</updated>
-    </task>
-    <task id="LOCAL-00002" summary="'V1'">
-      <option name="closed" value="true" />
-      <created>1756464140529</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1756464140529</updated>
-    </task>
-    <task id="LOCAL-00003" summary="'V1'">
-      <option name="closed" value="true" />
-      <created>1756465106769</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1756465106769</updated>
+      <workItem from="1762164122576" duration="22719000" />
+      <workItem from="1762253323546" duration="991000" />
     </task>
     <task id="LOCAL-00004" summary="'V2'">
       <option name="closed" value="true" />
@@ -622,7 +593,31 @@
       <option name="project" value="LOCAL" />
       <updated>1762238575285</updated>
     </task>
-    <option name="localTasksCounter" value="50" />
+    <task id="LOCAL-00050" summary="&quot;Version Spring-Web 8.6&quot;">
+      <option name="closed" value="true" />
+      <created>1762239102175</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1762239102176</updated>
+    </task>
+    <task id="LOCAL-00051" summary="&quot;Version Spring-Web 8.6&quot;">
+      <option name="closed" value="true" />
+      <created>1762239225382</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1762239225382</updated>
+    </task>
+    <task id="LOCAL-00052" summary="&quot;Version Spring-Web 8.7&quot;">
+      <option name="closed" value="true" />
+      <created>1762239984248</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1762239984248</updated>
+    </task>
+    <option name="localTasksCounter" value="53" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -643,8 +638,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="'V4'" />
-    <MESSAGE value="&quot;V5&quot;" />
     <MESSAGE value="&quot;V6&quot;" />
     <MESSAGE value="&quot;New Version&quot;" />
     <MESSAGE value="&quot;New Version 2&quot;" />
@@ -668,7 +661,9 @@
     <MESSAGE value="&quot;Version Spring-Web 8.4.1&quot;" />
     <MESSAGE value="&quot;Version Spring-Web 8.4.3&quot;" />
     <MESSAGE value="&quot;Version Spring-Web 8.5&quot;" />
-    <option name="LAST_COMMIT_MESSAGE" value="&quot;Version Spring-Web 8.5&quot;" />
+    <MESSAGE value="&quot;Version Spring-Web 8.6&quot;" />
+    <MESSAGE value="&quot;Version Spring-Web 8.7&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="&quot;Version Spring-Web 8.7&quot;" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

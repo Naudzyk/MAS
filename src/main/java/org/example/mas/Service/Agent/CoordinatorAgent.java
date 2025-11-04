@@ -65,23 +65,23 @@ public class CoordinatorAgent extends Agent {
                         "09_prometheus.yml",
                         "10_prometheus_server.yml"
                 };
-
+                StatusService statusSvc = StatusService.getInstance();
                 for (String playbook : playbooks) {
                     logger.info("Running playbook: {}", playbook);
-                    statusService.update("ansibleStage",playbook);
+                    statusSvc.update("ansibleStage",playbook);
                     AnsibleRunner.AnsibleResult result = AnsibleRunner.run(playbook, inventory, playbooksDir, 15);
 
                     if (!result.success) {
                         handlePlaybookFailure(playbook, result);
-                        statusService.update("ansibleStage", "Ошибка");
-                        statusService.update("clusterStatus","Ошибка");
+                        statusSvc.update("ansibleStage", "Ошибка");
+                        statusSvc.update("clusterStatus","Ошибка");
                         return;
                     }
                 }
 
                 logger.info("Initial cluster deployment completed. Creating node agents...");
-                statusService.update("ansibleStage", "Успешное разворачивание кластера");
-                statusService.update("clusterStatus","DEPLOY CLUSTER");
+                statusSvc.update("ansibleStage", "Успешное разворачивание кластера");
+                statusSvc.update("clusterStatus","DEPLOY CLUSTER");
                 createNodeAgents();
             }
         });
