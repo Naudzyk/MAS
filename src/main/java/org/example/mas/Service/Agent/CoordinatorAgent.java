@@ -31,6 +31,10 @@ public class CoordinatorAgent extends Agent {
     private final Map<String, AID> nodeAgents = new HashMap<>();
     private final StatusService statusService;
 
+    public CoordinatorAgent() {
+        this.statusService = new StatusService();
+    }
+
     @Override
     protected void setup() {
         Object[] args = getArguments();

@@ -29,6 +29,10 @@ public class MasterAgent extends Agent {
     private String inventoryPath;
     private final StatusService statusService;
 
+    public MasterAgent(){
+        this.statusService = new StatusService();
+    }
+
 
     @Override
     protected void setup() {
