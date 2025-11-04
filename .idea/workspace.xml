@@ -4,7 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version Spring-Web 8.4.1&quot;" />
+    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version Spring-Web 8.4.3&quot;">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/utils/AnsibleRunner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/utils/AnsibleRunner.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Main.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/utils/AnsibleRunner$AnsibleResult.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/utils/AnsibleRunner.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/utils/InventoryParser$Host.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/utils/InventoryParser$Inventory.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/utils/InventoryParser.class" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -128,9 +138,17 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="Main" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="MAS" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="org.example.mas.Main" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <list>
       <item itemvalue="Application.Unnamed" />
       <item itemvalue="Application.Main" />
+      <item itemvalue="Spring Boot.Main" />
     </list>
     <recent_temporary>
       <list>
@@ -204,7 +222,7 @@
       <workItem from="1762163280011" duration="26000" />
       <workItem from="1762163494299" duration="39000" />
       <workItem from="1762163678547" duration="14000" />
-      <workItem from="1762164122576" duration="15847000" />
+      <workItem from="1762164122576" duration="17678000" />
     </task>
     <task id="LOCAL-00001" summary="'V1'">
       <option name="closed" value="true" />
@@ -582,7 +600,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762236392396</updated>
     </task>
-    <option name="localTasksCounter" value="48" />
+    <task id="LOCAL-00048" summary="&quot;Version Spring-Web 8.4.3&quot;">
+      <option name="closed" value="true" />
+      <created>1762236676325</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1762236676325</updated>
+    </task>
+    <option name="localTasksCounter" value="49" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -603,7 +629,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="'V2'" />
     <MESSAGE value="'V3'" />
     <MESSAGE value="'V4'" />
     <MESSAGE value="&quot;V5&quot;" />
@@ -628,7 +653,8 @@
     <MESSAGE value="&quot;Version not Web 8.4&quot;" />
     <MESSAGE value="&quot;Version Spring-Web 8.4&quot;" />
     <MESSAGE value="&quot;Version Spring-Web 8.4.1&quot;" />
-    <option name="LAST_COMMIT_MESSAGE" value="&quot;Version Spring-Web 8.4.1&quot;" />
+    <MESSAGE value="&quot;Version Spring-Web 8.4.3&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="&quot;Version Spring-Web 8.4.3&quot;" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
