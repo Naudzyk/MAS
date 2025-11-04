@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTCondor Cluster Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            color: #212529;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        h1 {
+            font-size: 28px;
+            color: #0d6efd;
+            margin-bottom: 10px;
+        }
+        .metric-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .metric-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        .metric-label {
+            font-size: 14px;
+        }
+        .metric-value {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .metric-high {
+            color: #dc3545;
+        }
+        .metric-medium {
+            color: #ffc107;
+        }
+        .metric-normal {
+            color: #28a745;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .card h2 {
+            margin-bottom: 16px;
+            color: #495057;
+            font-size: 20px;
+        }
+        .status-item {
+            padding: 12px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-left: 4px solid #0d6efd;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .status-success {
+            border-left-color: #198754;
+            background: #e8f5e9;
+        }
+        .status-error {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .status-warning {
+            border-left-color: #ffc107;
+            background: #fff3cd;
+            color: #856404;
+        }
+        .alerts-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .hidden {
+            display: none;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #5c636a;
+        }
+        .btn-success {
+            background: #198754;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #157347;
+        }
+        .result-message {
+            padding: 12px;
+            margin-top: 12px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        .result-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .result-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔬 HTCondor Cluster Dashboard</h1>
+            <p>Автоматическое развёртывание и мониторинг кластера</p>
+        </header>
+
+        <!-- Статус развёртывания -->
+        <div class="card">
+            <h2>🔧 Статус развёртывания</h2>
+            <div id="ansible-stage" class="status-item">Ожидание запуска...</div>
+        </div>
+
+        <!-- Состояние кластера -->
+        <div class="card">
+            <h2>Состояние кластера</h2>
+            <div id="cluster-status" class="status-item">—</div>
+        </div>
+        <div class="card">
+            <h2> Метрики узлов</h2>
+            <div id="metrics-container">
+                <div class="metric-placeholder">Загрузка метрик...</div>
+            </div>
+        </div>
+
+        <!-- Управление -->
+        <div class="card">
+            <h2>Управление</h2>
+            <button class="btn btn-secondary" onclick="collectLogs()" id="collectLogsBtn">
+                Собрать диагностические логи
+            </button>
+            <button class="btn btn-success" onclick="downloadLogs()" id="downloadLogsBtn" disabled>
+                Скачать логи
+            </button>
+            <div id="logsResult" class="result-message hidden"></div>
+        </div>
+
+        <!-- Оповещения -->
+        <div class="card">
+            <h2>Оповещения</h2>
+            <div id="alerts" class="alerts-list">
+                Нет оповещений
+            </div>
+        </div>
+
+        <!-- (Опционально) История этапов -->
+        <!--
+        <div class="card">
+            <h2>🕒 История этапов</h2>
+            <div id="stage-history">
+                <div class="status-item">[00:00:01] system-prep-agent:  COMPLETE</div>
+                <div class="status-item">[00:05:23] containerd-agent:  COMPLETE</div>
+                ...
+            </div>
+        </div>
+        -->
+    </div>
+
+    <script>
+        let logsAvailable = false;
+
+        function updateStatus() {
+            fetch('/api/status')
+                .then(res => res.json())
+                .then(data => {
+                    // Этап развёртывания
+                    const stageEl = document.getElementById('ansible-stage');
+                    stageEl.textContent = data.ansibleStage || '—';
+                    if (data.ansibleStage && data.ansibleStage.includes('✅')) {
+                        stageEl.className = 'status-item status-success';
+                    } else if (data.ansibleStage && data.ansibleStage.includes('❌')) {
+                        stageEl.className = 'status-item status-error';
+                    } else if (data.ansibleStage && data.ansibleStage.includes('⚠️')) {
+                        stageEl.className = 'status-item status-warning';
+                    } else {
+                        stageEl.className = 'status-item';
+                    }
+
+                    // Состояние кластера
+                    const clusterEl = document.getElementById('cluster-status');
+                    clusterEl.textContent = data.clusterStatus || '—';
+                    if (data.clusterStatus === 'READY') {
+                        clusterEl.className = 'status-item status-success';
+                    } else if (data.clusterStatus && data.clusterStatus.includes('FAILED')) {
+                        clusterEl.className = 'status-item status-error';
+                    } else {
+                        clusterEl.className = 'status-item';
+                    }
+
+                    // Оповещения
+                    const alertsDiv = document.getElementById('alerts');
+                    if (data.alerts && Array.isArray(data.alerts) && data.alerts.length > 0) {
+                        alertsDiv.innerHTML = data.alerts.map(alert =>
+                            `<div class="status-item status-error">${alert}</div>`
+                        ).join('');
+                    } else {
+                        alertsDiv.innerHTML = 'Нет оповещений';
+                    }
+
+                    // Обновляем доступность кнопки скачивания
+                    logsAvailable = !!data.diagnosticLogs;
+                    document.getElementById('downloadLogsBtn').disabled = !logsAvailable;
+                })
+                .catch(err => console.error('Ошибка обновления статуса:', err));
+        }
+
+        // Сбор логов
+        async function collectLogs() {
+            const btn = document.getElementById('collectLogsBtn');
+            const resultDiv = document.getElementById('logsResult');
+
+            btn.disabled = true;
+            btn.textContent = 'Сбор логов...';
+
+            try {
+                const res = await fetch('/api/collect-logs', { method: 'POST' });
+                const data = await res.json();
+
+                if (res.ok) {
+                    resultDiv.className = 'result-message result-success';
+                    resultDiv.textContent = data.message || 'Логи собраны. Готовы к скачиванию.';
+                } else {
+                    resultDiv.className = 'result-message result-error';
+                    resultDiv.textContent = `Ошибка: ${data.error || 'Не удалось собрать логи'}`;
+                }
+                resultDiv.classList.remove('hidden');
+            } catch (err) {
+                resultDiv.className = 'result-message result-error';
+                resultDiv.textContent = 'Ошибка подключения к серверу';
+                resultDiv.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Собрать диагностические логи';
+            }
+        }
+
+        // Скачивание логов
+        function downloadLogs() {
+            if (logsAvailable) {
+                window.open('/logs', '_blank');
+            }
+        }
+
+        updateStatus();
+        setInterval(updateStatus, 2000);
+    </script>
+    <script>
+async function updateMetrics() {
+    try {
+
+        const nodeNames = ['central_manager', 'worker1']; // Заменить на динамическое получение
+
+        const container = document.getElementById('metrics-container');
+        container.innerHTML = ''; // Очищаем контейнер
+
+        for (const nodeName of nodeNames) {
+            try {
+                const res = await fetch(`/api/metrics/${nodeName}`);
+                if (res.ok) {
+                    const metrics = await res.json();
+                    const card = document.createElement('div');
+                    card.className = 'metric-card';
+
+                    // Определяем классы для цветовой индикации
+                    const cpuClass = getMetricClass(parseFloat(metrics.cpuLoad));
+                    const memClass = getMetricClass(parseFloat(metrics.memoryUsage));
+                    const diskClass = getMetricClass(parseFloat(metrics.diskUsage));
+
+                    card.innerHTML = `
+                        <div class="metric-title">${nodeName}</div>
+                        <div class="metric-row">
+                            <span class="metric-label">CPU:</span>
+                            <span class="metric-value ${cpuClass}">${metrics.cpuLoad}%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Память:</span>
+                            <span class="metric-value ${memClass}">${metrics.memoryUsage}%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Диск:</span>
+                            <span class="metric-value ${diskClass}">${metrics.diskUsage}%</span>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                } else {
+                    const card = document.createElement('div');
+                    card.className = 'metric-card';
+                    card.innerHTML = `
+                        <div class="metric-title">${nodeName}</div>
+                        <div class="metric-row">
+                            <span class="metric-label">Статус:</span>
+                            <span class="metric-value">Нет данных</span>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                }
+            } catch (e) {
+                console.error(`Failed to fetch metrics for ${nodeName}`, e);
+            }
+        }
+    } catch (e) {
+        console.error('Failed to update metrics', e);
+    }
+}
+
+function getMetricClass(value) {
+    if (value > 90) return 'metric-high';
+    if (value > 75) return 'metric-medium';
+    return 'metric-normal';
+}
+
+// Вызываем обновление метрик каждые 10 секунд
+setInterval(updateMetrics, 10000);
+updateMetrics();
+</script>
+</body>
+</html>
