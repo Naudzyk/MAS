@@ -77,7 +77,7 @@ public class CoordinatorAgent extends BaseAgent {
                     }
                 }
 
-                logger.info("Initial cluster deployment completed. Creating node agents...");
+                logger.info("Initial cluster deployment completed.");
                 statusSvc.update("ansibleStage", "Успешное разворачивание кластера");
                 statusSvc.update("clusterStatus","DEPLOY CLUSTER");
                 createNodeAgents();
@@ -107,6 +107,7 @@ public class CoordinatorAgent extends BaseAgent {
     }
 
     private void createNodeAgents() {
+        logger.info("Creating node agents...");
         try {
             InventoryParser.Inventory inv = InventoryParser.parse(this.inventory);
 

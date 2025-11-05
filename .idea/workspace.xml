@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version Spring-Web 10.0&quot;">
+    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version Spring-Web 10.1&quot;">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Service/Agent/CoordinatorAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Service/Agent/CoordinatorAgent.java" afterDir="false" />
     </list>
@@ -217,15 +217,7 @@
       <workItem from="1762163678547" duration="14000" />
       <workItem from="1762164122576" duration="22719000" />
       <workItem from="1762253323546" duration="5349000" />
-      <workItem from="1762336520613" duration="3028000" />
-    </task>
-    <task id="LOCAL-00009" summary="&quot;V6&quot;">
-      <option name="closed" value="true" />
-      <created>1757330000045</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1757330000045</updated>
+      <workItem from="1762336520613" duration="3711000" />
     </task>
     <task id="LOCAL-00010" summary="&quot;New Version&quot;">
       <option name="closed" value="true" />
@@ -611,7 +603,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762338645081</updated>
     </task>
-    <option name="localTasksCounter" value="58" />
+    <task id="LOCAL-00058" summary="&quot;Version Spring-Web 10.1&quot;">
+      <option name="closed" value="true" />
+      <created>1762339627341</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1762339627341</updated>
+    </task>
+    <option name="localTasksCounter" value="59" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -632,7 +632,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="&quot;New Version 4&quot;" />
     <MESSAGE value="&quot;New Version 5&quot;" />
     <MESSAGE value="&quot;New Version 6&quot;" />
     <MESSAGE value="&quot;New Version 7.0&quot;" />
@@ -657,7 +656,8 @@
     <MESSAGE value="&quot;Version Spring-Web 8.8&quot;" />
     <MESSAGE value="&quot;Version Spring-Web 9.0&quot;" />
     <MESSAGE value="&quot;Version Spring-Web 10.0&quot;" />
-    <option name="LAST_COMMIT_MESSAGE" value="&quot;Version Spring-Web 10.0&quot;" />
+    <MESSAGE value="&quot;Version Spring-Web 10.1&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="&quot;Version Spring-Web 10.1&quot;" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
