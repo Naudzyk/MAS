@@ -137,7 +137,12 @@ public class CoordinatorAgent extends BaseAgent {
 
     private void createNodeAgent(String nodeName, boolean isMaster) {
         try {
-            String agentType =  MasterAgent.class.getName();
+            String agentType;
+            if(isMaster) {
+                agentType = MasterAgent.class.getName();
+            }else {
+                agentType = WorkerAgent.class.getName();
+            }
 
             Object[] agentArgs = new Object[]{
                     nodeName,

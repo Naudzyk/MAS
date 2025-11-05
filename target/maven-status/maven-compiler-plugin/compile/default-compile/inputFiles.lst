@@ -1,6 +1,7 @@
 C:\Users\EVgeNII\IdeaProjects\MAS\src\main\java\org\example\mas\Main.java
 C:\Users\EVgeNII\IdeaProjects\MAS\src\main\java\org\example\mas\SpringContextHelper.java
 C:\Users\EVgeNII\IdeaProjects\MAS\src\main\java\org\example\mas\Controller\MetricsController.java
+C:\Users\EVgeNII\IdeaProjects\MAS\src\main\java\org\example\mas\Service\Agent\WorkerAgent.java
 C:\Users\EVgeNII\IdeaProjects\MAS\src\main\java\org\example\mas\Service\Agent\StatusService.java
 C:\Users\EVgeNII\IdeaProjects\MAS\src\main\java\org\example\mas\utils\InventoryParser.java
 C:\Users\EVgeNII\IdeaProjects\MAS\src\main\java\org\example\mas\Controller\DeployController.java
