@@ -2,10 +2,16 @@ package org.example.mas.Service.Agent;
 
 import jade.core.Agent;
 import org.example.mas.DTO.StatusUpdateDTO;
-import org.example.mas.SpringContextHelper;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.WebClient;
 
+
+
 public abstract class BaseAgent extends Agent {
+
+    private static final Logger logger = LoggerFactory.getLogger(BaseAgent.class);
 
     private WebClient getWebClient() {
         return WebClient.builder()
@@ -14,6 +20,7 @@ public abstract class BaseAgent extends Agent {
     }
 
     protected void sendStatusUpdate(String key, String value) {
+        logger.info(">>> Sending status update: {} = {}", key, value);
         try {
             getWebClient()
                 .post()

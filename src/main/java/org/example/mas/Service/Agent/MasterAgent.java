@@ -20,8 +20,7 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
-@Service
-@RequiredArgsConstructor
+
 public class MasterAgent extends BaseAgent {
     private final HttpClient httpClient = HttpClient.newHttpClient();
     private static final Logger logger = LoggerFactory.getLogger(MasterAgent.class);
@@ -134,11 +133,5 @@ private double parsePrometheusValue(JsonObject response) {
         return null;
     }
 
-    private void sendAlert(String message) {
-        logger.warn("ALERT: {}", message);
-        ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-        msg.addReceiver(new AID("coordinator", AID.ISLOCALNAME));
-        msg.setContent("ALERT: " + message);
-        send(msg);
-    }
+
 }
