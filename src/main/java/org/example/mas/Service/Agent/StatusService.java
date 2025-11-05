@@ -1,6 +1,7 @@
 package org.example.mas.Service.Agent;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -12,8 +13,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class StatusService {
     private final Map<String,Object> status = new ConcurrentHashMap<>();
 
-    private static StatusService instance;
-
     public StatusService() {
         status.put("ansibleStage", "WAITING_FOR_DEPLOYMENT_START");
         status.put("clusterStatus", "NOT_DEPLOYED");
@@ -22,10 +21,6 @@ public class StatusService {
         status.put("lastUpdate", System.currentTimeMillis());
         status.put("metric_", "ANALAZY");
 
-        StatusService.instance = this;
-    }
-       public static StatusService getInstance() {
-        return instance;
     }
 
     public Map<String, Object> getStatus() {
@@ -36,18 +31,21 @@ public class StatusService {
         return status.get(key);
     }
 
-    public void update(String key, String value) {
-        status.put(key, value);
-    }
-
-    public void update(String key, Map<String, Object> metrics) {
-        status.put(key, metrics);
-    }
-
-    public void update(String key,Object value) {
-        status.put(key, value);
+    public void update(String key, String jsonString) {
+        try {
+            if (jsonString.startsWith("{") && jsonString.endsWith("}")) {
+                Map<String, Object> obj = new ObjectMapper().readValue(jsonString, Map.class);
+                status.put(key, obj);
+            } else {
+                status.put(key, jsonString);
+            }
+        } catch (Exception e) {
+            // Если не JSON — сохраняем как строку
+            status.put(key, jsonString);
+        }
         status.put("lastUpdate", System.currentTimeMillis());
     }
+
 
 
 }

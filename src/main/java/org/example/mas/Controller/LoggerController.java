@@ -1,13 +1,11 @@
 package org.example.mas.Controller;
 
-import jade.content.abs.AbsAgentAction;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import lombok.RequiredArgsConstructor;
 import org.example.mas.Service.Agent.StatusService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

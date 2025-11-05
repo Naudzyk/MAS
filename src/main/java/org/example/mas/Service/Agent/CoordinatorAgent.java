@@ -1,11 +1,11 @@
 package org.example.mas.Service.Agent;
 
 import jade.core.AID;
-import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
 import lombok.RequiredArgsConstructor;
+import org.example.mas.SpringContextHelper;
 import org.example.mas.utils.AnsibleRunner;
 import org.example.mas.utils.InventoryParser;
 import org.slf4j.Logger;
@@ -24,19 +24,16 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class CoordinatorAgent extends Agent {
+public class CoordinatorAgent extends BaseAgent {
     private static final Logger logger = LoggerFactory.getLogger(CoordinatorAgent.class);
     private String inventory;
     private String playbooksDir;
     private final Map<String, AID> nodeAgents = new HashMap<>();
-    private final StatusService statusService;
 
-    public CoordinatorAgent() {
-        this.statusService = new StatusService();
-    }
 
     @Override
     protected void setup() {
+        StatusService statusSvc = SpringContextHelper.getBean(StatusService.class);
         Object[] args = getArguments();
         if (args == null || args.length < 2) {
             logger.error("CoordinatorAgent requires: inventoryPath, playbooksDir");
@@ -65,10 +62,11 @@ public class CoordinatorAgent extends Agent {
                         "09_prometheus.yml",
                         "10_prometheus_server.yml"
                 };
-                StatusService statusSvc = StatusService.getInstance();
+
                 for (String playbook : playbooks) {
                     logger.info("Running playbook: {}", playbook);
-                    statusSvc.update("ansibleStage",playbook);
+                    sendStatusUpdate("ansibleStage", playbook);
+
                     AnsibleRunner.AnsibleResult result = AnsibleRunner.run(playbook, inventory, playbooksDir, 15);
 
                     if (!result.success) {
@@ -172,12 +170,12 @@ public class CoordinatorAgent extends Agent {
         Files.write(logPath, fullLog.getBytes(StandardCharsets.UTF_8));
         logger.info("Diagnostic logs saved successfully");
 
-        statusService.update("diagnosticLogs", logPath.toAbsolutePath().toString());
+        sendStatusUpdate("diagnosticLogs", logPath.toAbsolutePath().toString());
         logger.info("Diagnostic logs saved to: {}", logPath);
 
     } catch (Exception e) {
         logger.error("Failed to collect diagnostic logs", e);
-        statusService.update("diagnosticLogs", "");
+        sendStatusUpdate("diagnosticLogs", "");
     }
 }
 
