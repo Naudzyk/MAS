@@ -1,5 +1,6 @@
 package org.example.mas.Service.Agent;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jade.core.AID;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -18,7 +19,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -108,12 +111,23 @@ public class CoordinatorAgent extends BaseAgent {
 
     private void createNodeAgents() {
         logger.info("Creating node agents...");
+        List<String> nodeList = new ArrayList<>();
         try {
             InventoryParser.Inventory inv = InventoryParser.parse(this.inventory);
 
             for (InventoryParser.Host master : inv.getGroup("central_manager")) {
+                nodeList.add(master.name);
                 createNodeAgent(master.name, true);
             }
+
+            for (InventoryParser.Host worker : inv.getGroup("execute_nodes")) {
+                nodeList.add(worker.name);
+                createNodeAgent(worker.name, false);
+            }
+
+            ObjectMapper mapper = new ObjectMapper();
+            String nodeListJson = mapper.writeValueAsString(nodeList);
+            sendStatusUpdate("activeNodes", nodeListJson);
 
 
         } catch (Exception e) {

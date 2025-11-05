@@ -286,11 +286,30 @@
     <script>
 async function updateMetrics() {
     try {
+        const statusRes = await fetch('/api/status');
+        const statusData = await statusRes.json();
 
-        const nodeNames = ['central_manager', 'worker1'];
+        let nodeNames = [];
+        if (statusData.activeNodes) {
+            try {
+                if (typeof statusData.activeNodes === 'string') {
+                    nodeNames = JSON.parse(statusData.activeNodes);
+                } else if (Array.isArray(statusData.activeNodes)) {
+                    nodeNames = statusData.activeNodes;
+                }
+            } catch (e) {
+                console.warn('Failed to parse activeNodes:', statusData.activeNodes);
+            }
+        }
+
+        if (nodeNames.length === 0) {
+            document.getElementById('metrics-container').innerHTML =
+                '<div class="metric-card">Нет данных о нодах</div>';
+            return;
+        }
 
         const container = document.getElementById('metrics-container');
-        container.innerHTML = ''; // Очищаем контейнер
+        container.innerHTML = '';
 
         for (const nodeName of nodeNames) {
             try {
@@ -300,7 +319,6 @@ async function updateMetrics() {
                     const card = document.createElement('div');
                     card.className = 'metric-card';
 
-                    // Определяем классы для цветовой индикации
                     const cpuClass = getMetricClass(parseFloat(metrics.cpuLoad));
                     const memClass = getMetricClass(parseFloat(metrics.memoryUsage));
                     const diskClass = getMetricClass(parseFloat(metrics.diskUsage));
@@ -339,6 +357,8 @@ async function updateMetrics() {
         }
     } catch (e) {
         console.error('Failed to update metrics', e);
+        document.getElementById('metrics-container').innerHTML =
+            '<div class="metric-card">Ошибка загрузки метрик</div>';
     }
 }
 

@@ -38,7 +38,7 @@ public class MasterAgent extends BaseAgent {
 
         logger.info("MasterAgent {} initialized for node: {}", getLocalName(), nodeName);
 
-        addBehaviour(new TickerBehaviour(this, 10_000) { // Каждые 10 секунд
+        addBehaviour(new TickerBehaviour(this, 10_000) {
             @Override
             protected void onTick() {
                 collectMetrics();
