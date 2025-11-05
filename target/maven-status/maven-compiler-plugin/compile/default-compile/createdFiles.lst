@@ -13,6 +13,8 @@ org\example\mas\Controller\InternalAgentController.class
 org\example\mas\Service\Agent\MasterAgent.class
 org\example\mas\Service\Agent\BaseAgent.class
 org\example\mas\utils\InventoryParser$Host.class
+org\example\mas\Service\Agent\WorkerAgent$1.class
+org\example\mas\Service\Agent\WorkerAgent.class
 org\example\mas\Service\Agent\CoordinatorAgent$1.class
 org\example\mas\utils\AnsibleRunner.class
 org\example\mas\SpringContextHelper.class
