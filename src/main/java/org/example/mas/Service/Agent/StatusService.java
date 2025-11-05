@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,6 +24,7 @@ public class StatusService {
         status.put("diagnosticLogs", "");
         status.put("lastUpdate", System.currentTimeMillis());
         status.put("metric_", "ANALAZY");
+        status.put("activeNodes", new ArrayList<String>());
 
     }
 
