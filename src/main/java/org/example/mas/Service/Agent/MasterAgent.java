@@ -1,9 +1,9 @@
 package org.example.mas.Service.Agent;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import jade.core.AID;
-import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import lombok.RequiredArgsConstructor;
@@ -22,16 +22,12 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class MasterAgent extends Agent {
+public class MasterAgent extends BaseAgent {
     private final HttpClient httpClient = HttpClient.newHttpClient();
     private static final Logger logger = LoggerFactory.getLogger(MasterAgent.class);
     private String nodeName;
     private String inventoryPath;
-    private final StatusService statusService;
 
-    public MasterAgent(){
-        this.statusService = new StatusService();
-    }
 
 
     @Override
@@ -46,7 +42,6 @@ public class MasterAgent extends Agent {
         addBehaviour(new TickerBehaviour(this, 10_000) { // Каждые 10 секунд
             @Override
             protected void onTick() {
-                checkNodeHealth();
                 collectMetrics();
             }
         });
@@ -79,7 +74,10 @@ public class MasterAgent extends Agent {
         metrics.put("diskUsage", String.format("%.2f", diskUsage));
         metrics.put("timestamp", System.currentTimeMillis());
 
-        statusService.update("metrics_" + nodeName, metrics);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String metricsJson = objectMapper.writeValueAsString(metrics);
+
+        sendStatusUpdate("metrics_" + nodeName, metricsJson);
         logger.info("Collected metrics for {}: CPU: {}%, MEM: {}%, DISK: {}%", nodeName, cpuLoad, memUsage, diskUsage);
 
     } catch (Exception e) {
@@ -121,50 +119,6 @@ private double parsePrometheusValue(JsonObject response) {
     return 0.0;
 }
 
-    private void checkNodeHealth() {
-        try {
-            String nodeIp = getNodeIpFromInventory(nodeName);
-            if (nodeIp == null) {
-                logger.warn("IP for node {} not found in inventory", nodeName);
-                return;
-            }
-
-            String prometheusUrl = "http://localhost:9090";
-            String query = "avg(rate(node_cpu_seconds_total{instance=\"" + nodeIp + ":9100\",mode!=\"idle\"}[1m]))";
-            HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(prometheusUrl + "/api/v1/query?query=" + java.net.URLEncoder.encode(query, "UTF-8")))
-                .timeout(Duration.ofSeconds(10))
-                .build();
-
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() != 200) {
-                logger.warn("Prometheus returned status {}: {}", response.statusCode(), response.body());
-                return;
-            }
-
-            JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
-            if ("success".equals(json.get("status").getAsString())) {
-                double cpuLoad = json.getAsJsonObject("data")
-                    .getAsJsonArray("result")
-                    .get(0)
-                    .getAsJsonObject()
-                    .get("value")
-                    .getAsJsonArray()
-                    .get(1)
-                    .getAsDouble();
-
-                logger.info("CPU load on {}: {:.2f}%", nodeName, cpuLoad * 100);
-                if (cpuLoad > 0.9) {
-                    sendAlert("High CPU load on " + nodeName + ": " + String.format("%.2f%%", cpuLoad * 100));
-                }
-            } else {
-                logger.warn("Prometheus query failed: {}", json.get("error").getAsString());
-            }
-
-        } catch (Exception e) {
-            logger.error("Failed to check node health via Prometheus", e);
-        }
-    }
 
     private String getNodeIpFromInventory(String nodeName) {
         try {

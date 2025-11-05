@@ -1,3 +1,4 @@
+org\example\mas\DTO\StatusUpdateDTO.class
 org\example\mas\Service\Agent\CoordinatorAgent.class
 org\example\mas\Controller\LoggerController.class
 org\example\mas\Service\Agent\MasterAgent$1.class
@@ -8,7 +9,10 @@ org\example\mas\utils\InventoryParser.class
 org\example\mas\Controller\MetricsController.class
 org\example\mas\utils\InventoryParser$Inventory.class
 org\example\mas\Service\Agent\StatusService.class
+org\example\mas\Controller\InternalAgentController.class
 org\example\mas\Service\Agent\MasterAgent.class
+org\example\mas\Service\Agent\BaseAgent.class
 org\example\mas\utils\InventoryParser$Host.class
 org\example\mas\Service\Agent\CoordinatorAgent$1.class
 org\example\mas\utils\AnsibleRunner.class
+org\example\mas\SpringContextHelper.class
