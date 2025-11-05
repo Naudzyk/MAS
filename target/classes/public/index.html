@@ -151,29 +151,26 @@
 <body>
     <div class="container">
         <header>
-            <h1>🔬 HTCondor Cluster Dashboard</h1>
+            <h1>HTCondor Cluster Dashboard</h1>
             <p>Автоматическое развёртывание и мониторинг кластера</p>
         </header>
 
-        <!-- Статус развёртывания -->
         <div class="card">
-            <h2>🔧 Статус развёртывания</h2>
+            <h2>Статус развёртывания</h2>
             <div id="ansible-stage" class="status-item">Ожидание запуска...</div>
         </div>
 
-        <!-- Состояние кластера -->
         <div class="card">
             <h2>Состояние кластера</h2>
             <div id="cluster-status" class="status-item">—</div>
         </div>
         <div class="card">
-            <h2> Метрики узлов</h2>
+            <h2>Метрики узлов</h2>
             <div id="metrics-container">
                 <div class="metric-placeholder">Загрузка метрик...</div>
             </div>
         </div>
 
-        <!-- Управление -->
         <div class="card">
             <h2>Управление</h2>
             <button class="btn btn-secondary" onclick="collectLogs()" id="collectLogsBtn">
@@ -185,7 +182,6 @@
             <div id="logsResult" class="result-message hidden"></div>
         </div>
 
-        <!-- Оповещения -->
         <div class="card">
             <h2>Оповещения</h2>
             <div id="alerts" class="alerts-list">
@@ -193,10 +189,9 @@
             </div>
         </div>
 
-        <!-- (Опционально) История этапов -->
         <!--
         <div class="card">
-            <h2>🕒 История этапов</h2>
+            <h2> История этапов</h2>
             <div id="stage-history">
                 <div class="status-item">[00:00:01] system-prep-agent:  COMPLETE</div>
                 <div class="status-item">[00:05:23] containerd-agent:  COMPLETE</div>
@@ -213,7 +208,6 @@
             fetch('/api/status')
                 .then(res => res.json())
                 .then(data => {
-                    // Этап развёртывания
                     const stageEl = document.getElementById('ansible-stage');
                     stageEl.textContent = data.ansibleStage || '—';
                     if (data.ansibleStage && data.ansibleStage.includes('✅')) {
@@ -226,7 +220,6 @@
                         stageEl.className = 'status-item';
                     }
 
-                    // Состояние кластера
                     const clusterEl = document.getElementById('cluster-status');
                     clusterEl.textContent = data.clusterStatus || '—';
                     if (data.clusterStatus === 'READY') {
@@ -237,7 +230,6 @@
                         clusterEl.className = 'status-item';
                     }
 
-                    // Оповещения
                     const alertsDiv = document.getElementById('alerts');
                     if (data.alerts && Array.isArray(data.alerts) && data.alerts.length > 0) {
                         alertsDiv.innerHTML = data.alerts.map(alert =>
@@ -247,14 +239,12 @@
                         alertsDiv.innerHTML = 'Нет оповещений';
                     }
 
-                    // Обновляем доступность кнопки скачивания
                     logsAvailable = !!data.diagnosticLogs;
                     document.getElementById('downloadLogsBtn').disabled = !logsAvailable;
                 })
                 .catch(err => console.error('Ошибка обновления статуса:', err));
         }
 
-        // Сбор логов
         async function collectLogs() {
             const btn = document.getElementById('collectLogsBtn');
             const resultDiv = document.getElementById('logsResult');
@@ -284,7 +274,6 @@
             }
         }
 
-        // Скачивание логов
         function downloadLogs() {
             if (logsAvailable) {
                 window.open('/logs', '_blank');
@@ -298,7 +287,7 @@
 async function updateMetrics() {
     try {
 
-        const nodeNames = ['central_manager', 'worker1']; // Заменить на динамическое получение
+        const nodeNames = ['central_manager', 'worker1'];
 
         const container = document.getElementById('metrics-container');
         container.innerHTML = ''; // Очищаем контейнер
@@ -359,7 +348,6 @@ function getMetricClass(value) {
     return 'metric-normal';
 }
 
-// Вызываем обновление метрик каждые 10 секунд
 setInterval(updateMetrics, 10000);
 updateMetrics();
 </script>
