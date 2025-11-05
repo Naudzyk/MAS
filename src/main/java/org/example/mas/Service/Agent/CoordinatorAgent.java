@@ -110,13 +110,10 @@ public class CoordinatorAgent extends BaseAgent {
         try {
             InventoryParser.Inventory inv = InventoryParser.parse(this.inventory);
 
-            for (InventoryParser.Host master : inv.getGroup("master")) {
+            for (InventoryParser.Host master : inv.getGroup("central_manager")) {
                 createNodeAgent(master.name, true);
             }
 
-            for (InventoryParser.Host worker : inv.getGroup("workers")) {
-                createNodeAgent(worker.name, false);
-            }
 
         } catch (Exception e) {
             logger.error("Failed to create node agents from inventory", e);
