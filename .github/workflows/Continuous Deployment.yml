@@ -1,0 +1,63 @@
+name: Deploy to Cluster 
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download JAR from CI artifacts
+        uses: actions/checkout@v4
+        with:
+          name: mas-jar
+          path: target/
+
+      - name: Install jq (for JSON parsing)
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Deploy files to remote server
+        uses: appleboy/scp-actions@v0.1.7
+        with: 
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          source: "target/*,inventory.ini,scripts/"
+          target: "/opt/mas/"
+          strip_components: 1
+          
+      - name: Start Coordinator and validate 
+        uses: appleboy/ssh-action@v1.0.3
+        with: 
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SHH_KEY }}
+          scripts: |
+            pkill -f MAS-1.0-SNAPSHOT.jar || true
+
+            cd /opt/mas
+            nohup java -jar MAS-*.jar scripts/inventory.ini scripts/ > mas.log 2>&1 &
+
+            echo "Waiting for web server to start..."
+            for i in {1..30}; do
+              if curl -s http://localhost:8080/api/status > /dev/null; then
+                echo "Web servers is up"
+                break
+              fi 
+              sleep 10
+            done
+
+
+            echo "Waiting for cluster deployment..."
+            for i in {1..60}; do
+              STATUS=$(curl -s http://localhost:8080/api/status | jq -r '.clusterStatus // "UNKNOWN"') 
+              if [[ "$STATUS" == "DEPLOY CLUSTER" || "$STATUS" == "READY" ]]; then
+                echo "Deployment successful! Status: $STATUS"
+                exit 0
+              elif [[ "$STATUS" == "Ошибка" ]]; then
+              
