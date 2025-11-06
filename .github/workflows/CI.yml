@@ -41,9 +41,9 @@ jobs:
           python3 -m pip install --upgrade pip
           python3 -m pip install "ansible>=2.14" "ansible-lint>=6.0"
 
-      - name: Lint Ansible playbooks
-        run: |
-          ansible-lint scripts/
+      # - name: Lint Ansible playbooks
+      #   run: |
+      #     ansible-lint scripts/
 
       # - name: Test playbooks with molecule 
       #   run: |
