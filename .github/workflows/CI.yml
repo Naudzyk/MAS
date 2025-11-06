@@ -36,6 +36,10 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y ansible 
+      - name: Install Ansible and ansible-lint via pip
+        run: |
+          python3 -m pip install --upgarde pip
+          python3 -m pip install "ansible>=2.14" "ansible-lint>=6.0"
 
       - name: Lint Ansible playbooks
         run: |
