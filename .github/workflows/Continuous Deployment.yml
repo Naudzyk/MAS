@@ -18,8 +18,8 @@ jobs:
           name: mas-jar
           path: target/
 
-      - name: Install jq (for JSON parsing)
-        run: sudo apt-get update && sudo apt-get install -y jq
+      # - name: Install jq (for JSON parsing)
+      #   run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: Deploy files to remote server
         uses: appleboy/scp-action@v0.1.7
