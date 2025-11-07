@@ -31,44 +31,53 @@ jobs:
           target: "/home/vboxuser/MasForUser/"
           strip_components: 1
           
-      - name: Start Coordinator and validate 
+      - name: Start MAS and validate
         uses: appleboy/ssh-action@v1.0.3
-        with: 
+        with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_SHH_KEY }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
             pkill -f MAS-1.0-SNAPSHOT.jar || true
 
-            cd /home/vboxuser/MasForUser/
-            nohup java -jar MAS-*.jar scripts/inventory.ini scripts/ > mas.log 2>&1 &
+            cd /home/vboxuser/mas
+            nohup java -jar MAS-1.0-SNAPSHOT.jar scripts/inventory.ini scripts/ > mas.log 2>&1 &
 
             echo "Waiting for web server to start..."
             for i in {1..30}; do
               if curl -s http://localhost:8080/api/status > /dev/null; then
-                echo "Web servers is up"
+                echo "Web server is up"
                 break
-              fi 
+              fi
+              echo "Web server not responding yet (attempt $i/30)"
               sleep 10
             done
 
-
             echo "Waiting for cluster deployment..."
             for i in {1..60}; do
-              STATUS=$(curl -s http://localhost:8080/api/status | jq -r '.clusterStatus // "UNKNOWN"') 
+              if ! curl -s http://localhost:8080/api/status > /dev/null; then
+                echo "Web server is not responding, continuing to wait..."
+                sleep 10
+                continue
+              fi
+
+              STATUS=$(curl -s http://localhost:8080/api/status | jq -r '.clusterStatus // "UNKNOWN"')
               if [[ "$STATUS" == "DEPLOY CLUSTER" || "$STATUS" == "READY" ]]; then
                 echo "Deployment successful! Status: $STATUS"
                 exit 0
               elif [[ "$STATUS" == "Ошибка" ]]; then
-                echo "Deployment failed!" Status: $STATUS
-                tail -n 20 /opt/mas/mas.log
+                echo "Deployment failed! Status: $STATUS"
+                echo "=== LAST LOG LINES ==="
+                tail -n 20 /home/vboxuser/mas/mas.log
                 exit 1
+              else
+                echo "Still deploying... Current status: $STATUS"
               fi
-              echo "Still deploying Current status: $STATUS"
               sleep 10
             done
 
-            echo "Timeout waiting for deploy"
-            tail -n 20 /opt/mas/mas.log
-            exit 1 
+            echo "Timeout waiting for deployment (10 minutes)"
+            echo "=== LAST LOG LINES ==="
+            tail -n 20 /home/vboxuser/mas/mas.log
+            exit 1
               
