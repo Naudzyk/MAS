@@ -28,7 +28,7 @@ jobs:
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           source: "target/*,scripts/inventory.ini,scripts/"
-          target: "/opt/mas/"
+          target: "/home/vboxuser/MasForUser/"
           strip_components: 1
           
       - name: Start Coordinator and validate 
@@ -40,7 +40,7 @@ jobs:
           scripts: |
             pkill -f MAS-1.0-SNAPSHOT.jar || true
 
-            cd /opt/mas
+            cd /home/vboxuser/MasForUser/
             nohup java -jar MAS-*.jar scripts/inventory.ini scripts/ > mas.log 2>&1 &
 
             echo "Waiting for web server to start..."
