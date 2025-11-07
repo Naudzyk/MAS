@@ -37,7 +37,7 @@ jobs:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SHH_KEY }}
-          scripts: |
+          script: |
             pkill -f MAS-1.0-SNAPSHOT.jar || true
 
             cd /home/vboxuser/MasForUser/
