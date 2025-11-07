@@ -60,4 +60,15 @@ jobs:
                 echo "Deployment successful! Status: $STATUS"
                 exit 0
               elif [[ "$STATUS" == "Ошибка" ]]; then
+                echo "Deployment failed!" Status: $STATUS
+                tail -n 20 /opt/mas/mas.log
+                exit 1
+              fi
+              echo "Still deploying Current status: $STATUS"
+              sleep 10
+            done
+
+            echo "Timeout waiting for deploy"
+            tail -n 20 /opt/mas/mas.log
+            exit 1 
               
