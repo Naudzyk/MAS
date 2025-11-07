@@ -22,7 +22,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: Deploy files to remote server
-        uses: appleboy/scp-actions@v0.1.7
+        uses: appleboy/scp-action@v0.1.7
         with: 
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
