@@ -39,7 +39,6 @@ jobs:
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           command_timeout: 15m
           script: |
-            pkill -f MAS-1.0-SNAPSHOT.jar || true 
 
             cd /home/vboxuser/MasForUser/
             nohup java -jar MAS-1.0-SNAPSHOT.jar scripts/inventory.ini scripts/ > mas.log 2>&1 &
