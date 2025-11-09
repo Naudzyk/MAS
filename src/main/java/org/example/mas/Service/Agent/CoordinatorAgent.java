@@ -179,7 +179,6 @@ public class CoordinatorAgent extends BaseAgent {
 
         String kubeletLog = executeCommand("journalctl", "-u", "kubelet", "--since=-1h", "-n", "50");
         String containerdLog = executeCommand("systemctl", "status", "containerd");
-        String kubectlLog = executeCommand("sudo", "kubectl", "get", "pods", "-A");
 
         String fullLog = "=== KUBELET ===\n" + (kubeletLog != null ? kubeletLog : "N/A") +
                         "\n\n=== CONTAINERD ===\n" + (containerdLog != null ? containerdLog : "N/A");
