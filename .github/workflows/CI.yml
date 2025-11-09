@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [master,test_branch]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Setup JDk 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with: 
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+
+      - name: Build with Maven
+        run: mvn -B clean verify 
+
+      - name: Run unit tests
+        run: mvn test
+
+      - name: Install Ansible
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ansible 
+      - name: Install Ansible and ansible-lint via pip
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install "ansible>=2.14" "ansible-lint>=6.0"
+
+      # - name: Lint Ansible playbooks
+      #   run: |
+      #     ansible-lint scripts/
+
+      # - name: Test playbooks with molecule 
+      #   run: |
+      #     cd playbooks && molecule test
+      
+      - name: Package JAR
+        run: mvn package -DskipTests
+        if: success()
+       
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mas-jar
+          path: target/mas-*.jar
