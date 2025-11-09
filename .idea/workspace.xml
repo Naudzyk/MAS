@@ -5,14 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version Spring-Web 11.1&quot;">
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Service/Agent/WorkerAgent.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/terraform/inventory.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/terraform/inventory.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/terraform/main.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/terraform/outputs.tf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/terraform/templates/inventory.tpl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/terraform/variables.tf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Service/Agent/CoordinatorAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Service/Agent/CoordinatorAgent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar.original" beforeDir="false" afterPath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar.original" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Service/Agent/CoordinatorAgent.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/Service/Agent/CoordinatorAgent.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -223,15 +223,9 @@
       <workItem from="1762163678547" duration="14000" />
       <workItem from="1762164122576" duration="22719000" />
       <workItem from="1762253323546" duration="5349000" />
-      <workItem from="1762336520613" duration="6556000" />
-    </task>
-    <task id="LOCAL-00012" summary="&quot;New Version 4&quot;">
-      <option name="closed" value="true" />
-      <created>1761007330061</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1761007330061</updated>
+      <workItem from="1762336520613" duration="6897000" />
+      <workItem from="1762400780831" duration="1458000" />
+      <workItem from="1762672661236" duration="3787000" />
     </task>
     <task id="LOCAL-00013" summary="&quot;New Version 4&quot;">
       <option name="closed" value="true" />
@@ -617,7 +611,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762342608527</updated>
     </task>
-    <option name="localTasksCounter" value="61" />
+    <task id="LOCAL-00061" summary="&quot;Version Spring-Web 11.1&quot;">
+      <option name="closed" value="true" />
+      <created>1762344715560</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1762344715560</updated>
+    </task>
+    <option name="localTasksCounter" value="62" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
