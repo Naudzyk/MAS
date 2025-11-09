@@ -41,7 +41,7 @@ jobs:
           script: |
 
             cd /home/vboxuser/MasForUser/
-            nohup java -jar MAS-1.0-SNAPSHOT.jar scripts/inventory.ini scripts/ > mas.log 2>&1 &
+            nohup java -jar target/MAS-1.0-SNAPSHOT.jar scripts/inventory.ini scripts/ > mas.log 2>&1 &
           
             echo "Waiting for web server to start..."
             for i in {1..30}; do
