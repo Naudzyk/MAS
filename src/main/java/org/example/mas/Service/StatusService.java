@@ -25,6 +25,7 @@ public class StatusService {
         status.put("lastUpdate", System.currentTimeMillis());
         status.put("metric_", "ANALAZY");
         status.put("activeNodes", new ArrayList<String>());
+        status.put("bootstrapStatus", "PENDING");
 
     }
 

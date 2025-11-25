@@ -7,5 +7,6 @@ public class ClusterNode {
     private String inventoryName;
     private String ipAddress;
     private String role;
-    private String Password;
+    private String sshUser;
+    private String sshKeyPath;
 }

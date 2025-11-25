@@ -14,13 +14,13 @@
             padding: 20px;
         }
         .container {
-            max-width: 1000px;
+            max-width: 1400px;
             margin: 0 auto;
         }
         header {
             text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
+            margin-bottom: 20px;
+            padding: 15px;
             background: white;
             border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
@@ -29,6 +29,102 @@
             font-size: 28px;
             color: #0d6efd;
             margin-bottom: 10px;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 900px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .control-panel {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 20px;
+            height: fit-content;
+        }
+        .control-panel h2 {
+            margin-bottom: 16px;
+            color: #495057;
+            font-size: 20px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #495057;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.2s;
+        }
+        .form-control:focus {
+            border-color: #0d6efd;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+        }
+        .node-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 10px;
+            background: #f8f9fa;
+        }
+        .node-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            margin-bottom: 5px;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-block;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        .btn-primary {
+            background: #0d6efd;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #0b5ed7;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #bb2d3b;
+        }
+        .btn-block {
+            display: block;
+            width: 100%;
+            margin-top: 15px;
         }
         .metric-card {
             background: #f8f9fa;
@@ -105,31 +201,6 @@
         .hidden {
             display: none;
         }
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-right: 10px;
-            margin-bottom: 10px;
-        }
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-        .btn-secondary:hover {
-            background: #5c636a;
-        }
-        .btn-success {
-            background: #198754;
-            color: white;
-        }
-        .btn-success:hover {
-            background: #157347;
-        }
         .result-message {
             padding: 12px;
             margin-top: 12px;
@@ -146,6 +217,26 @@
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
+        .node-form-section {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .add-node-btn {
+            background: #198754;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .add-node-btn:hover {
+            background: #157347;
+        }
     </style>
 </head>
 <body>
@@ -155,55 +246,445 @@
             <p>Автоматическое развёртывание и мониторинг кластера</p>
         </header>
 
-        <div class="card">
-            <h2>Статус развёртывания</h2>
-            <div id="ansible-stage" class="status-item">Ожидание запуска...</div>
-        </div>
+        <div class="dashboard-grid">
+            <!-- Левая колонка: Управление узлами -->
+            <div class="control-panel">
+                <h2>Настройка кластера</h2>
+                <div class="card">
+                  <h2>Первоначальная настройка</h2>
+                  <div class="form-group">
+                    <label for="publicKeyPath">Путь к публичному ключу</label>
+                    <input type="text" id="publicKeyPath" class="form-control"
+                           value="~/.ssh/id_ed25519.pub">
+                  </div>
 
-        <div class="card">
-            <h2>Состояние кластера</h2>
-            <div id="cluster-status" class="status-item">—</div>
-        </div>
-        <div class="card">
-            <h2>Метрики узлов</h2>
-            <div id="metrics-container">
-                <div class="metric-placeholder">Загрузка метрик...</div>
+                  <div id="bootstrapNodes">
+                    <!-- Динамически добавляемые поля для узлов -->
+                  </div>
+
+                  <button class="btn btn-warning" onclick="addBootstrapNode()">
+                    + Добавить узел для настройки
+                  </button>
+
+                  <button class="btn btn-primary" onclick="startBootstrap()"
+                          id="bootstrapBtn" style="margin-top: 15px;">
+                    Запустить первоначальную настройку
+                  </button>
+
+                  <div id="bootstrapResult" class="result-message hidden"
+                       style="margin-top: 15px;"></div>
+                </div>
+                <div class="node-form-section">
+                    <h3>Добавить центральный узел</h3>
+                    <div class="form-group">
+                        <label for="masterName">Имя узла</label>
+                        <input type="text" id="masterName" class="form-control" placeholder="central_manager">
+                    </div>
+                    <div class="form-group">
+                        <label for="masterIp">IP-адрес</label>
+                        <input type="text" id="masterIp" class="form-control" placeholder="192.168.56.107">
+                    </div>
+                    <div class="form-group">
+                        <label for="masterUser">Пользователь SSH</label>
+                        <input type="text" id="masterUser" class="form-control" placeholder="vboxuser">
+                    </div>
+                    <button class="btn btn-primary" onclick="addMasterNode()">
+                        <i class="fas fa-plus"></i> Добавить центральный узел
+                    </button>
+                </div>
+
+                <div class="node-form-section">
+                    <h3>Добавить рабочий узел</h3>
+                    <div class="form-group">
+                        <label for="workerName">Имя узла</label>
+                        <input type="text" id="workerName" class="form-control" placeholder="worker1">
+                    </div>
+                    <div class="form-group">
+                        <label for="workerIp">IP-адрес</label>
+                        <input type="text" id="workerIp" class="form-control" placeholder="192.168.56.105">
+                    </div>
+                    <div class="form-group">
+                        <label for="workerUser">Пользователь SSH</label>
+                        <input type="text" id="workerUser" class="form-control" placeholder="kuber">
+                    </div>
+                    <button class="btn btn-primary" onclick="addWorkerNode()">
+                        <i class="fas fa-plus"></i> Добавить рабочий узел
+                    </button>
+                </div>
+
+                <div class="form-group">
+                    <label>Текущие узлы</label>
+                    <div class="node-list" id="nodesList">
+                        <div class="status-item">Нет добавленных узлов</div>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label style="display:flex; align-items:center; gap:8px;">
+                        <input type="checkbox" id="skipBootstrap">
+                        Пропустить Bootstrap (SSH уже настроен)
+                    </label>
+                </div>
+
+                <button class="btn btn-success btn-block" onclick="deployCluster()" id="deployBtn">
+                    Развернуть кластер
+                </button>
+                <div id="deployResult" class="result-message hidden"></div>
+            </div>
+
+            <!-- Правая колонка: Статус и метрики -->
+            <div>
+                <div class="card">
+                    <h2>Статус развёртывания</h2>
+                    <div id="ansible-stage" class="status-item">Ожидание запуска...</div>
+                </div>
+
+                <div class="card">
+                    <h2>Состояние кластера</h2>
+                    <div id="cluster-status" class="status-item">—</div>
+                </div>
+
+                <div class="card">
+                    <h2>Метрики узлов</h2>
+                    <div id="metrics-container">
+                        <div class="metric-placeholder">Загрузка метрик...</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Управление</h2>
+                    <button class="btn btn-secondary" onclick="collectLogs()" id="collectLogsBtn">
+                        Собрать диагностические логи
+                    </button>
+                    <button class="btn btn-success" onclick="downloadLogs()" id="downloadLogsBtn" disabled>
+                        Скачать логи
+                    </button>
+                    <div id="logsResult" class="result-message hidden"></div>
+                </div>
+
+                <div class="card">
+                    <h2>Оповещения</h2>
+                    <div id="alerts" class="alerts-list">
+                        Нет оповещений
+                    </div>
+                </div>
             </div>
         </div>
-
-        <div class="card">
-            <h2>Управление</h2>
-            <button class="btn btn-secondary" onclick="collectLogs()" id="collectLogsBtn">
-                Собрать диагностические логи
-            </button>
-            <button class="btn btn-success" onclick="downloadLogs()" id="downloadLogsBtn" disabled>
-                Скачать логи
-            </button>
-            <div id="logsResult" class="result-message hidden"></div>
-        </div>
-
-        <div class="card">
-            <h2>Оповещения</h2>
-            <div id="alerts" class="alerts-list">
-                Нет оповещений
-            </div>
-        </div>
-
-        <!--
-        <div class="card">
-            <h2> История этапов</h2>
-            <div id="stage-history">
-                <div class="status-item">[00:00:01] system-prep-agent:  COMPLETE</div>
-                <div class="status-item">[00:05:23] containerd-agent:  COMPLETE</div>
-                ...
-            </div>
-        </div>
-        -->
     </div>
 
     <script>
         let logsAvailable = false;
+        const nodes = [];
+        let bootstrapNodeCounter = 0;
 
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', () => {
+            loadNodesFromStorage();
+            updateNodesList();
+            updateStatus();
+            ensureBootstrapNodeForm();
+        });
+        function ensureBootstrapNodeForm() {
+            const container = document.getElementById('bootstrapNodes');
+            if (container && container.children.length === 0) {
+                addBootstrapNode();
+            }
+        }
+
+        function addBootstrapNode() {
+            const container = document.getElementById('bootstrapNodes');
+            const nodeId = `bootstrap-${bootstrapNodeCounter++}`;
+            const nodeEl = document.createElement('div');
+            nodeEl.className = 'node-form-section bootstrap-node';
+            nodeEl.dataset.nodeId = nodeId;
+            nodeEl.innerHTML = `
+                <div class="form-group">
+                    <label>IP-адрес</label>
+                    <input type="text" class="form-control" placeholder="192.168.56.101" data-field="ip">
+                </div>
+                <div class="form-group">
+                    <label>Пользователь</label>
+                    <input type="text" class="form-control" placeholder="vboxuser" data-field="username">
+                </div>
+                <div class="form-group">
+                    <label>Пароль</label>
+                    <input type="password" class="form-control" placeholder="••••••" data-field="password">
+                </div>
+                <button class="btn btn-danger" type="button" onclick="removeBootstrapNode('${nodeId}')">
+                    Удалить
+                </button>
+            `;
+            container.appendChild(nodeEl);
+        }
+
+        function removeBootstrapNode(id) {
+            const node = document.querySelector(\`.bootstrap-node[data-node-id="\${id}"]\`);
+            if (node) {
+                node.remove();
+            }
+        }
+
+        function collectBootstrapForm() {
+            const publicKeyPath = document.getElementById('publicKeyPath').value.trim() || '~/.ssh/id_ed25519.pub';
+            const nodes = Array.from(document.querySelectorAll('.bootstrap-node')).map(node => {
+                return {
+                    ip: node.querySelector('input[data-field="ip"]').value.trim(),
+                    username: node.querySelector('input[data-field="username"]').value.trim(),
+                    password: node.querySelector('input[data-field="password"]').value.trim()
+                };
+            }).filter(node => node.ip && node.username && node.password);
+
+            return { publicKeyPath, nodes };
+        }
+
+        async function startBootstrap() {
+            const resultDiv = document.getElementById('bootstrapResult');
+            const payload = collectBootstrapForm();
+            if (payload.nodes.length === 0) {
+                resultDiv.className = 'result-message result-error';
+                resultDiv.textContent = 'Добавьте хотя бы один узел для Bootstrap.';
+                resultDiv.classList.remove('hidden');
+                return;
+            }
+
+            const btn = document.getElementById('bootstrapBtn');
+            btn.disabled = true;
+            btn.textContent = 'Запуск...';
+
+            try {
+                const res = await fetch('/api/bootstrap/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    resultDiv.className = 'result-message result-success';
+                    resultDiv.textContent = data.message || 'Bootstrap запущен.';
+                } else {
+                    resultDiv.className = 'result-message result-error';
+                    resultDiv.textContent = data.error || 'Не удалось запустить Bootstrap.';
+                }
+            } catch (err) {
+                resultDiv.className = 'result-message result-error';
+                resultDiv.textContent = 'Ошибка подключения к серверу';
+            } finally {
+                resultDiv.classList.remove('hidden');
+                btn.disabled = false;
+                btn.textContent = 'Запустить первоначальную настройку';
+            }
+        }
+
+
+        // Загрузка нод из localStorage
+        function loadNodesFromStorage() {
+            const savedNodes = localStorage.getItem('clusterNodes');
+            if (savedNodes) {
+                try {
+                    nodes.push(...JSON.parse(savedNodes));
+                } catch (e) {
+                    console.error('Failed to parse saved nodes:', e);
+                }
+            }
+        }
+
+        // Сохранение нод в localStorage
+        function saveNodesToStorage() {
+            localStorage.setItem('clusterNodes', JSON.stringify(nodes));
+        }
+
+        // Добавление центрального узла
+        function addMasterNode() {
+            const name = document.getElementById('masterName').value.trim();
+            const ip = document.getElementById('masterIp').value.trim();
+            const user = document.getElementById('masterUser').value.trim();
+
+            if (!name || !ip || !user) {
+                alert('Заполните все поля для центрального узла');
+                return;
+            }
+
+            addNode(name, ip, 'central_manager', user);
+            document.getElementById('masterName').value = 'central_manager';
+            document.getElementById('masterIp').value = '';
+            document.getElementById('masterUser').value = 'vboxuser';
+        }
+
+        // Добавление рабочего узла
+        function addWorkerNode() {
+            const name = document.getElementById('workerName').value.trim();
+            const ip = document.getElementById('workerIp').value.trim();
+            const user = document.getElementById('workerUser').value.trim();
+
+            if (!name || !ip || !user) {
+                alert('Заполните все поля для рабочего узла');
+                return;
+            }
+
+            addNode(name, ip, 'execute_nodes', user);
+            document.getElementById('workerName').value = `worker${nodes.filter(n => n.role === 'execute_nodes').length + 1}`;
+            document.getElementById('workerIp').value = '';
+            document.getElementById('workerUser').value = 'kuber';
+        }
+
+        // Общая функция добавления узла
+        function addNode(name, ip, role, user) {
+            // Валидация IP
+            const ipRegex = /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+            if (!ipRegex.test(ip)) {
+                alert('Неверный формат IP-адреса');
+                return;
+            }
+
+            const node = {
+                id: Date.now(),
+                inventoryName: name,
+                ipAddress: ip,
+                role: role,
+                sshUser: user
+            };
+
+            nodes.push(node);
+            saveNodesToStorage();
+            updateNodesList();
+        }
+
+        // Обновление списка узлов в интерфейсе
+        function updateNodesList() {
+            const listEl = document.getElementById('nodesList');
+
+            if (nodes.length === 0) {
+                listEl.innerHTML = '<div class="status-item">Нет добавленных узлов</div>';
+                return;
+            }
+
+            listEl.innerHTML = nodes.map(node => `
+                <div class="node-item">
+                    <div>
+                        <strong>${node.inventoryName}</strong><br>
+                        <small>${node.ipAddress} (${node.role === 'central_manager' ? 'Центральный' : 'Рабочий'})</small>
+                    </div>
+                    <button class="btn btn-danger btn-sm" onclick="removeNode(${node.id})">
+                        Удалить
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Удаление узла
+        function removeNode(id) {
+            const index = nodes.findIndex(n => n.id === id);
+            if (index !== -1) {
+                nodes.splice(index, 1);
+                saveNodesToStorage();
+                updateNodesList();
+            }
+        }
+
+        // Развёртывание кластера
+        async function deployCluster() {
+            if (nodes.length === 0) {
+                alert('Добавьте хотя бы один узел для развёртывания');
+                return;
+            }
+            const skipBootstrap = document.getElementById('skipBootstrap').checked;
+            const bootstrapPayload = collectBootstrapForm();
+            if (!skipBootstrap && bootstrapPayload.nodes.length === 0) {
+                alert('Укажите узлы для Bootstrap или отметьте, что он не нужен.');
+                return;
+            }
+
+            const btn = document.getElementById('deployBtn');
+            const resultDiv = document.getElementById('deployResult');
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Развёртывание...';
+
+            try {
+                // Шаг 1: Отправка узлов на сервер
+                const response = await fetch('/api/nodes/bulk', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(nodes)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Ошибка сохранения узлов');
+                }
+
+                // Шаг 2: Генерация inventory
+                const genResponse = await fetch('/api/nodes/generate-inventory', { method: 'POST' });
+                if (!genResponse.ok) {
+                    throw new Error('Ошибка генерации inventory');
+                }
+
+                // Шаг 3: Запуск развёртывания
+                const deployResponse = await fetch('/api/deploy/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        skipBootstrap,
+                        bootstrap: skipBootstrap ? null : bootstrapPayload
+                    })
+                });
+                const deployData = await deployResponse.json();
+
+                if (deployResponse.ok) {
+                    resultDiv.className = 'result-message result-success';
+                    resultDiv.textContent = deployData.message || 'Кластер успешно развёрнут!';
+                } else {
+                    throw new Error(deployData.error || 'Неизвестная ошибка развёртывания');
+                }
+
+            } catch (err) {
+                resultDiv.className = 'result-message result-error';
+                resultDiv.textContent = `Ошибка: ${err.message}`;
+                console.error('Deployment error:', err);
+            } finally {
+                resultDiv.classList.remove('hidden');
+                btn.disabled = false;
+                btn.innerHTML = 'Развернуть кластер';
+            }
+        }
+
+        // Сбор логов
+        async function collectLogs() {
+            const btn = document.getElementById('collectLogsBtn');
+            const resultDiv = document.getElementById('logsResult');
+
+            btn.disabled = true;
+            btn.textContent = 'Сбор логов...';
+
+            try {
+                const res = await fetch('/api/collect-logs', { method: 'POST' });
+                const data = await res.json();
+
+                if (res.ok) {
+                    resultDiv.className = 'result-message result-success';
+                    resultDiv.textContent = data.message || 'Логи собраны. Готовы к скачиванию.';
+                } else {
+                    resultDiv.className = 'result-message result-error';
+                    resultDiv.textContent = `Ошибка: ${data.error || 'Не удалось собрать логи'}`;
+                }
+                resultDiv.classList.remove('hidden');
+            } catch (err) {
+                resultDiv.className = 'result-message result-error';
+                resultDiv.textContent = 'Ошибка подключения к серверу';
+                resultDiv.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Собрать диагностические логи';
+            }
+        }
+
+        // Скачивание логов
+        function downloadLogs() {
+            if (logsAvailable) {
+                window.open('/logs', '_blank');
+            }
+        }
+
+        // Обновление статуса
         function updateStatus() {
             fetch('/api/status')
                 .then(res => res.json())
@@ -245,131 +726,95 @@
                 .catch(err => console.error('Ошибка обновления статуса:', err));
         }
 
-        async function collectLogs() {
-            const btn = document.getElementById('collectLogsBtn');
-            const resultDiv = document.getElementById('logsResult');
-
-            btn.disabled = true;
-            btn.textContent = 'Сбор логов...';
-
+        // Обновление метрик
+        async function updateMetrics() {
             try {
-                const res = await fetch('/api/collect-logs', { method: 'POST' });
-                const data = await res.json();
+                const statusRes = await fetch('/api/status');
+                const statusData = await statusRes.json();
 
-                if (res.ok) {
-                    resultDiv.className = 'result-message result-success';
-                    resultDiv.textContent = data.message || 'Логи собраны. Готовы к скачиванию.';
-                } else {
-                    resultDiv.className = 'result-message result-error';
-                    resultDiv.textContent = `Ошибка: ${data.error || 'Не удалось собрать логи'}`;
+                let nodeNames = [];
+                if (statusData.activeNodes) {
+                    try {
+                        if (typeof statusData.activeNodes === 'string') {
+                            nodeNames = JSON.parse(statusData.activeNodes);
+                        } else if (Array.isArray(statusData.activeNodes)) {
+                            nodeNames = statusData.activeNodes;
+                        }
+                    } catch (e) {
+                        console.warn('Failed to parse activeNodes:', statusData.activeNodes);
+                    }
                 }
-                resultDiv.classList.remove('hidden');
-            } catch (err) {
-                resultDiv.className = 'result-message result-error';
-                resultDiv.textContent = 'Ошибка подключения к серверу';
-                resultDiv.classList.remove('hidden');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Собрать диагностические логи';
+
+                if (nodeNames.length === 0) {
+                    document.getElementById('metrics-container').innerHTML =
+                        '<div class="metric-card">Нет данных о нодах</div>';
+                    return;
+                }
+
+                const container = document.getElementById('metrics-container');
+                container.innerHTML = '';
+
+                for (const nodeName of nodeNames) {
+                    try {
+                        const res = await fetch(`/api/metrics/${nodeName}`);
+                        if (res.ok) {
+                            const metrics = await res.json();
+                            const card = document.createElement('div');
+                            card.className = 'metric-card';
+
+                            const cpuClass = getMetricClass(parseFloat(metrics.cpuLoad));
+                            const memClass = getMetricClass(parseFloat(metrics.memoryUsage));
+                            const diskClass = getMetricClass(parseFloat(metrics.diskUsage));
+
+                            card.innerHTML = `
+                                <div class="metric-title">${nodeName}</div>
+                                <div class="metric-row">
+                                    <span class="metric-label">CPU:</span>
+                                    <span class="metric-value ${cpuClass}">${metrics.cpuLoad}%</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span class="metric-label">Память:</span>
+                                    <span class="metric-value ${memClass}">${metrics.memoryUsage}%</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span class="metric-label">Диск:</span>
+                                    <span class="metric-value ${diskClass}">${metrics.diskUsage}%</span>
+                                </div>
+                            `;
+                            container.appendChild(card);
+                        } else {
+                            const card = document.createElement('div');
+                            card.className = 'metric-card';
+                            card.innerHTML = `
+                                <div class="metric-title">${nodeName}</div>
+                                <div class="metric-row">
+                                    <span class="metric-label">Статус:</span>
+                                    <span class="metric-value">Нет данных</span>
+                                </div>
+                            `;
+                            container.appendChild(card);
+                        }
+                    } catch (e) {
+                        console.error(`Failed to fetch metrics for ${nodeName}`, e);
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to update metrics', e);
+                document.getElementById('metrics-container').innerHTML =
+                    '<div class="metric-card">Ошибка загрузки метрик</div>';
             }
         }
 
-        function downloadLogs() {
-            if (logsAvailable) {
-                window.open('/logs', '_blank');
-            }
+        function getMetricClass(value) {
+            if (value > 90) return 'metric-high';
+            if (value > 75) return 'metric-medium';
+            return 'metric-normal';
         }
 
-        updateStatus();
+        // Обновление данных
         setInterval(updateStatus, 2000);
+        setInterval(updateMetrics, 10000);
+        updateMetrics();
     </script>
-    <script>
-async function updateMetrics() {
-    try {
-        const statusRes = await fetch('/api/status');
-        const statusData = await statusRes.json();
-
-        let nodeNames = [];
-        if (statusData.activeNodes) {
-            try {
-                if (typeof statusData.activeNodes === 'string') {
-                    nodeNames = JSON.parse(statusData.activeNodes);
-                } else if (Array.isArray(statusData.activeNodes)) {
-                    nodeNames = statusData.activeNodes;
-                }
-            } catch (e) {
-                console.warn('Failed to parse activeNodes:', statusData.activeNodes);
-            }
-        }
-
-        if (nodeNames.length === 0) {
-            document.getElementById('metrics-container').innerHTML =
-                '<div class="metric-card">Нет данных о нодах</div>';
-            return;
-        }
-
-        const container = document.getElementById('metrics-container');
-        container.innerHTML = '';
-
-        for (const nodeName of nodeNames) {
-            try {
-                const res = await fetch(`/api/metrics/${nodeName}`);
-                if (res.ok) {
-                    const metrics = await res.json();
-                    const card = document.createElement('div');
-                    card.className = 'metric-card';
-
-                    const cpuClass = getMetricClass(parseFloat(metrics.cpuLoad));
-                    const memClass = getMetricClass(parseFloat(metrics.memoryUsage));
-                    const diskClass = getMetricClass(parseFloat(metrics.diskUsage));
-
-                    card.innerHTML = `
-                        <div class="metric-title">${nodeName}</div>
-                        <div class="metric-row">
-                            <span class="metric-label">CPU:</span>
-                            <span class="metric-value ${cpuClass}">${metrics.cpuLoad}%</span>
-                        </div>
-                        <div class="metric-row">
-                            <span class="metric-label">Память:</span>
-                            <span class="metric-value ${memClass}">${metrics.memoryUsage}%</span>
-                        </div>
-                        <div class="metric-row">
-                            <span class="metric-label">Диск:</span>
-                            <span class="metric-value ${diskClass}">${metrics.diskUsage}%</span>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                } else {
-                    const card = document.createElement('div');
-                    card.className = 'metric-card';
-                    card.innerHTML = `
-                        <div class="metric-title">${nodeName}</div>
-                        <div class="metric-row">
-                            <span class="metric-label">Статус:</span>
-                            <span class="metric-value">Нет данных</span>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                }
-            } catch (e) {
-                console.error(`Failed to fetch metrics for ${nodeName}`, e);
-            }
-        }
-    } catch (e) {
-        console.error('Failed to update metrics', e);
-        document.getElementById('metrics-container').innerHTML =
-            '<div class="metric-card">Ошибка загрузки метрик</div>';
-    }
-}
-
-function getMetricClass(value) {
-    if (value > 90) return 'metric-high';
-    if (value > 75) return 'metric-medium';
-    return 'metric-normal';
-}
-
-setInterval(updateMetrics, 10000);
-updateMetrics();
-</script>
 </body>
 </html>

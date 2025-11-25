@@ -1,11 +1,12 @@
 package org.example.mas.Agent;
 
-import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
-import jade.wrapper.AgentController;
 import lombok.extern.slf4j.Slf4j;
 import com.jcraft.jsch.*;
 import org.apache.commons.io.IOUtils;
+import org.example.mas.Service.DeploymentService;
+import org.example.mas.SpringContextHelper;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -13,25 +14,21 @@ import java.nio.file.Paths;
 import java.util.Properties;
 
 @Slf4j
-public class BootstrapAgent extends Agent {
-    private final String targetIp;
-    private final String initialUser;
-    private final String initialPassword;
-    private final String publicKeyPath;
-    private final String coordinatorName;
+public class BootstrapAgent extends BaseAgent {
+    private String targetIp;
+    private String initialUser;
+    private String initialPassword;
+    private String publicKeyPath;
     private Session sshSession;
     private ChannelExec sshChannel;
 
-    public BootstrapAgent(String targetIp, String initialUser, String initialPassword, String publicKeyPath, String coordinatorName) {
-        this.targetIp = targetIp;
-        this.initialUser = initialUser;
-        this.initialPassword = initialPassword;
-        this.publicKeyPath = publicKeyPath;
-        this.coordinatorName = coordinatorName;
-    }
-
     @Override
     protected void setup() {
+        if (!extractArgs()) {
+            log.error("BootstrapAgent arguments not provided, stopping.");
+            doDelete();
+            return;
+        }
         log.info("Starting BootstrapAgent for {}", targetIp);
 
         addBehaviour(new OneShotBehaviour() {
@@ -65,19 +62,33 @@ public class BootstrapAgent extends Agent {
                         return;
                     }
 
-                    createCoordinatorAgent();
-
                     log.info("Bootstrap completed successfully for {}", targetIp);
+                    sendStatusUpdate("bootstrap:" + targetIp, "SUCCESS");
                     closeConnection();
+                    notifyDeploymentService(true);
                     doDelete();
 
                 } catch (Exception e) {
                     log.error("Bootstrap failed for {} due to: {}", targetIp, e.getMessage(), e);
                     closeConnection();
+                    sendStatusUpdate("bootstrap:" + targetIp, "FAILED:" + e.getMessage());
+                    notifyDeploymentService(false);
                     doDelete();
                 }
             }
         });
+    }
+
+    private boolean extractArgs() {
+        Object[] args = getArguments();
+        if (args == null || args.length < 4) {
+            return false;
+        }
+        this.targetIp = (String) args[0];
+        this.initialUser = (String) args[1];
+        this.initialPassword = (String) args[2];
+        this.publicKeyPath = (String) args[3];
+        return true;
     }
 
     private boolean establishSshConnection() throws JSchException {
@@ -180,28 +191,12 @@ public class BootstrapAgent extends Agent {
         }
     }
 
-    private void createCoordinatorAgent() {
+    private void notifyDeploymentService(boolean success) {
         try {
-            log.info("Creating CoordinatorAgent for {}", targetIp);
-
-            String agentType = CoordinatorAgent.class.getName();
-            Object[] agentArgs = new Object[]{
-                targetIp,
-                getContainerController().getContainerName(), // Путь к inventory
-                "playbooks/" // Путь к плейбукам
-            };
-
-            AgentController ac = getContainerController().createNewAgent(
-                coordinatorName,
-                agentType,
-                agentArgs
-            );
-            ac.start();
-
-            log.info("CoordinatorAgent started for {}", targetIp);
-
+            DeploymentService deploymentService = SpringContextHelper.getBean(DeploymentService.class);
+            deploymentService.notifyBootstrapResult(targetIp, success);
         } catch (Exception e) {
-            log.error("Failed to create CoordinatorAgent for {}: {}", targetIp, e.getMessage(), e);
+            log.warn("Failed to notify deployment service about {} bootstrap: {}", targetIp, e.getMessage());
         }
     }
 }

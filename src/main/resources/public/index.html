@@ -319,6 +319,12 @@
                     </div>
                 </div>
 
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label style="display:flex; align-items:center; gap:8px;">
+                        <input type="checkbox" id="skipBootstrap">
+                        Пропустить Bootstrap (SSH уже настроен)
+                    </label>
+                </div>
 
                 <button class="btn btn-success btn-block" onclick="deployCluster()" id="deployBtn">
                     Развернуть кластер
@@ -369,13 +375,106 @@
     <script>
         let logsAvailable = false;
         const nodes = [];
+        let bootstrapNodeCounter = 0;
 
         // Инициализация при загрузке
         document.addEventListener('DOMContentLoaded', () => {
             loadNodesFromStorage();
             updateNodesList();
             updateStatus();
+            ensureBootstrapNodeForm();
         });
+        function ensureBootstrapNodeForm() {
+            const container = document.getElementById('bootstrapNodes');
+            if (container && container.children.length === 0) {
+                addBootstrapNode();
+            }
+        }
+
+        function addBootstrapNode() {
+            const container = document.getElementById('bootstrapNodes');
+            const nodeId = `bootstrap-${bootstrapNodeCounter++}`;
+            const nodeEl = document.createElement('div');
+            nodeEl.className = 'node-form-section bootstrap-node';
+            nodeEl.dataset.nodeId = nodeId;
+            nodeEl.innerHTML = `
+                <div class="form-group">
+                    <label>IP-адрес</label>
+                    <input type="text" class="form-control" placeholder="192.168.56.101" data-field="ip">
+                </div>
+                <div class="form-group">
+                    <label>Пользователь</label>
+                    <input type="text" class="form-control" placeholder="vboxuser" data-field="username">
+                </div>
+                <div class="form-group">
+                    <label>Пароль</label>
+                    <input type="password" class="form-control" placeholder="••••••" data-field="password">
+                </div>
+                <button class="btn btn-danger" type="button" onclick="removeBootstrapNode('${nodeId}')">
+                    Удалить
+                </button>
+            `;
+            container.appendChild(nodeEl);
+        }
+
+        function removeBootstrapNode(id) {
+            const node = document.querySelector(\`.bootstrap-node[data-node-id="\${id}"]\`);
+            if (node) {
+                node.remove();
+            }
+        }
+
+        function collectBootstrapForm() {
+            const publicKeyPath = document.getElementById('publicKeyPath').value.trim() || '~/.ssh/id_ed25519.pub';
+            const nodes = Array.from(document.querySelectorAll('.bootstrap-node')).map(node => {
+                return {
+                    ip: node.querySelector('input[data-field="ip"]').value.trim(),
+                    username: node.querySelector('input[data-field="username"]').value.trim(),
+                    password: node.querySelector('input[data-field="password"]').value.trim()
+                };
+            }).filter(node => node.ip && node.username && node.password);
+
+            return { publicKeyPath, nodes };
+        }
+
+        async function startBootstrap() {
+            const resultDiv = document.getElementById('bootstrapResult');
+            const payload = collectBootstrapForm();
+            if (payload.nodes.length === 0) {
+                resultDiv.className = 'result-message result-error';
+                resultDiv.textContent = 'Добавьте хотя бы один узел для Bootstrap.';
+                resultDiv.classList.remove('hidden');
+                return;
+            }
+
+            const btn = document.getElementById('bootstrapBtn');
+            btn.disabled = true;
+            btn.textContent = 'Запуск...';
+
+            try {
+                const res = await fetch('/api/bootstrap/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    resultDiv.className = 'result-message result-success';
+                    resultDiv.textContent = data.message || 'Bootstrap запущен.';
+                } else {
+                    resultDiv.className = 'result-message result-error';
+                    resultDiv.textContent = data.error || 'Не удалось запустить Bootstrap.';
+                }
+            } catch (err) {
+                resultDiv.className = 'result-message result-error';
+                resultDiv.textContent = 'Ошибка подключения к серверу';
+            } finally {
+                resultDiv.classList.remove('hidden');
+                btn.disabled = false;
+                btn.textContent = 'Запустить первоначальную настройку';
+            }
+        }
+
 
         // Загрузка нод из localStorage
         function loadNodesFromStorage() {
@@ -488,6 +587,12 @@
                 alert('Добавьте хотя бы один узел для развёртывания');
                 return;
             }
+            const skipBootstrap = document.getElementById('skipBootstrap').checked;
+            const bootstrapPayload = collectBootstrapForm();
+            if (!skipBootstrap && bootstrapPayload.nodes.length === 0) {
+                alert('Укажите узлы для Bootstrap или отметьте, что он не нужен.');
+                return;
+            }
 
             const btn = document.getElementById('deployBtn');
             const resultDiv = document.getElementById('deployResult');
@@ -514,7 +619,14 @@
                 }
 
                 // Шаг 3: Запуск развёртывания
-                const deployResponse = await fetch('/api/deploy/start', { method: 'POST' });
+                const deployResponse = await fetch('/api/deploy/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        skipBootstrap,
+                        bootstrap: skipBootstrap ? null : bootstrapPayload
+                    })
+                });
                 const deployData = await deployResponse.json();
 
                 if (deployResponse.ok) {

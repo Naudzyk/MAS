@@ -1,9 +1,5 @@
 package org.example.mas.Service;
 
-import jade.core.Profile;
-import jade.core.ProfileImpl;
-import jade.core.Runtime;
-
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import lombok.RequiredArgsConstructor;
@@ -16,37 +12,30 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class BootstrapService {
 
-    // Получаем контейнер из глобального JADE runtime
-    private AgentContainer getMainContainer() {
+    private final AgentContainer agentContainer;
+
+    public void bootstrapNode(String ip, String username, String password, String publicKeyPath) {
+        String resolvedKeyPath = resolvePath(publicKeyPath);
         try {
-            Runtime runtime = Runtime.instance();
-            Profile profile = new ProfileImpl();
-            // Настройки профиля (если нужны)
-            return runtime.createMainContainer(profile);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to get JADE main container", e);
-        }
-    }
-
-    public void bootstrapNode(String ip, String username, String password,
-                            String publicKeyPath, String coordinatorName) {
-        if (publicKeyPath.startsWith("~")) {
-            publicKeyPath = System.getProperty("user.home") + publicKeyPath.substring(1);
-        }
-
-        try {
-            AgentContainer container = getMainContainer();
-
-            AgentController ac = container.createNewAgent(
+            AgentController controller = agentContainer.createNewAgent(
                 "bootstrap-" + ip.replace(".", "-"),
                 BootstrapAgent.class.getName(),
-                new Object[]{ip, username, password, publicKeyPath, coordinatorName}
+                new Object[]{ip, username, password, resolvedKeyPath}
             );
-            ac.start();
+            controller.start();
             log.info("Started BootstrapAgent for {}", ip);
-
         } catch (Exception e) {
             log.error("Failed to start BootstrapAgent for {}: {}", ip, e.getMessage(), e);
         }
+    }
+
+    private String resolvePath(String path) {
+        if (path == null || path.isBlank()) {
+            return System.getProperty("user.home") + "/.ssh/id_ed25519.pub";
+        }
+        if (path.startsWith("~")) {
+            return System.getProperty("user.home") + path.substring(1);
+        }
+        return path;
     }
 }
