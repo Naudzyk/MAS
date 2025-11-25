@@ -1,7 +1,7 @@
 package org.example.mas.Controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.mas.Service.Agent.StatusService;
+import org.example.mas.Service.StatusService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -1,46 +1,45 @@
 terraform {
   required_providers {
-    null = {
-          source   = "hashicorp/null"
-          version  = "3.2.1"
-        }
     local = {
-        source = "hashicorp/local"
-        version = "2.4.0"
-        }
+      source  = "hashicorp/local"
+      version = "2.4.0"
+    }
     template = {
-        source = "hashicorp/template"
-        version = "2.2.0"
-        }
+      source  = "hashicorp/template"
+      version = "2.2.0"
     }
   }
+}
 
+data "local_file" "nodes_config" {
+  filename = "${path.module}/inventory.yaml"
+}
 
-resource "null_resource" "existing_node" {
-    triggers = {
-        node_ip = var.node_ip
-        }
+locals {
+  config = yamldecode(data.local_file.nodes_config.content)
 
-    provisioner "remote-exec" {
-        inline = ["echo 'Node is reachable!'"]
+  nodes = try(local.config.nodes, [])
 
-        connection {
-            type        = "ssh"
-            user        = var.ansible_user
-            private_key = file(var.ssh_key_path)
-            host        = var.node_ip
-            }
-        }
-    }
+  valid_nodes = [for node in local.nodes : node if try(node.group, null) != null]
+
+  groups = distinct([for node in local.valid_nodes : node.group])
+
+  grouped_nodes = {
+    for group in local.groups : group => [
+      for node in local.valid_nodes : node if node.group == group
+    ]
+  }
+}
+
 data "template_file" "inventory" {
-    template = file("${path.module}/templates/inventory.tpl")
-    vars ={
-        node_ip     = var.node_ip
-        ansible_user= var.ansible_user
-        ssh_key_path = var.ssh_key_path
-        }
-    }
+  template = file("${path.module}/templates/inventory.tpl")
+  vars = {
+    groups = local.grouped_nodes
+  }
+}
+
 resource "local_file" "inventory" {
-    content  = data.template_file.inventory.rendered
-    filename ="${path.root}/../inventory.ini"
-    }
+  content  = data.template_file.inventory.rendered
+  filename = "${path.root}/../inventory.ini"
+}
+

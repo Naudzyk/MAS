@@ -3,7 +3,7 @@ package org.example.mas.Controller;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import lombok.RequiredArgsConstructor;
-import org.example.mas.Service.Agent.StatusService;
+import org.example.mas.Service.StatusService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

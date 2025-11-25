@@ -1,16 +1,12 @@
-package org.example.mas.Service.Agent;
+package org.example.mas.Agent;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import jade.core.AID;
 import jade.core.behaviours.TickerBehaviour;
-import jade.lang.acl.ACLMessage;
-import lombok.RequiredArgsConstructor;
 import org.example.mas.utils.InventoryParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -20,10 +16,9 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
-
-public class MasterAgent extends BaseAgent {
+public class WorkerAgent extends BaseAgent {
     private final HttpClient httpClient = HttpClient.newHttpClient();
-    private static final Logger logger = LoggerFactory.getLogger(MasterAgent.class);
+    private static final Logger logger = LoggerFactory.getLogger(WorkerAgent.class);
     private String nodeName;
     private String inventoryPath;
 
@@ -36,7 +31,7 @@ public class MasterAgent extends BaseAgent {
         this.inventoryPath = (String) args[1];
 
 
-        logger.info("MasterAgent {} initialized for node: {}", getLocalName(), nodeName);
+        logger.info("WokerAgent {} initialized for node: {}", getLocalName(), nodeName);
 
         addBehaviour(new TickerBehaviour(this, 10_000) {
             @Override

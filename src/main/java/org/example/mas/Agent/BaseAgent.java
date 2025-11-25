@@ -1,4 +1,4 @@
-package org.example.mas.Service.Agent;
+package org.example.mas.Agent;
 
 import jade.core.Agent;
 import org.example.mas.DTO.StatusUpdateDTO;

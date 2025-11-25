@@ -4,13 +4,40 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version Spring-Web 11.1&quot;">
+    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version Spring-Web + Terraform 11.1&quot;">
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/BootstrapAgent.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Controller/NodeController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/DTO/BootstrapRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Service/BootstrapService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/models/BootstrapNode.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/models/ClusterNode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_09_11_2025_16_58_[Changes]1/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_09_11_2025_16_58__Changes_1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_09_11_2025_17_04_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_09_11_2025_17_04__Changes_.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_09_11_2025_17_05_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_09_11_2025_17_05__Changes_.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase__Changes_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar.original" beforeDir="false" afterPath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar.original" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Service/Agent/CoordinatorAgent.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/Service/Agent/CoordinatorAgent.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Controller/DeployController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Controller/DeployController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Controller/InternalAgentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Controller/InternalAgentController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Controller/LoggerController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Controller/LoggerController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Controller/MetricsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Controller/MetricsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Service/Agent/BaseAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/BaseAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Service/Agent/CoordinatorAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/CoordinatorAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Service/Agent/MasterAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/MasterAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Service/Agent/StatusService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Service/StatusService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Service/Agent/WorkerAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/WorkerAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/public/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terraform/inventory.tf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/terraform/inventory.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/terraform/inventory.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terraform/main.tf" beforeDir="false" afterPath="$PROJECT_DIR$/terraform/main.tf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terraform/outputs.tf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/terraform/templates/inventory.tpl" beforeDir="false" afterPath="$PROJECT_DIR$/terraform/templates/inventory.tpl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terraform/variables.tf" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -97,7 +124,7 @@
     "project.structure.last.edited": "Libraries",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.47126436",
-    "settings.editor.selected.configurable": "configurable.group.tools",
+    "settings.editor.selected.configurable": "reference.settings.dialog.project.terraform",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -226,14 +253,10 @@
       <workItem from="1762336520613" duration="6897000" />
       <workItem from="1762400780831" duration="1458000" />
       <workItem from="1762672661236" duration="3787000" />
-    </task>
-    <task id="LOCAL-00013" summary="&quot;New Version 4&quot;">
-      <option name="closed" value="true" />
-      <created>1761009314198</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1761009314198</updated>
+      <workItem from="1762689754050" duration="1088000" />
+      <workItem from="1762830524165" duration="378000" />
+      <workItem from="1763801982901" duration="4080000" />
+      <workItem from="1764039326583" duration="9226000" />
     </task>
     <task id="LOCAL-00014" summary="&quot;New Version 4&quot;">
       <option name="closed" value="true" />
@@ -619,7 +642,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762344715560</updated>
     </task>
-    <option name="localTasksCounter" value="62" />
+    <task id="LOCAL-00062" summary="&quot;Version Spring-Web + Terraform 11.1&quot;">
+      <option name="closed" value="true" />
+      <created>1762679364332</created>
+      <option name="number" value="00062" />
+      <option name="presentableId" value="LOCAL-00062" />
+      <option name="project" value="LOCAL" />
+      <updated>1762679364332</updated>
+    </task>
+    <option name="localTasksCounter" value="63" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -640,7 +671,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="&quot;New Version 6&quot;" />
     <MESSAGE value="&quot;New Version 7.0&quot;" />
     <MESSAGE value="&quot;New Version 7.1&quot;" />
     <MESSAGE value="&quot;New Version 7.2&quot;" />
@@ -665,7 +695,8 @@
     <MESSAGE value="&quot;Version Spring-Web 10.0&quot;" />
     <MESSAGE value="&quot;Version Spring-Web 10.1&quot;" />
     <MESSAGE value="&quot;Version Spring-Web 11.1&quot;" />
-    <option name="LAST_COMMIT_MESSAGE" value="&quot;Version Spring-Web 11.1&quot;" />
+    <MESSAGE value="&quot;Version Spring-Web + Terraform 11.1&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="&quot;Version Spring-Web + Terraform 11.1&quot;" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

@@ -1,4 +1,4 @@
-package org.example.mas.Service.Agent;
+package org.example.mas.Agent;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
@@ -16,9 +16,10 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WorkerAgent extends BaseAgent {
+
+public class MasterAgent extends BaseAgent {
     private final HttpClient httpClient = HttpClient.newHttpClient();
-    private static final Logger logger = LoggerFactory.getLogger(WorkerAgent.class);
+    private static final Logger logger = LoggerFactory.getLogger(MasterAgent.class);
     private String nodeName;
     private String inventoryPath;
 
@@ -31,7 +32,7 @@ public class WorkerAgent extends BaseAgent {
         this.inventoryPath = (String) args[1];
 
 
-        logger.info("WokerAgent {} initialized for node: {}", getLocalName(), nodeName);
+        logger.info("MasterAgent {} initialized for node: {}", getLocalName(), nodeName);
 
         addBehaviour(new TickerBehaviour(this, 10_000) {
             @Override
