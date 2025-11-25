@@ -24,7 +24,7 @@ public class InternalAgentController {
 
     @PostMapping("/status")
     public ResponseEntity<Void> updateStatus(@RequestBody StatusUpdateDTO update) {
-        logger.info("<<< Received status update: {} = {}", update.getKey(), update.getValue());
+        logger.info("Received status update: {} = {}", update.getKey(), update.getValue());
         if (update.getKey() == null || update.getValue() == null) {
             return ResponseEntity.badRequest().build();
         }
