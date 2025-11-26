@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version  13&quot;">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Controller/InternalAgentController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/Controller/InternalAgentController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
-    </list>
+    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version  13.2&quot;" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -229,14 +224,7 @@
       <workItem from="1763801982901" duration="4080000" />
       <workItem from="1764039326583" duration="13029000" />
       <workItem from="1764065162243" duration="631000" />
-    </task>
-    <task id="LOCAL-00016" summary="&quot;New Version 4&quot;">
-      <option name="closed" value="true" />
-      <created>1761106945034</created>
-      <option name="number" value="00016" />
-      <option name="presentableId" value="LOCAL-00016" />
-      <option name="project" value="LOCAL" />
-      <updated>1761106945034</updated>
+      <workItem from="1764141796422" duration="129000" />
     </task>
     <task id="LOCAL-00017" summary="&quot;New Version 4&quot;">
       <option name="closed" value="true" />
@@ -622,7 +610,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764057598642</updated>
     </task>
-    <option name="localTasksCounter" value="65" />
+    <task id="LOCAL-00065" summary="&quot;Version  13.2&quot;">
+      <option name="closed" value="true" />
+      <created>1764141909741</created>
+      <option name="number" value="00065" />
+      <option name="presentableId" value="LOCAL-00065" />
+      <option name="project" value="LOCAL" />
+      <updated>1764141909742</updated>
+    </task>
+    <option name="localTasksCounter" value="66" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -643,7 +639,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="&quot;New Version 7.2&quot;" />
     <MESSAGE value="&quot;New Version 7.5&quot;" />
     <MESSAGE value="&quot;New Version 7.6&quot;" />
     <MESSAGE value="&quot;New Version 7.7&quot;" />
@@ -668,7 +663,8 @@
     <MESSAGE value="&quot;Version Spring-Web + Terraform 11.1&quot;" />
     <MESSAGE value="&quot;Version  12.1&quot;" />
     <MESSAGE value="&quot;Version  13&quot;" />
-    <option name="LAST_COMMIT_MESSAGE" value="&quot;Version  13&quot;" />
+    <MESSAGE value="&quot;Version  13.2&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="&quot;Version  13.2&quot;" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

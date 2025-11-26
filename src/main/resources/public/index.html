@@ -418,7 +418,7 @@
         }
 
         function removeBootstrapNode(id) {
-            const node = document.querySelector(\`.bootstrap-node[data-node-id="\${id}"]\`);
+            const node = document.querySelector(`.bootstrap-node[data-node-id="${id}"]`);
             if (node) {
                 node.remove();
             }
