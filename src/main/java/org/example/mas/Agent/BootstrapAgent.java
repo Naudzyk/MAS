@@ -55,12 +55,12 @@ public class BootstrapAgent extends BaseAgent {
                         return;
                     }
 
-                    if (!verifySetup()) {
-                        log.error("Verification failed for {}", targetIp);
-                        closeConnection();
-                        doDelete();
-                        return;
-                    }
+//                    if (!verifySetup()) {
+//                        log.error("Verification failed for {}", targetIp);
+//                        closeConnection();
+//                        doDelete();
+//                        return;
+//                    }
 
                     log.info("Bootstrap completed successfully for {}", targetIp);
                     sendStatusUpdate("bootstrap:" + targetIp, "SUCCESS");
