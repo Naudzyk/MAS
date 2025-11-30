@@ -13,5 +13,5 @@ server:
 mas:
   paths:
     terraform: /home/vboxuser/tets_branch/terraform
-    inventory: scripts/inventory.ini
+    inventory: inventory.ini
     playbooks: scripts
