@@ -10,7 +10,7 @@ management:
 server:
   forward-headers-strategy: framework
 
-  mas:
+mas:
   paths:
     terraform: terraform
     inventory: scripts/inventory.ini

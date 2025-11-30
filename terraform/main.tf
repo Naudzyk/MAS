@@ -40,6 +40,8 @@ data "template_file" "inventory" {
 
 resource "local_file" "inventory" {
   content  = data.template_file.inventory.rendered
-  filename = "${path.root}/../inventory.ini"
+  filename = "${path.root}/../scripts/inventory.ini"
 }
+
+
 

@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version  13.2&quot;" />
+    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version  13.3&quot;">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/public/index.html" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -225,14 +228,10 @@
       <workItem from="1764039326583" duration="13029000" />
       <workItem from="1764065162243" duration="631000" />
       <workItem from="1764141796422" duration="129000" />
-    </task>
-    <task id="LOCAL-00017" summary="&quot;New Version 4&quot;">
-      <option name="closed" value="true" />
-      <created>1761110005612</created>
-      <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
-      <option name="project" value="LOCAL" />
-      <updated>1761110005612</updated>
+      <workItem from="1764143097328" duration="1215000" />
+      <workItem from="1764482722139" duration="19000" />
+      <workItem from="1764485717272" duration="17000" />
+      <workItem from="1764485847166" duration="635000" />
     </task>
     <task id="LOCAL-00018" summary="&quot;New Version 5&quot;">
       <option name="closed" value="true" />
@@ -618,7 +617,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764141909742</updated>
     </task>
-    <option name="localTasksCounter" value="66" />
+    <task id="LOCAL-00066" summary="&quot;Version  13.3&quot;">
+      <option name="closed" value="true" />
+      <created>1764143710737</created>
+      <option name="number" value="00066" />
+      <option name="presentableId" value="LOCAL-00066" />
+      <option name="project" value="LOCAL" />
+      <updated>1764143710737</updated>
+    </task>
+    <option name="localTasksCounter" value="67" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -639,7 +646,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="&quot;New Version 7.5&quot;" />
     <MESSAGE value="&quot;New Version 7.6&quot;" />
     <MESSAGE value="&quot;New Version 7.7&quot;" />
     <MESSAGE value="&quot;New Version 7.8&quot;" />
@@ -664,7 +670,8 @@
     <MESSAGE value="&quot;Version  12.1&quot;" />
     <MESSAGE value="&quot;Version  13&quot;" />
     <MESSAGE value="&quot;Version  13.2&quot;" />
-    <option name="LAST_COMMIT_MESSAGE" value="&quot;Version  13.2&quot;" />
+    <MESSAGE value="&quot;Version  13.3&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="&quot;Version  13.3&quot;" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

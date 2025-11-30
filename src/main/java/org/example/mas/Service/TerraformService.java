@@ -45,7 +45,10 @@ public class TerraformService {
 
         Path output = Paths.get(inventoryOutput).toAbsolutePath();
         if (!Files.exists(output)) {
-            throw new IllegalStateException("Terraform не создал inventory по адресу " + output);
+            log.error("Файл inventory.ini не найден по пути: {}", output);
+            log.error("Terraform работал в директории: {}", terraformPath);
+            throw new IllegalStateException("Terraform не создал inventory по адресу " + output +
+                ". Проверьте, что terraform apply выполнился успешно и создал файл в scripts/inventory.ini");
         }
 
         log.info("Inventory.ini обновлён: {}", output);
