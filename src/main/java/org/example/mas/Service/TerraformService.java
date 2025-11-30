@@ -3,6 +3,8 @@ package org.example.mas.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.mas.models.ClusterNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -17,10 +19,11 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class TerraformService {
+    Logger log = LoggerFactory.getLogger(TerraformService.class);
 
     private final NodeService nodeService;
 

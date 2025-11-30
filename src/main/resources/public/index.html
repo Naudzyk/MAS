@@ -614,8 +614,11 @@
 
                 // Шаг 2: Генерация inventory
                 const genResponse = await fetch('/api/nodes/generate-inventory', { method: 'POST' });
-                if (!genResponse.ok) {
-                    throw new Error('Ошибка генерации inventory');
+                const genData = await genResponse.json();
+                if (!genResponse.ok || !genData.success) {
+                    const errorMsg = genData.error || 'Ошибка генерации inventory';
+                    const details = genData.details ? `\n\nДетали: ${genData.details}` : '';
+                    throw new Error(`Ошибка генерации inventory: ${errorMsg}${details}`);
                 }
 
                 // Шаг 3: Запуск развёртывания
@@ -638,7 +641,9 @@
 
             } catch (err) {
                 resultDiv.className = 'result-message result-error';
-                resultDiv.textContent = `Ошибка: ${err.message}`;
+                const errorMessage = `Ошибка: ${err.message}`;
+                // Заменяем \n на <br> для многострочных ошибок
+                resultDiv.innerHTML = errorMessage.replace(/\n/g, '<br>');
                 console.error('Deployment error:', err);
             } finally {
                 resultDiv.classList.remove('hidden');
