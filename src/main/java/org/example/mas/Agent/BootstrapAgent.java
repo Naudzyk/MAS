@@ -142,7 +142,7 @@ public class BootstrapAgent extends BaseAgent {
     private boolean verifySetup() throws Exception {
         log.info("Verifying setup on {}", targetIp);
 
-        String testKeyCommand = "ssh -o BatchMode=yes -o ConnectTimeout=5 localhost echo 'Key verification successful'";
+        String testKeyCommand = "ssh -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=5 localhost echo 'Key verification successful'";;
         if (!executeCommand(testKeyCommand, "Key verification")) {
             return false;
         }
