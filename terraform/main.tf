@@ -4,10 +4,6 @@ terraform {
       source  = "hashicorp/local"
       version = "2.4.0"
     }
-    template = {
-      source  = "hashicorp/template"
-      version = "2.2.0"
-    }
   }
 }
 
@@ -31,15 +27,10 @@ locals {
   }
 }
 
-data "template_file" "inventory" {
-  template = file("${path.module}/templates/inventory.tpl")
-  vars = {
-    groups = local.grouped_nodes
-  }
-}
-
 resource "local_file" "inventory" {
-  content  = data.template_file.inventory.rendered
+  content  = templatefile("${path.module}/templates/inventory.tpl", {
+    groups = local.grouped_nodes
+  })
   filename = "${path.root}/../scripts/inventory.ini"
 }
 
