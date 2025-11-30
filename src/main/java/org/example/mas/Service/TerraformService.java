@@ -95,9 +95,11 @@ public class TerraformService {
                     .append("    ip_address: ").append(node.getIpAddress()).append("\n")
                     .append("    group: ").append(node.getRole()).append("\n")
                     .append("    ssh_user: ").append(node.getSshUser()).append("\n");
-                if (node.getSshKeyPath() != null && !node.getSshKeyPath().isBlank()) {
-                    yaml.append("    ssh_key_path: ").append(node.getSshKeyPath()).append("\n");
-                }
+                // Всегда записываем ssh_key_path, даже если пустой, чтобы поле существовало в YAML
+                String sshKeyPath = (node.getSshKeyPath() != null && !node.getSshKeyPath().isBlank())
+                    ? node.getSshKeyPath()
+                    : "";
+                yaml.append("    ssh_key_path: ").append(sshKeyPath).append("\n");
             }
             Files.writeString(destination, yaml.toString(), StandardCharsets.UTF_8);
             log.debug("inventory.yaml обновлён ({} узлов)", nodes.size());
