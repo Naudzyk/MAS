@@ -55,13 +55,6 @@ public class BootstrapAgent extends BaseAgent {
                         return;
                     }
 
-//                    if (!verifySetup()) {
-//                        log.error("Verification failed for {}", targetIp);
-//                        closeConnection();
-//                        doDelete();
-//                        return;
-//                    }
-
                     log.info("Bootstrap completed successfully for {}", targetIp);
                     sendStatusUpdate("bootstrap:" + targetIp, "SUCCESS");
                     closeConnection();
@@ -139,17 +132,6 @@ public class BootstrapAgent extends BaseAgent {
         return executeCommand(command, "Passwordless sudo setup");
     }
 
-    private boolean verifySetup() throws Exception {
-        log.info("Verifying setup on {}", targetIp);
-
-        String testKeyCommand = "ssh -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=5 localhost echo 'Key verification successful'";;
-        if (!executeCommand(testKeyCommand, "Key verification")) {
-            return false;
-        }
-
-        String testSudoCommand = "sudo -n true && echo 'Sudo verification successful' || echo 'Sudo requires password'";
-        return executeCommand(testSudoCommand, "Sudo verification");
-    }
 
     private boolean executeCommand(String command, String stepName) throws Exception {
         log.debug("Executing on {}: {}", targetIp, command);
@@ -157,13 +139,11 @@ public class BootstrapAgent extends BaseAgent {
         sshChannel = (ChannelExec) sshSession.openChannel("exec");
         sshChannel.setCommand(command);
 
-        // Потоки для вывода
         InputStream stdout = sshChannel.getInputStream();
         InputStream stderr = sshChannel.getErrStream();
 
         sshChannel.connect(10000); // Таймаут 10 секунд
 
-        // Читаем вывод
         String output = IOUtils.toString(stdout, StandardCharsets.UTF_8);
         String error = IOUtils.toString(stderr, StandardCharsets.UTF_8);
 
