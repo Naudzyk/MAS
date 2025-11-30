@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version  13.5&quot;">
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Service/TerraformService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/Service/TerraformService.class" afterDir="false" />
+    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version  13.7&quot;">
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Controller/NodeController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/Controller/NodeController.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -230,15 +230,7 @@
       <workItem from="1764143097328" duration="1215000" />
       <workItem from="1764482722139" duration="19000" />
       <workItem from="1764485717272" duration="17000" />
-      <workItem from="1764485847166" duration="1479000" />
-    </task>
-    <task id="LOCAL-00019" summary="&quot;New Version 5&quot;">
-      <option name="closed" value="true" />
-      <created>1761115752516</created>
-      <option name="number" value="00019" />
-      <option name="presentableId" value="LOCAL-00019" />
-      <option name="project" value="LOCAL" />
-      <updated>1761115752516</updated>
+      <workItem from="1764485847166" duration="1863000" />
     </task>
     <task id="LOCAL-00020" summary="&quot;New Version 5&quot;">
       <option name="closed" value="true" />
@@ -624,7 +616,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764490198046</updated>
     </task>
-    <option name="localTasksCounter" value="68" />
+    <task id="LOCAL-00068" summary="&quot;Version  13.7&quot;">
+      <option name="closed" value="true" />
+      <created>1764491472860</created>
+      <option name="number" value="00068" />
+      <option name="presentableId" value="LOCAL-00068" />
+      <option name="project" value="LOCAL" />
+      <updated>1764491472860</updated>
+    </task>
+    <option name="localTasksCounter" value="69" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -645,7 +645,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="&quot;New Version 7.7&quot;" />
     <MESSAGE value="&quot;New Version 7.8&quot;" />
     <MESSAGE value="&quot;Version not Web 8&quot;" />
     <MESSAGE value="&quot;Version not Web 8.1 add prometheus&quot;" />
@@ -670,7 +669,8 @@
     <MESSAGE value="&quot;Version  13.2&quot;" />
     <MESSAGE value="&quot;Version  13.3&quot;" />
     <MESSAGE value="&quot;Version  13.5&quot;" />
-    <option name="LAST_COMMIT_MESSAGE" value="&quot;Version  13.5&quot;" />
+    <MESSAGE value="&quot;Version  13.7&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="&quot;Version  13.7&quot;" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

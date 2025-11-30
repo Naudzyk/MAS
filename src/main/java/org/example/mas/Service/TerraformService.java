@@ -3,8 +3,6 @@ package org.example.mas.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.mas.models.ClusterNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -19,11 +17,10 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TerraformService {
-    Logger log = LoggerFactory.getLogger(TerraformService.class);
 
     private final NodeService nodeService;
 
@@ -39,7 +36,38 @@ public class TerraformService {
             throw new IllegalStateException("Сначала добавьте хотя бы один узел.");
         }
 
-        Path terraformPath = Paths.get(terraformDir).toAbsolutePath();
+
+        Path currentDir = Paths.get(".").toAbsolutePath().normalize();
+        log.info("Текущая рабочая директория: {}", currentDir);
+        log.info("Конфигурация terraform директории: {}", terraformDir);
+
+        Path terraformPath = Paths.get(terraformDir).toAbsolutePath().normalize();
+        log.info("Абсолютный путь к terraform директории: {}", terraformPath);
+
+
+        if (!Files.exists(terraformPath) || !Files.isDirectory(terraformPath)) {
+            throw new IllegalStateException("Terraform директория не существует: " + terraformPath);
+        }
+
+        // Проверяем наличие main.tf
+        Path mainTf = terraformPath.resolve("main.tf");
+        if (!Files.exists(mainTf)) {
+            throw new IllegalStateException("Файл main.tf не найден в директории: " + terraformPath);
+        }
+
+        log.info("Файл main.tf найден: {}", mainTf);
+
+
+        try {
+            log.info("Содержимое terraform директории:");
+            Files.list(terraformPath).forEach(path ->
+                log.info("  - {} ({})", path.getFileName(),
+                    Files.isDirectory(path) ? "директория" : "файл")
+            );
+        } catch (IOException e) {
+            log.warn("Не удалось прочитать содержимое terraform директории: {}", e.getMessage());
+        }
+
         Path inventoryYaml = terraformPath.resolve("inventory.yaml");
         writeInventoryYaml(inventoryYaml, nodes);
 
@@ -80,12 +108,16 @@ public class TerraformService {
 
     private void runTerraformCommand(Path terraformPath, String... args) {
         try {
+            log.info("Выполнение terraform команды в директории: {}", terraformPath);
+
             List<String> command = new ArrayList<>();
             command.add("terraform");
-            command.add("-chdir=" + terraformPath);
+            command.add("-chdir=" + terraformPath.toString());
             for (String arg : args) {
                 command.add(arg);
             }
+
+            log.info("Команда terraform: {}", String.join(" ", command));
 
             ProcessBuilder pb = new ProcessBuilder(command);
             pb.redirectErrorStream(true);
@@ -96,6 +128,7 @@ public class TerraformService {
                 new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
+                    log.info("Terraform output: {}", line);
                     output.append(line).append(System.lineSeparator());
                 }
             }
