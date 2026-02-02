@@ -49,7 +49,6 @@ public class TerraformService {
             throw new IllegalStateException("Terraform директория не существует: " + terraformPath);
         }
 
-        // Проверяем наличие main.tf
         Path mainTf = terraformPath.resolve("main.tf");
         if (!Files.exists(mainTf)) {
             throw new IllegalStateException("Файл main.tf не найден в директории: " + terraformPath);

@@ -18,7 +18,7 @@ locals {
 
   valid_nodes = [for node in local.nodes : node if try(node.group, null) != null]
 
-  # Нормализуем узлы, гарантируя, что все поля имеют строковые значения (не null)
+
   normalized_nodes = [
     for node in local.valid_nodes : {
       inventory_name = try(node.inventory_name, null) != null ? tostring(node.inventory_name) : ""

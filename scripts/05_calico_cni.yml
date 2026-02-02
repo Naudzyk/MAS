@@ -16,13 +16,6 @@
       set_fact:
         k8s_node_ip: "{{ (route_ip.stdout | trim) | default(ansible_default_ipv4.address, true) }}"
 
-    - name: Uninstall Flannel namespace (if present)
-      command: /usr/bin/kubectl delete ns kube-flannel --ignore-not-found
-      environment:
-        KUBECONFIG: /root/.kube/config
-      when: "'central_manager' in group_names"
-      delegate_to: central_manager
-      run_once: true
 
     - name: Wipe CNI state on all nodes (before Calico)
       shell: |
@@ -39,7 +32,6 @@
       loop:
         - "127.0.0.1 localhost"
         - "::l localhost ip6-localhost ip6-loopback"
-
 
 
     - name: Ensure node hostname resolves (optinal but recommended)

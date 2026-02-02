@@ -6,8 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version  13.9&quot;">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/BootstrapAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/BootstrapAgent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/BootstrapAgent.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/BootstrapAgent.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/05_calico_cni.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/05_calico_cni.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Service/TerraformService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Service/TerraformService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/terraform/main.tf" beforeDir="false" afterPath="$PROJECT_DIR$/terraform/main.tf" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -232,23 +234,13 @@
       <workItem from="1764143097328" duration="1215000" />
       <workItem from="1764482722139" duration="19000" />
       <workItem from="1764485717272" duration="17000" />
-      <workItem from="1764485847166" duration="11407000" />
-    </task>
-    <task id="LOCAL-00029" summary="&quot;New Version 7.2&quot;">
-      <option name="closed" value="true" />
-      <created>1761394327411</created>
-      <option name="number" value="00029" />
-      <option name="presentableId" value="LOCAL-00029" />
-      <option name="project" value="LOCAL" />
-      <updated>1761394327411</updated>
-    </task>
-    <task id="LOCAL-00030" summary="&quot;New Version 7.2&quot;">
-      <option name="closed" value="true" />
-      <created>1761396691205</created>
-      <option name="number" value="00030" />
-      <option name="presentableId" value="LOCAL-00030" />
-      <option name="project" value="LOCAL" />
-      <updated>1761396691205</updated>
+      <workItem from="1764485847166" duration="12411000" />
+      <workItem from="1765940410318" duration="831000" />
+      <workItem from="1768198499369" duration="102000" />
+      <workItem from="1768198651356" duration="246000" />
+      <workItem from="1768198980974" duration="75000" />
+      <workItem from="1768199196196" duration="724000" />
+      <workItem from="1770002905207" duration="766000" />
     </task>
     <task id="LOCAL-00031" summary="&quot;New Version 7.2&quot;">
       <option name="closed" value="true" />
@@ -626,7 +618,23 @@
       <option name="project" value="LOCAL" />
       <updated>1764500698831</updated>
     </task>
-    <option name="localTasksCounter" value="78" />
+    <task id="LOCAL-00078" summary="&quot;Version  13.9&quot;">
+      <option name="closed" value="true" />
+      <created>1764502215676</created>
+      <option name="number" value="00078" />
+      <option name="presentableId" value="LOCAL-00078" />
+      <option name="project" value="LOCAL" />
+      <updated>1764502215676</updated>
+    </task>
+    <task id="LOCAL-00079" summary="&quot;Version  13.9&quot;">
+      <option name="closed" value="true" />
+      <created>1764502374575</created>
+      <option name="number" value="00079" />
+      <option name="presentableId" value="LOCAL-00079" />
+      <option name="project" value="LOCAL" />
+      <updated>1764502374575</updated>
+    </task>
+    <option name="localTasksCounter" value="80" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
