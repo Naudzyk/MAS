@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version  02.02.2026&quot;">
+    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version  02.02.2026 ver 2&quot;">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Service/TerraformService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/Service/TerraformService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/application.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -239,15 +238,9 @@
       <workItem from="1768198980974" duration="75000" />
       <workItem from="1768199196196" duration="724000" />
       <workItem from="1770002905207" duration="1481000" />
-      <workItem from="1770005308536" duration="719000" />
-    </task>
-    <task id="LOCAL-00032" summary="&quot;New Version 7.2&quot;">
-      <option name="closed" value="true" />
-      <created>1761461494912</created>
-      <option name="number" value="00032" />
-      <option name="presentableId" value="LOCAL-00032" />
-      <option name="project" value="LOCAL" />
-      <updated>1761461494912</updated>
+      <workItem from="1770005308536" duration="1011000" />
+      <workItem from="1770088454865" duration="28000" />
+      <workItem from="1770088852206" duration="334000" />
     </task>
     <task id="LOCAL-00033" summary="&quot;New Version 7.2&quot;">
       <option name="closed" value="true" />
@@ -633,7 +626,15 @@
       <option name="project" value="LOCAL" />
       <updated>1770003778564</updated>
     </task>
-    <option name="localTasksCounter" value="81" />
+    <task id="LOCAL-00081" summary="&quot;Version  02.02.2026 ver 2&quot;">
+      <option name="closed" value="true" />
+      <created>1770006343167</created>
+      <option name="number" value="00081" />
+      <option name="presentableId" value="LOCAL-00081" />
+      <option name="project" value="LOCAL" />
+      <updated>1770006343168</updated>
+    </task>
+    <option name="localTasksCounter" value="82" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -654,7 +655,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="&quot;Version not Web 8.1 add prometheus&quot;" />
     <MESSAGE value="&quot;Version not Web 8.2&quot;" />
     <MESSAGE value="&quot;Version not Web 8.2.1&quot;" />
     <MESSAGE value="&quot;Version not Web 8.3&quot;" />
@@ -679,7 +679,8 @@
     <MESSAGE value="&quot;Version  13.7&quot;" />
     <MESSAGE value="&quot;Version  13.9&quot;" />
     <MESSAGE value="&quot;Version  02.02.2026&quot;" />
-    <option name="LAST_COMMIT_MESSAGE" value="&quot;Version  02.02.2026&quot;" />
+    <MESSAGE value="&quot;Version  02.02.2026 ver 2&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="&quot;Version  02.02.2026 ver 2&quot;" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
