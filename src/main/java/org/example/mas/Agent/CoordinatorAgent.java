@@ -1,4 +1,4 @@
-package org.example.mas.Service.Agent;
+package org.example.mas.Agent;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jade.core.AID;
@@ -6,6 +6,7 @@ import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentController;
 import lombok.RequiredArgsConstructor;
+import org.example.mas.Service.StatusService;
 import org.example.mas.SpringContextHelper;
 import org.example.mas.utils.AnsibleRunner;
 import org.example.mas.utils.InventoryParser;

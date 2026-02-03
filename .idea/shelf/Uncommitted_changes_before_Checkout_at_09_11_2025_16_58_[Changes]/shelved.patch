@@ -1,0 +1,20 @@
+Index: terraform/variables.tf
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>variable \"node_ip\" {\r\n  description = \"IP-адрес существующей машины\"\r\n  type        = string\r\n  default     = \"192.168.56.107\"\r\n}\r\n\r\nvariable \"ansible_user\" {\r\n  description = \"Пользователь для подключения по SSH\"\r\n  type        = string\r\n  default     = \"vboxuser\"\r\n}\r\n\r\nvariable \"ssh_key_path\" {\r\n  description = \"Путь к SSH-ключу\"\r\n  type        = string\r\n  default     = \"~/.ssh/id_ed25519\"\r\n}
+===================================================================
+diff --git a/terraform/variables.tf b/terraform/variables.tf
+--- a/terraform/variables.tf	(revision b293da06678477a895bb64238d290a579751889c)
++++ b/terraform/variables.tf	(date 1762678694042)
+@@ -4,6 +4,11 @@
+   default     = "192.168.56.107"
+ }
+ 
++variable "worker_ip" {
++  type = string
++  default = "192.168.56.105"
++}
++
+ variable "ansible_user" {
+   description = "Пользователь для подключения по SSH"
+   type        = string

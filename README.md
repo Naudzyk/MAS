@@ -39,3 +39,31 @@ execute ansible_host=192.168.56.105 ansible_user=vboxuser ansible_become=true
  
 
 ### Запуск приложения
+
+1. Соберите фронтенд и бекэнд (`mvn spring-boot:run` или запуск jar).
+2. Перейдите в веб-панель `http://localhost:8080`.
+3. Добавьте узлы и сохраните их — сервис сохранит данные и передаст их в Terraform.
+4. Нажмите «Сгенерировать inventory» (кнопка «Развернуть кластер» сама вызывает `/api/nodes/generate-inventory`). Terraform создаст `inventory.ini` из данных веб-панели.
+5. При первом запуске оставьте чекбокс «Пропустить Bootstrap» выключенным, заполните форму первоначальной настройки и нажмите «Развернуть кластер». Будут созданы `BootstrapAgent` для каждого хоста, настроены SSH-ключи и sudo, затем автоматически стартует `CoordinatorAgent`.
+6. Если хосты уже подготовлены, отметьте чекбокс и агент-координатор стартует сразу, минуя Bootstrap.
+
+# Terraform
+sudo apt update && sudo apt install -y gnupg software-properties-common
+wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+sudo apt update && sudo apt install terraform
+
+# Ansible
+sudo apt install -y ansible
+
+# Java 17
+sudo apt install -y openjdk-17-jdk
+
+# Проверка
+terraform --version  # Должно быть >= 1.3
+ansible --version
+java -version
+
+ssh -L 8080:localhost:8080 vboxuser@192.168.56.107  
+
+

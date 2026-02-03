@@ -9,3 +9,9 @@ management:
 
 server:
   forward-headers-strategy: framework
+
+mas:
+  paths:
+    terraform: terraform
+    inventory: scripts/inventory.ini
+    playbooks: scripts

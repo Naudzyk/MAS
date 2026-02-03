@@ -1,46 +1,47 @@
 terraform {
   required_providers {
-    null = {
-          source   = "hashicorp/null"
-          version  = "3.2.1"
-        }
     local = {
-        source = "hashicorp/local"
-        version = "2.4.0"
-        }
-    template = {
-        source = "hashicorp/template"
-        version = "2.2.0"
-        }
+      source  = "hashicorp/local"
+      version = "2.4.0"
     }
   }
+}
+
+data "local_file" "nodes_config" {
+  filename = "${path.module}/inventory.yaml"
+}
+
+locals {
+  config = yamldecode(data.local_file.nodes_config.content)
+
+  nodes = try(local.config.nodes, [])
+
+  valid_nodes = [for node in local.nodes : node if try(node.group, null) != null]
 
 
-resource "null_resource" "existing_node" {
-    triggers = {
-        node_ip = var.node_ip
-        }
-
-    provisioner "remote-exec" {
-        inline = ["echo 'Node is reachable!'"]
-
-        connection {
-            type        = "ssh"
-            user        = var.ansible_user
-            private_key = file(var.ssh_key_path)
-            host        = var.node_ip
-            }
-        }
+  normalized_nodes = [
+    for node in local.valid_nodes : {
+      inventory_name = try(node.inventory_name, null) != null ? tostring(node.inventory_name) : ""
+      ip_address     = try(node.ip_address, null) != null ? tostring(node.ip_address) : ""
+      ssh_user       = try(node.ssh_user, null) != null ? tostring(node.ssh_user) : ""
+      ssh_key_path   = try(node.ssh_key_path, null) != null && node.ssh_key_path != "" ? tostring(node.ssh_key_path) : ""
+      group          = try(node.group, null) != null ? tostring(node.group) : ""
     }
-data "template_file" "inventory" {
-    template = file("${path.module}/templates/inventory.tpl")
-    vars ={
-        node_ip     = var.node_ip
-        ansible_user= var.ansible_user
-        ssh_key_path = var.ssh_key_path
-        }
-    }
+  ]
+
+  groups = distinct([for node in local.normalized_nodes : node.group])
+
+  grouped_nodes = {
+    for group in local.groups : group => [
+      for node in local.normalized_nodes : node if node.group == group
+    ]
+  }
+}
+
 resource "local_file" "inventory" {
-    content  = data.template_file.inventory.rendered
-    filename ="${path.root}/../inventory.ini"
-    }
+  content  = templatefile("${path.module}/templates/inventory.tpl", {
+    groups = local.grouped_nodes
+  })
+  filename = "${path.root}/../scripts/inventory.ini"
+}
+
