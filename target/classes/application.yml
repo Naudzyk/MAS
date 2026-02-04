@@ -12,6 +12,8 @@ server:
 
 mas:
   paths:
-    terraform: terraform
     inventory: scripts/inventory.ini
     playbooks: scripts
+  bootstrap:
+    group: bootstrap
+    public-key: ~/.ssh/id_ed25519.pub

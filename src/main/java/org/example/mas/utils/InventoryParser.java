@@ -43,7 +43,16 @@ public  class InventoryParser {
             if (line.isEmpty() || line.startsWith("#")) continue;
 
             if (line.startsWith("[") && line.endsWith("]")) {
-                currentGroup = line.substring(1, line.length() - 1).split(":")[0];
+                String groupToken = line.substring(1, line.length() - 1).trim();
+                String[] groupParts = groupToken.split(":", 2);
+                if (groupParts.length > 1) {
+                    String suffix = groupParts[1].trim();
+                    if ("vars".equalsIgnoreCase(suffix) || "children".equalsIgnoreCase(suffix)) {
+                        currentGroup = null;
+                        continue;
+                    }
+                }
+                currentGroup = groupParts[0];
             } else if (currentGroup != null) {
                 String[] parts = line.split("\\s+");
                 if (parts.length == 0) continue;

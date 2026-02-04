@@ -8,13 +8,17 @@ import org.example.mas.Agent.CoordinatorAgent;
 import org.example.mas.DTO.BootstrapRequest;
 import org.example.mas.DTO.DeploymentRequest;
 import org.example.mas.models.BootstrapNode;
+import org.example.mas.utils.InventoryParser;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -32,6 +36,12 @@ public class DeploymentService {
 
     @Value("${mas.paths.playbooks:scripts}")
     private String playbooksDir;
+
+    @Value("${mas.bootstrap.group:bootstrap}")
+    private String bootstrapGroup;
+
+    @Value("${mas.bootstrap.public-key:~/.ssh/id_ed25519.pub}")
+    private String defaultPublicKeyPath;
 
     private final Set<String> pendingBootstrap = ConcurrentHashMap.newKeySet();
     private volatile boolean coordinatorStarted = false;
@@ -54,6 +64,22 @@ public class DeploymentService {
         statusService.update("bootstrapStatus", "SKIPPED");
         startCoordinatorInternal();
         return "Координатор запущен без Bootstrap.";
+    }
+
+    public synchronized String startDeploymentFromInventory() {
+        if (coordinatorStarted) {
+            return "Coordinator уже запущен.";
+        }
+
+        BootstrapRequest bootstrapRequest = buildBootstrapRequestFromInventory();
+        if (CollectionUtils.isEmpty(bootstrapRequest.getNodes())) {
+            statusService.update("bootstrapStatus", "SKIPPED");
+            startCoordinatorInternal();
+            return "Координатор запущен (Bootstrap пропущен).";
+        }
+
+        startBootstrapPhase(bootstrapRequest, true);
+        return "Bootstrap-agent запущен из inventory. Координатор стартует автоматически после завершения.";
     }
 
     public synchronized String startBootstrapOnly(BootstrapRequest request) {
@@ -79,6 +105,74 @@ public class DeploymentService {
                 bootstrapService.bootstrapNode(node.getIp(), node.getUsername(), node.getPassword(), request.getPublicKeyPath());
             }
         }
+    }
+
+    private BootstrapRequest buildBootstrapRequestFromInventory() {
+        Path inventory = Paths.get(inventoryPath).toAbsolutePath();
+        if (!Files.exists(inventory)) {
+            throw new IllegalStateException("Inventory не найден: " + inventory);
+        }
+
+        InventoryParser.Inventory parsedInventory;
+        try {
+            parsedInventory = InventoryParser.parse(inventory.toString());
+        } catch (IOException e) {
+            throw new IllegalStateException("Не удалось прочитать inventory: " + inventory, e);
+        }
+
+        List<InventoryParser.Host> hosts = parsedInventory.getGroup(bootstrapGroup);
+        BootstrapRequest request = new BootstrapRequest();
+        request.setPublicKeyPath(resolveBootstrapPublicKey(hosts));
+
+        List<BootstrapNode> nodes = new ArrayList<>();
+        for (InventoryParser.Host host : hosts) {
+            String ip = host.getHost();
+            String username = firstVar(host, "bootstrap_user", "ansible_user", "user");
+            String password = firstVar(host, "bootstrap_password", "bootstrap_pass", "password");
+
+            if (ip == null || username == null || password == null) {
+                log.warn("Пропущен узел bootstrap (нет ip/user/password): {}", host.name);
+                continue;
+            }
+
+            BootstrapNode node = new BootstrapNode();
+            node.setIp(ip);
+            node.setUsername(username);
+            node.setPassword(password);
+            nodes.add(node);
+        }
+
+        request.setNodes(nodes);
+        if (!hosts.isEmpty() && nodes.isEmpty()) {
+            throw new IllegalArgumentException("В группе '" + bootstrapGroup + "' нет узлов с валидными учетными данными.");
+        }
+
+        return request;
+    }
+
+    private String resolveBootstrapPublicKey(List<InventoryParser.Host> hosts) {
+        for (InventoryParser.Host host : hosts) {
+            String value = firstVar(host,
+                "bootstrap_public_key",
+                "bootstrap_public_key_path",
+                "bootstrap_pubkey",
+                "bootstrap_key_path"
+            );
+            if (value != null) {
+                return value;
+            }
+        }
+        return defaultPublicKeyPath;
+    }
+
+    private String firstVar(InventoryParser.Host host, String... keys) {
+        for (String key : keys) {
+            String value = host.vars.get(key);
+            if (value != null && !value.isBlank()) {
+                return value.trim();
+            }
+        }
+        return null;
     }
 
     public void notifyBootstrapResult(String ip, boolean success) {
