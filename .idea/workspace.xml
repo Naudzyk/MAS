@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version  04.02.2026 ver 1&quot;">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version  04.02.2026 ver 1&quot;" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -241,30 +239,7 @@
       <workItem from="1770088454865" duration="28000" />
       <workItem from="1770088852206" duration="334000" />
       <workItem from="1770174762317" duration="966000" />
-    </task>
-    <task id="LOCAL-00034" summary="&quot;New Version 7.2&quot;">
-      <option name="closed" value="true" />
-      <created>1761461655487</created>
-      <option name="number" value="00034" />
-      <option name="presentableId" value="LOCAL-00034" />
-      <option name="project" value="LOCAL" />
-      <updated>1761461655487</updated>
-    </task>
-    <task id="LOCAL-00035" summary="&quot;New Version 7.2&quot;">
-      <option name="closed" value="true" />
-      <created>1761471667386</created>
-      <option name="number" value="00035" />
-      <option name="presentableId" value="LOCAL-00035" />
-      <option name="project" value="LOCAL" />
-      <updated>1761471667386</updated>
-    </task>
-    <task id="LOCAL-00036" summary="&quot;New Version 7.5&quot;">
-      <option name="closed" value="true" />
-      <created>1761565971617</created>
-      <option name="number" value="00036" />
-      <option name="presentableId" value="LOCAL-00036" />
-      <option name="project" value="LOCAL" />
-      <updated>1761565971617</updated>
+      <workItem from="1770176825321" duration="171000" />
     </task>
     <task id="LOCAL-00037" summary="&quot;New Version 7.6&quot;">
       <option name="closed" value="true" />
@@ -634,7 +609,31 @@
       <option name="project" value="LOCAL" />
       <updated>1770089556561</updated>
     </task>
-    <option name="localTasksCounter" value="83" />
+    <task id="LOCAL-00083" summary="&quot;Version  04.02.2026 ver 1&quot;">
+      <option name="closed" value="true" />
+      <created>1770176862712</created>
+      <option name="number" value="00083" />
+      <option name="presentableId" value="LOCAL-00083" />
+      <option name="project" value="LOCAL" />
+      <updated>1770176862712</updated>
+    </task>
+    <task id="LOCAL-00084" summary="&quot;Version  04.02.2026 ver 1&quot;">
+      <option name="closed" value="true" />
+      <created>1770176877172</created>
+      <option name="number" value="00084" />
+      <option name="presentableId" value="LOCAL-00084" />
+      <option name="project" value="LOCAL" />
+      <updated>1770176877172</updated>
+    </task>
+    <task id="LOCAL-00085" summary="&quot;Version  04.02.2026 ver 1&quot;">
+      <option name="closed" value="true" />
+      <created>1770176980809</created>
+      <option name="number" value="00085" />
+      <option name="presentableId" value="LOCAL-00085" />
+      <option name="project" value="LOCAL" />
+      <updated>1770176980809</updated>
+    </task>
+    <option name="localTasksCounter" value="86" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -655,7 +654,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="&quot;Version not Web 8.2.1&quot;" />
     <MESSAGE value="&quot;Version not Web 8.3&quot;" />
     <MESSAGE value="&quot;Version not Web 8.4&quot;" />
     <MESSAGE value="&quot;Version Spring-Web 8.4&quot;" />
@@ -680,7 +678,8 @@
     <MESSAGE value="&quot;Version  02.02.2026&quot;" />
     <MESSAGE value="&quot;Version  02.02.2026 ver 2&quot;" />
     <MESSAGE value="&quot;Version  03.02.2026 ver 1&quot;" />
-    <option name="LAST_COMMIT_MESSAGE" value="&quot;Version  03.02.2026 ver 1&quot;" />
+    <MESSAGE value="&quot;Version  04.02.2026 ver 1&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="&quot;Version  04.02.2026 ver 1&quot;" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

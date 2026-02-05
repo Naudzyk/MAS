@@ -12,6 +12,7 @@ import org.example.mas.utils.AnsibleRunner;
 import org.example.mas.utils.InventoryParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -21,9 +22,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -54,18 +58,7 @@ public class CoordinatorAgent extends BaseAgent {
             public void action() {
                 logger.info("Starting initial cluster deployment...");
 
-                String[] playbooks = {
-                        "01_system_preparation.yml",
-                        "02_containerd.yml",
-                        "03_kubernetes_install.yml",
-                        "04_kubernetes_init.yml",
-                        "05_calico_cni.yml",
-                        "06_worker_preparation.yml",
-                        "07_worker_join.yml",
-                        "08_htcondor.yml",
-                        "09_prometheus.yml",
-                        "10_prometheus_server.yml"
-                };
+                List<String> playbooks = resolvePlaybooks();
 
                 for (String playbook : playbooks) {
                     logger.info("Running playbook: {}", playbook);
@@ -91,6 +84,69 @@ public class CoordinatorAgent extends BaseAgent {
 
 
 
+    }
+    private List<String> resolvePlaybooks() {
+        List<String> defaults = List.of(
+            "01_system_preparation.yml",
+            "02_containerd.yml",
+            "03_kubernetes_install.yml",
+            "04_kubernetes_init.yml",
+            "05_calico_cni.yml",
+            "06_worker_preparation.yml",
+            "07_worker_join.yml",
+            "08_htcondor.yml",
+            "09_prometheus.yml",
+            "10_prometheus_server.yml"
+        );
+
+        try {
+            Environment env = SpringContextHelper.getBean(Environment.class);
+            String mode = env.getProperty("mas.mode");
+            String sequenceProp = env.getProperty("mas.playbooks.sequence");
+            String skipProp = env.getProperty("mas.playbooks.skip");
+
+            LinkedHashSet<String> sequence = new LinkedHashSet<>();
+            if (sequenceProp != null && !sequenceProp.isBlank()) {
+                sequence.addAll(parseCsv(sequenceProp));
+            } else {
+                sequence.addAll(defaults);
+            }
+
+            if ("existing-cluster".equalsIgnoreCase(mode)) {
+                String autoSkip = String.join(",",
+                    "02_containerd.yml",
+                    "03_kubernetes_install.yml",
+                    "04_kubernetes_init.yml",
+                    "05_calico_cni.yml",
+                    "06_worker_preparation.yml",
+                    "07_worker_join.yml"
+                );
+                skipProp = (skipProp == null || skipProp.isBlank())
+                    ? autoSkip
+                    : skipProp + "," + autoSkip;
+            }
+
+            if (skipProp != null && !skipProp.isBlank()) {
+                Set<String> skip = new LinkedHashSet<>(parseCsv(skipProp));
+                sequence.removeIf(skip::contains);
+            }
+
+            List<String> resolved = new ArrayList<>(sequence);
+            if (resolved.isEmpty()) {
+                throw new IllegalStateException("Playbook sequence is empty after applying skip list.");
+            }
+            return resolved;
+        } catch (Exception e) {
+            logger.warn("Failed to resolve playbook list, using defaults: {}", e.getMessage());
+            return new ArrayList<>(defaults);
+        }
+    }
+
+    private List<String> parseCsv(String value) {
+        return Arrays.stream(value.split(","))
+            .map(String::trim)
+            .filter(v -> !v.isEmpty())
+            .collect(Collectors.toList());
     }
     private void handlePlaybookFailure(String playbook, AnsibleRunner.AnsibleResult result) {
         String alert = "Playbook " + playbook + " failed: " + result.errorCode;
