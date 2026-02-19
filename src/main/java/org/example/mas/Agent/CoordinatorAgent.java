@@ -60,11 +60,18 @@ public class CoordinatorAgent extends BaseAgent {
 
                 List<String> playbooks = resolvePlaybooks();
 
+                org.springframework.core.env.Environment env = SpringContextHelper.getBean(org.springframework.core.env.Environment.class);
+                int timeoutMinutes = 15;
+                try {
+                    String t = env.getProperty("mas.playbook.timeout-minutes");
+                    if (t != null && !t.isBlank()) timeoutMinutes = Integer.parseInt(t.trim());
+                } catch (Exception ignored) {}
+
                 for (String playbook : playbooks) {
                     logger.info("Running playbook: {}", playbook);
                     sendStatusUpdate("ansibleStage", playbook);
 
-                    AnsibleRunner.AnsibleResult result = AnsibleRunner.run(playbook, inventory, playbooksDir, 15);
+                    AnsibleRunner.AnsibleResult result = AnsibleRunner.run(playbook, inventory, playbooksDir, timeoutMinutes);
 
                     if (!result.success) {
                         handlePlaybookFailure(playbook, result);
@@ -94,9 +101,7 @@ public class CoordinatorAgent extends BaseAgent {
             "05_calico_cni.yml",
             "06_worker_preparation.yml",
             "07_worker_join.yml",
-            "08_htcondor.yml",
-            "09_prometheus.yml",
-            "10_prometheus_server.yml"
+            "08_htcondor.yml"
         );
 
         try {

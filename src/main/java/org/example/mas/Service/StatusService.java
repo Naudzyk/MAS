@@ -1,6 +1,5 @@
 package org.example.mas.Service;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,11 +10,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-
 @Service
 public class StatusService {
-    private final Map<String,Object> status = new ConcurrentHashMap<>();
-    private final static Logger logger = LoggerFactory.getLogger(StatusService.class);
+    private static final Logger logger = LoggerFactory.getLogger(StatusService.class);
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+    private final Map<String, Object> status = new ConcurrentHashMap<>();
 
     public StatusService() {
         status.put("ansibleStage", "WAITING_FOR_DEPLOYMENT_START");
@@ -23,10 +23,8 @@ public class StatusService {
         status.put("alerts", new String[0]);
         status.put("diagnosticLogs", "");
         status.put("lastUpdate", System.currentTimeMillis());
-        status.put("metric_", "ANALAZY");
         status.put("activeNodes", new ArrayList<String>());
         status.put("bootstrapStatus", "PENDING");
-
     }
 
     public Map<String, Object> getStatus() {
@@ -41,7 +39,7 @@ public class StatusService {
         logger.info("### StatusService updated: {} = {}", key, jsonString);
         try {
             if (jsonString != null && jsonString.trim().startsWith("{") && jsonString.endsWith("}")) {
-                Map<String, Object> obj = new ObjectMapper().readValue(jsonString, Map.class);
+                Map<String, Object> obj = OBJECT_MAPPER.readValue(jsonString, Map.class);
                 status.put(key, obj);
             } else {
                 status.put(key, jsonString);

@@ -1,30 +1,22 @@
 ### HTCondor Multi‑Agent Deployment System (JADE + Ansible)
 
-Система оркестрации, которая поэтапно разворачивает кластер Kubernetes и HTCondor с помощью агентов JADE, запускающих Ansible‑плейбуки. Порядок этапов строго последовательный и контролируется координатором.
+Система оркестрации, которая поэтапно разворачивает кластер Kubernetes и HTCondor с помощью агентов JADE, запускающих Ansible‑плейбуки.
 
 ### Что делает
 - Этапы: системная подготовка → containerd → установка Kubernetes → инициализация Kubernetes → Calico CNI → подготовка воркеров → присоединение воркеров → HTCondor.
-- Каждый этап исполняет отдельный агент. `CoordinatorAgent` шлёт `START_*`, агент запускает один плейбук и отвечает `COMPLETE`/`FAILED`.
+- Каждый этап исполняет отдельный агент. 
 
-### Требования
-- Машина управления (Linux):
+### Требования:
   - Java 17+ (OpenJDK)
   - Ansible 2.13+ (Python 3)
   - SSH‑доступ к целевым хостам
-- Целевые узлы (manager и worker): **Debian**, **Ubuntu**, **AstraLinux**, **RHEL**, **Rocky**, **AlmaLinux**, **Red OS (Рэд ОС)** — с systemd.
+  -  Целевые узлы (manager и worker): **Debian**, **Ubuntu**, **AstraLinux**, **RHEL**, **Rocky**, **AlmaLinux**, **Red OS (Рэд ОС)** — с systemd.
 
 ### Структура
 - `target/MAS-1.0-SNAPSHOT.jar` — собранное приложение (имя может отличаться)
 - `scripts/inventory.ini` — Ansible‑инвентарь
-- `scripts/` — каталог с плейбуками:
-  - `01_system_preparation.yml`
-  - `02_containerd.yml`
-  - `03_kubernetes_install.yml`
-  - `04_kubernetes_init.yml`
-  - `05_calico_cni.yml`
-  - `06_worker_preparation.yml`
-  - `07_worker_join.yml`
-  - `08_htcondor.yml`
+- `scripts/` — каталог с плейбуками
+
 
 ### Конфигурация (application.yml)
 Минимальные настройки:
@@ -44,7 +36,7 @@ mas:
 mas:
   playbooks:
     skip: 02_containerd.yml,03_kubernetes_install.yml
-    # sequence: 08_htcondor.yml,09_prometheus.yml,10_prometheus_server.yml
+    # sequence: 08_htcondor.yml
 ```
 
 ### Роли групп inventory
@@ -64,7 +56,6 @@ Bootstrap‑учётные данные читаются из группы `[boo
 **Пароль пула HTCondor** не храните в репозитории. Задайте его переменной окружения перед запуском:
 ```bash
 export CONDOR_CLUSTER_PASSWORD="ваш_секретный_пароль"
-java -jar target/MAS-1.0-SNAPSHOT.jar
 ```
 Без этой переменной плейбук `08_htcondor.yml` завершится с ошибкой.
 
@@ -95,54 +86,6 @@ worker ansible_host=192.168.56.105 ansible_user=vboxuser ansible_ssh_private_key
 По умолчанию берётся `/etc/kubernetes/admin.conf`. Если у вас другой путь, задайте его в `scripts/vars.yml`:
 ```yaml
 kubeconfig_path: "/path/to/your/kubeconfig"
-```
-
-### Запуск на существующем Kubernetes‑кластере
-Самый простой способ — включить режим существующего кластера:
-
-В `application.yml`:
-```yaml
-mas:
-  mode: existing-cluster
-```
-
-Или через переменную окружения:
-```
-MAS_MODE=existing-cluster
-```
-
-Это автоматически пропустит плейбуки установки Kubernetes и containerd (этап `01_system_preparation.yml` остаётся).
-
-Когда использовать `existing-cluster`:
-- Kubernetes уже установлен и работает.
-- containerd настроен и запущен.
-- Нужна только установка HTCondor/Prometheus поверх существующего кластера.
-
-Что именно пропускается:
-- `02_containerd.yml`
-- `03_kubernetes_install.yml`
-- `04_kubernetes_init.yml`
-- `05_calico_cni.yml`
-- `06_worker_preparation.yml`
-- `07_worker_join.yml`
-
-Также можно вручную задать список пропускаемых плейбуков:
-
-В `src/main/resources/application.yml`:
-```yaml
-mas:
-  playbooks:
-    skip: 02_containerd.yml,03_kubernetes_install.yml,04_kubernetes_init.yml,05_calico_cni.yml,06_worker_preparation.yml,07_worker_join.yml
-```
-
-Или через переменную окружения:
-```
-MAS_PLAYBOOKS_SKIP=02_containerd.yml,03_kubernetes_install.yml,04_kubernetes_init.yml,05_calico_cni.yml,06_worker_preparation.yml,07_worker_join.yml
-```
-
-Можно также задать явную последовательность:
-```
-MAS_PLAYBOOKS_SEQUENCE=08_htcondor.yml,09_prometheus.yml,10_prometheus_server.yml
 ```
 
 ### Установка зависимостей (Ubuntu/Debian)
