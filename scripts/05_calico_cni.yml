@@ -6,6 +6,10 @@
     - vars.yml
 
   tasks:
+    - name: Resolve OS family
+      set_fact:
+        resolved_os_family: "{{ 'redhat' if (ansible_os_family in ['RedHat','CentOS','Rocky','AlmaLinux','Fedora','RedOS'] or (ansible_distribution | default('')) in ['RedOS','Red OS']) else 'debian' }}"
+
     - name: Detect node IP by routing to API endpoint
       shell: ip -4 route get {{ central_manager_ip }} | awk '{for(i=1;i<=NF;i++) if($i=="src"){print $(i+1); exit}}'
       register: route_ip
@@ -41,10 +45,17 @@
         state: present
 
 
-    - name: Insatall CNI plugins required by kubelet
+    - name: Install CNI plugins required by kubelet (Debian/Ubuntu/AstraLinux)
       apt:
         name: kubernetes-cni
         state: present
+      when: resolved_os_family == 'debian'
+
+    - name: Install CNI plugins required by kubelet (RHEL/RedOS)
+      dnf:
+        name: kubernetes-cni
+        state: present
+      when: resolved_os_family == 'redhat'
 
 
     - name: Install Calico CNI

@@ -1,0 +1,18 @@
+# Пакеты для семейства Debian (Debian, Ubuntu, AstraLinux)
+# AstraLinux основан на Debian — используем тот же набор пакетов
+---
+os_pkg_manager: apt
+os_update_command: apt update
+
+os_packages:
+  - curl
+  - ca-certificates
+  - gnupg
+  - apt-transport-https
+  - conntrack
+  - socat
+  - ebtables
+  - ipset
+  - lsof
+  - jq
+  - python3-pip

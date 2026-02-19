@@ -4,7 +4,23 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version  04.02.2026 ver 1&quot;" />
+    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version  05.02.2026 ver 1&quot;">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/01_system_preparation.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/01_system_preparation.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/02_containerd.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/02_containerd.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/03_kubernetes_install.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/03_kubernetes_install.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/05_calico_cni.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/05_calico_cni.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/08_htcondor.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/08_htcondor.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/09_prometheus.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/10_prometheus_server.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/inventory.ini" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/inventory.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/prometheus.yml.j2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/vars.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/vars.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/CoordinatorAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/CoordinatorAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/CoordinatorAgent$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/CoordinatorAgent$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/CoordinatorAgent.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/CoordinatorAgent.class" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -240,14 +256,9 @@
       <workItem from="1770088852206" duration="334000" />
       <workItem from="1770174762317" duration="966000" />
       <workItem from="1770176825321" duration="171000" />
-    </task>
-    <task id="LOCAL-00037" summary="&quot;New Version 7.6&quot;">
-      <option name="closed" value="true" />
-      <created>1761993715072</created>
-      <option name="number" value="00037" />
-      <option name="presentableId" value="LOCAL-00037" />
-      <option name="project" value="LOCAL" />
-      <updated>1761993715072</updated>
+      <workItem from="1770260386746" duration="102000" />
+      <workItem from="1771393131432" duration="11000" />
+      <workItem from="1771473647985" duration="87000" />
     </task>
     <task id="LOCAL-00038" summary="&quot;New Version 7.7&quot;">
       <option name="closed" value="true" />
@@ -633,7 +644,15 @@
       <option name="project" value="LOCAL" />
       <updated>1770176980809</updated>
     </task>
-    <option name="localTasksCounter" value="86" />
+    <task id="LOCAL-00086" summary="&quot;Version  05.02.2026 ver 1&quot;">
+      <option name="closed" value="true" />
+      <created>1770260419490</created>
+      <option name="number" value="00086" />
+      <option name="presentableId" value="LOCAL-00086" />
+      <option name="project" value="LOCAL" />
+      <updated>1770260419490</updated>
+    </task>
+    <option name="localTasksCounter" value="87" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -654,7 +673,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="&quot;Version not Web 8.3&quot;" />
     <MESSAGE value="&quot;Version not Web 8.4&quot;" />
     <MESSAGE value="&quot;Version Spring-Web 8.4&quot;" />
     <MESSAGE value="&quot;Version Spring-Web 8.4.1&quot;" />
@@ -679,7 +697,8 @@
     <MESSAGE value="&quot;Version  02.02.2026 ver 2&quot;" />
     <MESSAGE value="&quot;Version  03.02.2026 ver 1&quot;" />
     <MESSAGE value="&quot;Version  04.02.2026 ver 1&quot;" />
-    <option name="LAST_COMMIT_MESSAGE" value="&quot;Version  04.02.2026 ver 1&quot;" />
+    <MESSAGE value="&quot;Version  05.02.2026 ver 1&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="&quot;Version  05.02.2026 ver 1&quot;" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
