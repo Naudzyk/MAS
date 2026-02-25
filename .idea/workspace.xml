@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version  02.02.2026 ver 2&quot;">
+    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version  25.02.2026 ver 2&quot;">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/application.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,7 +22,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="tets_branch" />
+        <entry key="$PROJECT_DIR$" value="master" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -241,70 +240,13 @@
       <workItem from="1770005308536" duration="1011000" />
       <workItem from="1770088454865" duration="28000" />
       <workItem from="1770088852206" duration="334000" />
-    </task>
-    <task id="LOCAL-00033" summary="&quot;New Version 7.2&quot;">
-      <option name="closed" value="true" />
-      <created>1761461518004</created>
-      <option name="number" value="00033" />
-      <option name="presentableId" value="LOCAL-00033" />
-      <option name="project" value="LOCAL" />
-      <updated>1761461518004</updated>
-    </task>
-    <task id="LOCAL-00034" summary="&quot;New Version 7.2&quot;">
-      <option name="closed" value="true" />
-      <created>1761461655487</created>
-      <option name="number" value="00034" />
-      <option name="presentableId" value="LOCAL-00034" />
-      <option name="project" value="LOCAL" />
-      <updated>1761461655487</updated>
-    </task>
-    <task id="LOCAL-00035" summary="&quot;New Version 7.2&quot;">
-      <option name="closed" value="true" />
-      <created>1761471667386</created>
-      <option name="number" value="00035" />
-      <option name="presentableId" value="LOCAL-00035" />
-      <option name="project" value="LOCAL" />
-      <updated>1761471667386</updated>
-    </task>
-    <task id="LOCAL-00036" summary="&quot;New Version 7.5&quot;">
-      <option name="closed" value="true" />
-      <created>1761565971617</created>
-      <option name="number" value="00036" />
-      <option name="presentableId" value="LOCAL-00036" />
-      <option name="project" value="LOCAL" />
-      <updated>1761565971617</updated>
-    </task>
-    <task id="LOCAL-00037" summary="&quot;New Version 7.6&quot;">
-      <option name="closed" value="true" />
-      <created>1761993715072</created>
-      <option name="number" value="00037" />
-      <option name="presentableId" value="LOCAL-00037" />
-      <option name="project" value="LOCAL" />
-      <updated>1761993715072</updated>
-    </task>
-    <task id="LOCAL-00038" summary="&quot;New Version 7.7&quot;">
-      <option name="closed" value="true" />
-      <created>1762056019776</created>
-      <option name="number" value="00038" />
-      <option name="presentableId" value="LOCAL-00038" />
-      <option name="project" value="LOCAL" />
-      <updated>1762056019776</updated>
-    </task>
-    <task id="LOCAL-00039" summary="&quot;New Version 7.8&quot;">
-      <option name="closed" value="true" />
-      <created>1762057470929</created>
-      <option name="number" value="00039" />
-      <option name="presentableId" value="LOCAL-00039" />
-      <option name="project" value="LOCAL" />
-      <updated>1762057470929</updated>
-    </task>
-    <task id="LOCAL-00040" summary="&quot;Version not Web 8&quot;">
-      <option name="closed" value="true" />
-      <created>1762070151618</created>
-      <option name="number" value="00040" />
-      <option name="presentableId" value="LOCAL-00040" />
-      <option name="project" value="LOCAL" />
-      <updated>1762070151618</updated>
+      <workItem from="1770174762317" duration="966000" />
+      <workItem from="1770176825321" duration="171000" />
+      <workItem from="1770260386746" duration="102000" />
+      <workItem from="1771393131432" duration="11000" />
+      <workItem from="1771473647985" duration="87000" />
+      <workItem from="1771993122548" duration="195000" />
+      <workItem from="1771993557519" duration="11000" />
     </task>
     <task id="LOCAL-00041" summary="&quot;Version not Web 8.1 add prometheus&quot;">
       <option name="closed" value="true" />
@@ -634,7 +576,71 @@
       <option name="project" value="LOCAL" />
       <updated>1770006343168</updated>
     </task>
-    <option name="localTasksCounter" value="82" />
+    <task id="LOCAL-00082" summary="&quot;Version  03.02.2026 ver 1&quot;">
+      <option name="closed" value="true" />
+      <created>1770089556561</created>
+      <option name="number" value="00082" />
+      <option name="presentableId" value="LOCAL-00082" />
+      <option name="project" value="LOCAL" />
+      <updated>1770089556561</updated>
+    </task>
+    <task id="LOCAL-00083" summary="&quot;Version  04.02.2026 ver 1&quot;">
+      <option name="closed" value="true" />
+      <created>1770176862712</created>
+      <option name="number" value="00083" />
+      <option name="presentableId" value="LOCAL-00083" />
+      <option name="project" value="LOCAL" />
+      <updated>1770176862712</updated>
+    </task>
+    <task id="LOCAL-00084" summary="&quot;Version  04.02.2026 ver 1&quot;">
+      <option name="closed" value="true" />
+      <created>1770176877172</created>
+      <option name="number" value="00084" />
+      <option name="presentableId" value="LOCAL-00084" />
+      <option name="project" value="LOCAL" />
+      <updated>1770176877172</updated>
+    </task>
+    <task id="LOCAL-00085" summary="&quot;Version  04.02.2026 ver 1&quot;">
+      <option name="closed" value="true" />
+      <created>1770176980809</created>
+      <option name="number" value="00085" />
+      <option name="presentableId" value="LOCAL-00085" />
+      <option name="project" value="LOCAL" />
+      <updated>1770176980809</updated>
+    </task>
+    <task id="LOCAL-00086" summary="&quot;Version  05.02.2026 ver 1&quot;">
+      <option name="closed" value="true" />
+      <created>1770260419490</created>
+      <option name="number" value="00086" />
+      <option name="presentableId" value="LOCAL-00086" />
+      <option name="project" value="LOCAL" />
+      <updated>1770260419490</updated>
+    </task>
+    <task id="LOCAL-00087" summary="&quot;Version  19.02.2026 ver 2&quot;">
+      <option name="closed" value="true" />
+      <created>1771477908654</created>
+      <option name="number" value="00087" />
+      <option name="presentableId" value="LOCAL-00087" />
+      <option name="project" value="LOCAL" />
+      <updated>1771477908654</updated>
+    </task>
+    <task id="LOCAL-00088" summary="&quot;Version  19.02.2026 ver 2&quot;">
+      <option name="closed" value="true" />
+      <created>1771478113526</created>
+      <option name="number" value="00088" />
+      <option name="presentableId" value="LOCAL-00088" />
+      <option name="project" value="LOCAL" />
+      <updated>1771478113527</updated>
+    </task>
+    <task id="LOCAL-00089" summary="&quot;Version  25.02.2026 ver 2&quot;">
+      <option name="closed" value="true" />
+      <created>1771993292451</created>
+      <option name="number" value="00089" />
+      <option name="presentableId" value="LOCAL-00089" />
+      <option name="project" value="LOCAL" />
+      <updated>1771993292451</updated>
+    </task>
+    <option name="localTasksCounter" value="90" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -655,11 +661,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="&quot;Version not Web 8.2&quot;" />
-    <MESSAGE value="&quot;Version not Web 8.2.1&quot;" />
-    <MESSAGE value="&quot;Version not Web 8.3&quot;" />
-    <MESSAGE value="&quot;Version not Web 8.4&quot;" />
-    <MESSAGE value="&quot;Version Spring-Web 8.4&quot;" />
     <MESSAGE value="&quot;Version Spring-Web 8.4.1&quot;" />
     <MESSAGE value="&quot;Version Spring-Web 8.4.3&quot;" />
     <MESSAGE value="&quot;Version Spring-Web 8.5&quot;" />
@@ -680,7 +681,12 @@
     <MESSAGE value="&quot;Version  13.9&quot;" />
     <MESSAGE value="&quot;Version  02.02.2026&quot;" />
     <MESSAGE value="&quot;Version  02.02.2026 ver 2&quot;" />
-    <option name="LAST_COMMIT_MESSAGE" value="&quot;Version  02.02.2026 ver 2&quot;" />
+    <MESSAGE value="&quot;Version  03.02.2026 ver 1&quot;" />
+    <MESSAGE value="&quot;Version  04.02.2026 ver 1&quot;" />
+    <MESSAGE value="&quot;Version  05.02.2026 ver 1&quot;" />
+    <MESSAGE value="&quot;Version  19.02.2026 ver 2&quot;" />
+    <MESSAGE value="&quot;Version  25.02.2026 ver 2&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="&quot;Version  25.02.2026 ver 2&quot;" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

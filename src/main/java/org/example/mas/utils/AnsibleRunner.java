@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class AnsibleRunner {
@@ -22,11 +23,25 @@ public class AnsibleRunner {
      * @return true, если успешно
      */
     public static AnsibleResult run(String playbook, String inventoryPath, String workingDir, int timeoutMinutes) {
+        return run(playbook, inventoryPath, workingDir, timeoutMinutes, null);
+    }
+
+    /**
+     * Запускает Ansible-плейбук. Окружение процесса наследуется от JVM; при необходимости
+     * передайте extraEnv (например CONDOR_CLUSTER_PASSWORD из конфига).
+     */
+    public static AnsibleResult run(String playbook, String inventoryPath, String workingDir, int timeoutMinutes,
+                                    Map<String, String> extraEnv) {
         try {
+            File workDir = new File(workingDir);
+            String varsPath = new File(workDir, "vars.yml").getAbsolutePath();
             ProcessBuilder pb = new ProcessBuilder("ansible-playbook", "-i", inventoryPath,
-                "--extra-vars", "@vars.yml", playbook);
-            pb.directory(new File(workingDir));
+                    "--extra-vars", "@" + varsPath, playbook);
+            pb.directory(workDir);
             pb.environment().put("ANSIBLE_HOST_KEY_CHECKING", "False");
+            if (extraEnv != null && !extraEnv.isEmpty()) {
+                pb.environment().putAll(extraEnv);
+            }
             pb.redirectErrorStream(true);
 
             Process process = pb.start();

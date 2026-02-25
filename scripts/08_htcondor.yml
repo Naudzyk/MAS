@@ -6,6 +6,11 @@
     - vars.yml
 
   tasks:
+    - name: Fail if Condor cluster password is not set
+      fail:
+        msg: "Задайте пароль пула HTCondor: export CONDOR_CLUSTER_PASSWORD=your_secret"
+      when: condor_cluster_password | default('') | length == 0
+
     - name: Ensure condor logs dir exists on all nodes
       file:
         path: "{{ condor_logs_dir }}"
