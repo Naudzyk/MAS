@@ -1,5 +1,4 @@
 ---
-# Подготовка системы для Kubernetes (multi-OS: Debian, Ubuntu, AstraLinux, RHEL, Rocky, AlmaLinux, RedOS)
 - name: Prepare system for Kubernetes
   hosts: all
   gather_facts: yes
@@ -59,7 +58,7 @@
         content: |
           overlay
           br_netfilter
-      mode: "0644"
+        mode: "0644"
 
     - name: Load kernel modules
       shell: |
@@ -76,7 +75,7 @@
           net.bridge.bridge-nf-call-iptables  = 1
           net.bridge.bridge-nf-call-ip6tables = 1
           net.ipv4.ip_forward                 = 1
-      mode: "0644"
+        mode: "0644"
 
     - name: Apply sysctl params
       command: sysctl --system
