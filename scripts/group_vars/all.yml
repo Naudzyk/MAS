@@ -1,3 +1,1 @@
-# Переменные для всех хостов (подставляются из inventory)
-# central_manager_ip берётся автоматически из первого узла в группе [central_manager]
 central_manager_ip: "{{ hostvars[groups['central_manager'][0]].ansible_host | default(groups['central_manager'][0]) }}"

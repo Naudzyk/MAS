@@ -1,0 +1,19 @@
+# Пакеты для семейства RedHat (RHEL, Rocky, AlmaLinux, RedOS)
+# Red OS (Рэд ОС) основан на RHEL — используем тот же набор пакетов
+---
+os_pkg_manager: dnf
+os_update_command: dnf makecache -y
+
+os_packages:
+  - curl
+  - ca-certificates
+  - gnupg2
+  - conntrack-tools
+  - socat
+  - ebtables
+  - ipset
+  - lsof
+  - jq
+  - python3-pip
+  - libseccomp
+  - container-selinux

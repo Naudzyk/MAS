@@ -1,17 +1,8 @@
 ansible_python_interpreter: /usr/bin/python3
-# central_manager_ip задаётся в group_vars/all.yml из inventory
 
 k8s_version: "1.30.7"
 pause_version: "3.9"
 condor_image: "evgenii457/htcondor2"
 condor_logs_dir: "/var/log/condor"
-# Пароль пула HTCondor — из переменной окружения (не хранить в репозитории)
 condor_cluster_password: "{{ lookup('env', 'CONDOR_CLUSTER_PASSWORD') }}"
 kube_network_plugins: "calico"
-
-
-
-#Мониторинг
-victoriametrics_version: "v1.135.0"
-victoriametrics_storage_path: "/var/lib/victoriametrics"
-victoriametrics_retention_period: "1"  

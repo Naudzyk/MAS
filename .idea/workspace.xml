@@ -4,23 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version  05.02.2026 ver 1&quot;">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/01_system_preparation.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/01_system_preparation.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/02_containerd.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/02_containerd.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/03_kubernetes_install.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/03_kubernetes_install.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/05_calico_cni.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/05_calico_cni.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/08_htcondor.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/08_htcondor.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/09_prometheus.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/10_prometheus_server.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/inventory.ini" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/inventory.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/prometheus.yml.j2" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/vars.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/vars.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/CoordinatorAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/CoordinatorAgent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/CoordinatorAgent$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/CoordinatorAgent$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/CoordinatorAgent.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/Agent/CoordinatorAgent.class" afterDir="false" />
-    </list>
+    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version  26.02.2026 ver 2&quot;" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
