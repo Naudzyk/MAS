@@ -7,9 +7,6 @@
     - vars.yml
 
   vars:
-    # Определяем семейство ОС: debian (apt) или redhat (dnf)
-    # AstraLinux (Astra Linux) — на базе Debian
-    # RedOS (Рэд ОС) — на базе RHEL
     _debian_like:
       - Debian
       - Ubuntu
