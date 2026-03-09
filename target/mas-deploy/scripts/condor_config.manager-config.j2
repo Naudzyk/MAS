@@ -1,0 +1,65 @@
+# HTCondor Central Manager Configuration
+RELEASE_DIR = /usr
+LOCAL_DIR = /var
+REQUIRE_LOCAL_CONFIG_FILE = false
+CONDOR_HOST = htcondor-manager.default.svc.cluster.local
+COLLECTOR_HOST = htcondor-manager.default.svc.cluster.local
+DAEMON_LIST = MASTER, COLLECTOR, NEGOTIATOR, SCHEDD
+
+# Network Configuration
+NETWORK_INTERFACE = *
+BIND_ALL_INTERFACES = false
+COLLECTOR_PORT = 9618
+USE_SHARED_PORT = false
+
+# Security Configuration
+SEC_DEFAULT_AUTHENTICATION = OPTIONAL
+SEC_DEFAULT_AUTHENTICATION_METHODS = PASSWORD, FS, ANON
+SEC_PASSWORD_FILE = /etc/condor/passwords.d/POOL
+SEC_DAEMON_AUTHENTICATION = OPTIONAL
+SEC_DAEMON_AUTHENTICATION_METHODS = PASSWORD, FS, ANON
+SEC_NEGOTIATOR_AUTHENTICATION = OPTIONAL
+SEC_NEGOTIATOR_AUTHENTICATION_METHODS = PASSWORD, FS, ANON
+SEC_CLIENT_AUTHENTICATION = OPTIONAL
+SEC_CLIENT_AUTHENTICATION_METHODS = PASSWORD, FS, ANON
+# Access Control
+ALLOW_READ = *
+ALLOW_WRITE = *
+ALLOW_DAEMON = *
+ALLOW_NEGOTIATOR = *
+ALLOW_ADMINISTRATOR = *
+# Performance Tuning
+SCHEDD_INTERVAL = 5
+NEGOTIATOR_INTERVAL = 2
+UPDATE_INTERVAL = 5
+
+# Paths
+RUN     = $(LOCAL_DIR)/run/condor
+LOG     = $(LOCAL_DIR)/log/condor
+LOCK    = $(LOCAL_DIR)/lock/condor
+SPOOL   = $(LOCAL_DIR)/spool/condor
+EXECUTE = $(LOCAL_DIR)/lib/condor/execute
+CRED_STORE_DIR = $(LOCAL_DIR)/lib/condor/cred_dir
+ETC     = /etc/condor
+BIN     = $(RELEASE_DIR)/bin
+LIB     = $(RELEASE_DIR)/lib/condor
+INCLUDE = $(RELEASE_DIR)/include/condor
+SBIN    = $(RELEASE_DIR)/sbin
+LIBEXEC = $(RELEASE_DIR)/libexec/condor
+SHARE   = $(RELEASE_DIR)/share/condor
+GANGLIA_LIB64_PATH = /lib,/usr/lib,/usr/local/lib
+
+# Account for different pki locations for Debian
+AUTH_SSL_SERVER_CAFILE   = /etc/ssl/certs/ca-certificates.crt
+AUTH_SSL_CLIENT_CAFILE   = /etc/ssl/certs/ca-certificates.crt
+AUTH_SSL_SERVER_CERTFILE = /etc/ssl/certs/ssl-cert-snakeoil.pem
+AUTH_SSL_SERVER_KEYFILE  = /etc/ssl/private/ssl-cert-snakeoil.key
+
+# Disable SharedPort
+SHARED_PORT = false
+SHARED_PORT_FILE =
+
+# Roles
+use ROLE: CentralManager
+use ROLE: Submit
+use ROLE: Execute

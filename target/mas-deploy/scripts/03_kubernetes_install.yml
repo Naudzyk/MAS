@@ -1,0 +1,183 @@
+---
+# Установка компонентов Kubernetes (multi-OS: Debian, Ubuntu, AstraLinux, RHEL, Rocky, RedOS)
+- name: Install Kubernetes components
+  hosts: all
+  gather_facts: yes
+  become: yes
+  vars_files:
+    - vars.yml
+
+  vars:
+    k8s_repo_version: "v{{ k8s_version.split('.')[0] }}.{{ k8s_version.split('.')[1] }}"
+    _debian_like: [Debian, Ubuntu, "Astra Linux"]
+    _redhat_like: [RedHat, CentOS, Rocky, AlmaLinux, Fedora, RedOS]
+
+  tasks:
+    - name: Resolve OS family
+      set_fact:
+        resolved_os_family: "{{ 'redhat' if (ansible_os_family in _redhat_like or (ansible_distribution | default('')) in ['RedOS', 'Red OS']) else 'debian' }}"
+
+    # --- Debian/Ubuntu/AstraLinux ---
+    - name: Ensure keyring dir exists
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: "0755"
+      when: resolved_os_family == 'debian'
+
+    - name: Add Kubernetes apt key (pkgs.k8s.io)
+      shell: |
+        mkdir -p /etc/apt/keyrings
+        curl -fsSL https://pkgs.k8s.io/core:/stable:/{{ k8s_repo_version }}/deb/Release.key \
+          | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+      args:
+        creates: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+      when: resolved_os_family == 'debian'
+
+    - name: Add Kubernetes apt repo
+      apt_repository:
+        repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/{{ k8s_repo_version }}/deb/ /"
+        filename: kubernetes
+        state: present
+      when: resolved_os_family == 'debian'
+
+    - name: apt update after repo add
+      apt:
+        update_cache: yes
+      when: resolved_os_family == 'debian'
+
+    # --- RHEL/Rocky/RedOS ---
+    - name: Add Kubernetes dnf repo (pkgs.k8s.io)
+      copy:
+        dest: /etc/yum.repos.d/kubernetes.repo
+        content: |
+          [kubernetes]
+          name=Kubernetes
+          baseurl=https://pkgs.k8s.io/core:/stable:/{{ k8s_repo_version }}/rpm/
+          enabled=1
+          gpgcheck=1
+          gpgkey=https://pkgs.k8s.io/core:/stable:/{{ k8s_repo_version }}/rpm/repodata/repomd.xml.key
+        mode: "0644"
+      when: resolved_os_family == 'redhat'
+
+    # --- Установка пакетов ---
+    - name: Unhold kube* (Debian)
+      command: apt-mark unhold kubelet kubeadm kubectl
+      changed_when: false
+      ignore_errors: true
+      when: resolved_os_family == 'debian'
+
+    - name: Detect exact package versions (Debian)
+      shell: |
+        set -e
+        for pkg in kubeadm kubelet kubectl; do
+          ver=$(apt-cache madison $pkg | awk '/{{ k8s_version }}-/{print $3; exit}')
+          if [ -z "$ver" ]; then echo "NO_VERSION_FOR_{{ k8s_version }}" >&2; exit 1; fi
+          echo "$pkg=$ver"
+        done
+      register: k8s_pkg_versions
+      changed_when: false
+      when: resolved_os_family == 'debian'
+
+    - name: Install k8s packages (Debian)
+      apt:
+        name: "{{ item }}"
+        state: present
+        allow_downgrade: yes
+      loop: "{{ k8s_pkg_versions.stdout_lines }}"
+      when: resolved_os_family == 'debian'
+
+    - name: Install k8s packages (RHEL)
+      dnf:
+        name:
+          - kubeadm-{{ k8s_version }}
+          - kubelet-{{ k8s_version }}
+          - kubectl-{{ k8s_version }}
+        state: present
+        disable_gpg_check: false
+      when: resolved_os_family == 'redhat'
+
+    - name: Hold kube* (Debian)
+      command: apt-mark hold kubelet kubeadm kubectl
+      changed_when: false
+      when: resolved_os_family == 'debian'
+
+    - name: Make KUBECONFIG global
+      copy:
+        dest: /etc/profile.d/kubectl.sh
+        mode: "0644"
+        content: |
+          export KUBECONFIG=/etc/kubernetes/admin.conf
+      when: "'central_manager' in group_names"
+      run_once: true
+      delegate_to: "{{ groups['central_manager'][0] }}"
+
+    - name: Remove conflicting kubernetes binaries from /usr/local/bin
+      file:
+        path: "/usr/local/bin/{{ item }}"
+        state: absent
+      loop:
+        - kubeadm
+        - kubelet
+        - kubectl
+
+    - name: Verify kube* versions
+      shell: |
+        set -e
+        echo "kubeadm: $(/usr/bin/kubeadm version -o=short)"
+        echo "kubelet: $(/usr/bin/kubelet --version)"
+        echo "kubectl: $(/usr/bin/kubectl version --client -o=json | jq -r .clientVersion.gitVersion)"
+      register: k8s_bin_versions
+      changed_when: false
+
+    - name: Show versions
+      debug:
+        var: k8s_bin_versions.stdout_lines
+
+    - name: Disable swap
+      shell: |
+        swapoff -a || true
+        sed -i.bak '/\sswap\s/ s/^/#/' /etc/fstab
+      args:
+        executable: /bin/bash
+
+    - name: Detect node IP by routing to API endpoint
+      shell: ip -4 route get {{ central_manager_ip }} | awk '{for(i=1;i<=NF;i++) if($i=="src"){print $(i+1); exit}}'
+      register: route_ip
+      changed_when: false
+      failed_when: route_ip.rc != 0 and (route_ip.stdout | trim) == ""
+
+    - name: Compute kubelet node-ip
+      set_fact:
+        k8s_node_ip: "{{ (route_ip.stdout | trim) | default(ansible_default_ipv4.address, true) }}"
+
+    - name: Ensure kubelet env dir exists (RHEL)
+      file:
+        path: /etc/sysconfig
+        state: directory
+        mode: "0755"
+      when: resolved_os_family == 'redhat'
+
+    - name: Ensure kubelet uses auto-detected node-ip
+      copy:
+        dest: "{{ '/etc/sysconfig/kubelet' if resolved_os_family == 'redhat' else '/etc/default/kubelet' }}"
+        content: |
+          KUBELET_EXTRA_ARGS="--node-ip={{ k8s_node_ip }}"
+      notify: Restart kubelet
+
+    - name: Remove conflicting kubelet override
+      file:
+        path: /etc/systemd/system/kubelet.service.d/10-kubelet.conf
+        state: absent
+
+    - name: Enable kubelet
+      systemd:
+        name: kubelet
+        enabled: yes
+
+  handlers:
+    - name: Restart kubelet
+      systemd:
+        name: kubelet
+        state: restarted
+        daemon_reload: yes

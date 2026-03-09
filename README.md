@@ -17,6 +17,34 @@
 - `scripts/inventory.ini` — Ansible‑инвентарь
 - `scripts/` — каталог с плейбуками
 
+### Минимальное развёртывание на узле (только JAR + scripts)
+
+Чтобы не копировать весь проект (исходники, pom.xml и т.д.), соберите дистрибутив и перенесите на узел только его:
+
+1. **Сборка дистрибутива** (на машине с Maven):
+   ```bash
+   mvn package -Pdist
+   ```
+   В каталоге `target/mas-deploy/` появятся:
+   - `MAS-1.0-SNAPSHOT.jar`
+   - `scripts/` — плейбуки, inventory, vars, group_vars, os, шаблоны
+
+2. **Копирование на узел** (одной папкой):
+   ```bash
+   scp -r target/mas-deploy user@node:/opt/mas
+   # или: rsync -av target/mas-deploy/ user@node:/opt/mas/
+   ```
+
+3. **Запуск на узле** из каталога дистрибутива:
+   ```bash
+   cd /opt/mas
+   export CONDOR_CLUSTER_PASSWORD="ваш_пароль"
+   # при необходимости отредактируйте scripts/inventory.ini
+   java -jar MAS-1.0-SNAPSHOT.jar
+   ```
+
+Пути в приложении заданы относительно рабочего каталога: `scripts/inventory.ini` и `scripts/` — поэтому запускать нужно из папки, где лежат `jar` и каталог `scripts`.
+
 
 ### Конфигурация (application.yml)
 Минимальные настройки:
@@ -75,7 +103,8 @@ worker ansible_host=192.168.56.105 ansible_user=vboxuser ansible_ssh_private_key
 1. Заполните `scripts/inventory.ini`.
 2. Убедитесь, что плейбуки лежат в `scripts/`.
 3. Запустите приложение:
-   - `java -jar target/MAS-1.0-SNAPSHOT.jar`
+   - из корня проекта: `java -jar target/MAS-1.0-SNAPSHOT.jar`
+   - или используйте минимальный дистрибутив (см. «Минимальное развёртывание на узле»): скопируйте `target/mas-deploy/` на узел и запускайте `java -jar` из этой папки.
 4. Приложение автоматически запускает `BootstrapAgent` для узлов из группы `[bootstrap]`.
 5. После успешного bootstrap автоматически стартует `CoordinatorAgent`, который запускает плейбуки по этапам.
 
