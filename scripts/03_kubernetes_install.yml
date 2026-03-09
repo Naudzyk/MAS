@@ -1,5 +1,4 @@
 ---
-# Установка компонентов Kubernetes (multi-OS: Debian, Ubuntu, AstraLinux, RHEL, Rocky, RedOS)
 - name: Install Kubernetes components
   hosts: all
   gather_facts: yes

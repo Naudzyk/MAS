@@ -1,5 +1,4 @@
 ---
-# Установка и настройка containerd (multi-OS: Debian, Ubuntu, AstraLinux, RHEL, Rocky, RedOS)
 - name: Install and configure containerd
   hosts: all
   gather_facts: yes
