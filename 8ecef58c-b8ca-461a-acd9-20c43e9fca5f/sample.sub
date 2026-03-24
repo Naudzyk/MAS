@@ -1,0 +1,7 @@
+executable     = sample.sh
+transfer_input_files = samples.txt max_order.txt parameter_file.csv
+transfer_output_files = model_input.csv
+log                     = sample.job.log
+error                   = sample.job.err
+output 					= sample.job.output
+queue

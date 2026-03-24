@@ -4,7 +4,26 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version  26.02.2026 ver 2&quot;" />
+    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version  26.02.2026 ver 2&quot;">
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_09_03_2026_14_40_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/02_containerd.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/02_containerd.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/03_kubernetes_install.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/03_kubernetes_install.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/04_kubernetes_init.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/04_kubernetes_init.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/05_calico_cni.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/05_calico_cni.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/08_htcondor.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/08_htcondor.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/vars.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/vars.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/internal/InternalAgentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/internal/InternalAgentController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar.original" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/example/mas/internal/InternalAgentController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/org/example/mas/internal/InternalAgentController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/mas-deploy-v1.0.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/mas-deploy/MAS-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/mas-deploy/MAS-1.0-SNAPSHOT.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/mas-deploy/scripts/04_kubernetes_init.yml" beforeDir="false" afterPath="$PROJECT_DIR$/target/mas-deploy/scripts/04_kubernetes_init.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -33,7 +52,7 @@
     </favorite-branches>
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="test_branch" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -91,10 +110,10 @@
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "test__branch",
+    "git-widget-placeholder": "master",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/EVgeNII/Desktop/jade.jar",
+    "last_opened_file_path": "C:/Users/EVgeNII/IdeaProjects/MAS/target/mas-deploy",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -109,6 +128,7 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\EVgeNII\IdeaProjects\MAS\target\mas-deploy" />
       <recent name="C:\Users\EVgeNII\Desktop\MAS" />
       <recent name="C:\Users\EVgeNII\Desktop\MAS\scripts" />
     </key>
@@ -261,14 +281,12 @@
       <workItem from="1771994096542" duration="654000" />
       <workItem from="1771995965482" duration="4000" />
       <workItem from="1773037512502" duration="378000" />
-    </task>
-    <task id="LOCAL-00044" summary="&quot;Version not Web 8.3&quot;">
-      <option name="closed" value="true" />
-      <created>1762167925832</created>
-      <option name="number" value="00044" />
-      <option name="presentableId" value="LOCAL-00044" />
-      <option name="project" value="LOCAL" />
-      <updated>1762167925832</updated>
+      <workItem from="1773042155004" duration="1271000" />
+      <workItem from="1773474711341" duration="818000" />
+      <workItem from="1773476073049" duration="48000" />
+      <workItem from="1773488321364" duration="57000" />
+      <workItem from="1774333755138" duration="198000" />
+      <workItem from="1774337553540" duration="88000" />
     </task>
     <task id="LOCAL-00045" summary="&quot;Version not Web 8.4&quot;">
       <option name="closed" value="true" />
@@ -654,7 +672,15 @@
       <option name="project" value="LOCAL" />
       <updated>1773037868385</updated>
     </task>
-    <option name="localTasksCounter" value="93" />
+    <task id="LOCAL-00093" summary="&quot;Version  26.02.2026 ver 2&quot;">
+      <option name="closed" value="true" />
+      <created>1773038494551</created>
+      <option name="number" value="00093" />
+      <option name="presentableId" value="LOCAL-00093" />
+      <option name="project" value="LOCAL" />
+      <updated>1773038494551</updated>
+    </task>
+    <option name="localTasksCounter" value="94" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

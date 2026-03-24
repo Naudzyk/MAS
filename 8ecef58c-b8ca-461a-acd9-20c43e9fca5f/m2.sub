@@ -1,0 +1,7 @@
+executable     = m2.sh
+transfer_input_files = duckdb.json model_input.txt salib_highs.xml gas2003_in.sqlite3 gas2003.duckdb salib_highs.xml libtbb.so libtbbmalloc.so libtbbmalloc_proxy.so libtbb.so.2 libtbbmalloc.so.2 libtbbmalloc_proxy.so.2
+transfer_output_files = stat2.txt gas2003_out.duckdb
+log                     = m2.job.log
+error                   = m2.job.err
+output 					= m2.job.output
+queue

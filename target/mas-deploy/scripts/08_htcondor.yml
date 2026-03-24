@@ -4,6 +4,9 @@
   become: yes
   vars_files:
     - vars.yml
+  vars:
+    # kubeadm leaves admin.conf here; override if you use ~/.kube/config
+    kubeconfig_path: /etc/kubernetes/admin.conf
 
   tasks:
     - name: Fail if Condor cluster password is not set
@@ -30,7 +33,7 @@
 
     - name: Create ConfigMap for HTCondor Central Manager
       kubernetes.core.k8s:
-        kubeconfig: /root/.kube/config
+        kubeconfig: "{{ kubeconfig_path }}"
         state: present
         definition:
           apiVersion: v1
@@ -47,7 +50,7 @@
 
     - name: Create ConfigMap for HTCondor Execute nodes
       kubernetes.core.k8s:
-        kubeconfig: /root/.kube/config
+        kubeconfig: "{{ kubeconfig_path }}"
         state: present
         definition:
           apiVersion: v1
@@ -64,7 +67,7 @@
 
     - name: Create Service for HTCondor Manager
       kubernetes.core.k8s:
-        kubeconfig: /root/.kube/config
+        kubeconfig: "{{ kubeconfig_path }}"
         state: present
         definition:
           apiVersion: v1
@@ -86,13 +89,13 @@
       delegate_to: central_manager
       run_once: true
 
-    - name: Deploy HTCondor Manager (Deployment)
+    - name: Deploy HTCondor Manager (StatefulSet)
       kubernetes.core.k8s:
-        kubeconfig: /root/.kube/config
+        kubeconfig: "{{ kubeconfig_path }}"
         state: present
         definition:
           apiVersion: apps/v1
-          kind: Deployment
+          kind: StatefulSet
           metadata:
             name: htcondor-manager
             namespace: default
@@ -121,7 +124,8 @@
                     effect: "NoSchedule"
                 containers:
                   - name: htcondor
-                    image: "{{ condor_image | default('evgenii457/htcondor2') }}"
+                    image: "{{ condor_image | default('docker.io/evgenii457/htcondor2:latest') }}"
+                    imagePullPolicy: "{{ condor_image_pull_policy | default('IfNotPresent') }}"
                     env:
                       - name: CONDOR_CONFIG
                         value: "/etc/condor/condor_config"
@@ -161,170 +165,210 @@
       run_once: true
 
     - name: Create DaemonSet for Execute Nodes
-      kubernetes.core.k8s:
-        kubeconfig: /root/.kube/config
-        state: present
-        wait: yes
-        wait_timeout: 600
-        definition:
-          apiVersion: apps/v1
-          kind: DaemonSet
-          metadata:
-            name: htcondor-execute
-            namespace: default
-            labels:
-              app: htcondor
-              role: execute
-          spec:
-            selector:
-              matchLabels:
-                app: htcondor
-                role: execute
-            template:
+      block:
+        - name: Apply DaemonSet manifest
+          kubernetes.core.k8s:
+            kubeconfig: "{{ kubeconfig_path }}"
+            state: present
+            wait: yes
+            wait_timeout: 600
+            definition:
+              apiVersion: apps/v1
+              kind: DaemonSet
               metadata:
+                name: htcondor-execute
+                namespace: default
                 labels:
                   app: htcondor
                   role: execute
               spec:
-                securityContext:
-                  fsGroup: 1000
-                affinity:
-                  nodeAffinity:
-                    requiredDuringSchedulingIgnoredDuringExecution:
-                      nodeSelectorTerms:
-                        - matchExpressions:
-                            - key: node-role.kubernetes.io/control-plane
-                              operator: DoesNotExist
-                tolerations:
-                  - key: "node.kubernetes.io/not-ready"
-                    operator: "Exists"
-                    effect: "NoExecute"
-                  - key: "node.kubernetes.io/unreachable"
-                    operator: "Exists"
-                    effect: "NoExecute"
-                initContainers:
-                  - name: init-user-setup
-                    image: busybox
-                    command: ["sh","-c"]
-                    args:
-                      - |
-                        set -e
-                        mkdir -p /etc/security /home/condor
-                        echo "condor:x:1000:1000:HTCondor User:/home/condor:/bin/sh" > /etc/security/passwd
-                        echo "condor:x:1000:" > /etc/security/group
-                        mkdir -p /var/log/condor /var/lock/condor /var/run/condor /var/lib/condor
-                        chown -R 1000:1000 /home/condor /var/log/condor /var/lock/condor /var/run/condor /var/lib/condor
-                    volumeMounts:
-                      - name: etc-security
-                        mountPath: /etc/security
-                      - name: home-dir
-                        mountPath: /home/condor
-                      - name: condor-logs
-                        mountPath: /var/log/condor
-                      - name: condor-lock
-                        mountPath: /var/lock/condor
-                      - name: condor-run
-                        mountPath: /var/run/condor
-                      - name: condor-lib
-                        mountPath: /var/lib/condor
-                  - name: init-config-copy
-                    image: busybox
-                    command: ["sh","-c"]
-                    args:
-                      - |
-                        set -e
-                        cp -a /etc/condor-orig/. /etc/condor/
-                        chown -R 1000:1000 /etc/condor
-                    volumeMounts:
-                      - name: condor-config
-                        mountPath: /etc/condor-orig
-                      - name: condor-config-writable
-                        mountPath: /etc/condor
-                  - name: init-password-setup
-                    image: busybox
-                    command: ["sh","-c"]
-                    args:
-                      - |
-                        set -e
-                        mkdir -p /etc/condor/passwords.d
-                        echo "{{ condor_cluster_password }}" > /etc/condor/passwords.d/POOL
-                        chmod 600 /etc/condor/passwords.d/POOL
-                        chown -R 1000:1000 /etc/condor/passwords.d
-                    volumeMounts:
-                      - name: condor-passwords
-                        mountPath: /etc/condor/passwords.d
-                containers:
-                  - name: htcondor
-                    image: "{{ condor_image }}"
-                    env:
-                      - name: CONDOR_CONFIG
-                        value: "/etc/condor/condor_config"
-                      - name: CONDOR_HOST
-                        value: "htcondor-manager.default.svc.cluster.local"
-                    ports:
-                      - containerPort: 9618
-                    command: ["sh","-c"]
-                    args:
-                      - |
-                        set -eu
-                        HOST=htcondor-manager.default.svc.cluster.local
-                        for i in $(seq 1 60); do
-                          (command -v getent >/dev/null 2>&1 && getent hosts "$HOST" >/dev/null 2>&1) || \
-                          (command -v nslookup >/dev/null 2>&1 && nslookup "$HOST" >/dev/null 2>&1) && break
-                          echo "Waiting for $HOST..."; sleep 3
-                        done
-                        exec condor_master -f
+                selector:
+                  matchLabels:
+                    app: htcondor
+                    role: execute
+                template:
+                  metadata:
+                    labels:
+                      app: htcondor
+                      role: execute
+                  spec:
                     securityContext:
-                      runAsUser: 1000
-                      runAsGroup: 1000
-                      readOnlyRootFilesystem: false
-                    volumeMounts:
+                      fsGroup: 1000
+                    affinity:
+                      nodeAffinity:
+                        requiredDuringSchedulingIgnoredDuringExecution:
+                          nodeSelectorTerms:
+                            - matchExpressions:
+                                - key: node-role.kubernetes.io/control-plane
+                                  operator: DoesNotExist
+                    tolerations:
+                      - key: "node.kubernetes.io/not-ready"
+                        operator: "Exists"
+                        effect: "NoExecute"
+                      - key: "node.kubernetes.io/unreachable"
+                        operator: "Exists"
+                        effect: "NoExecute"
+                    initContainers:
+                      - name: init-user-setup
+                        image: "{{ htcondor_busybox_image }}"
+                        imagePullPolicy: IfNotPresent
+                        command: ["sh","-c"]
+                        args:
+                          - |
+                            set -e
+                            mkdir -p /etc/security /home/condor
+                            echo "condor:x:1000:1000:HTCondor User:/home/condor:/bin/sh" > /etc/security/passwd
+                            echo "condor:x:1000:" > /etc/security/group
+                            mkdir -p /var/log/condor /var/lock/condor /var/run/condor /var/lib/condor
+                            chown -R 1000:1000 /home/condor /var/log/condor /var/lock/condor /var/run/condor /var/lib/condor
+                        volumeMounts:
+                          - name: etc-security
+                            mountPath: /etc/security
+                          - name: home-dir
+                            mountPath: /home/condor
+                          - name: condor-logs
+                            mountPath: /var/log/condor
+                          - name: condor-lock
+                            mountPath: /var/lock/condor
+                          - name: condor-run
+                            mountPath: /var/run/condor
+                          - name: condor-lib
+                            mountPath: /var/lib/condor
+                      - name: init-config-copy
+                        image: "{{ htcondor_busybox_image }}"
+                        command: ["sh","-c"]
+                        args:
+                          - |
+                            set -e
+                            cp -a /etc/condor-orig/. /etc/condor/
+                            chown -R 1000:1000 /etc/condor
+                        volumeMounts:
+                          - name: condor-config
+                            mountPath: /etc/condor-orig
+                          - name: condor-config-writable
+                            mountPath: /etc/condor
+                      - name: init-password-setup
+                        image: "{{ htcondor_busybox_image }}"
+                        imagePullPolicy: IfNotPresent
+                        command: ["sh","-c"]
+                        args:
+                          - |
+                            set -e
+                            mkdir -p /etc/condor/passwords.d
+                            echo "{{ condor_cluster_password }}" > /etc/condor/passwords.d/POOL
+                            chmod 600 /etc/condor/passwords.d/POOL
+                            chown -R 1000:1000 /etc/condor/passwords.d
+                        volumeMounts:
+                          - name: condor-passwords
+                            mountPath: /etc/condor/passwords.d
+                    containers:
+                      - name: htcondor
+                        image: "{{ condor_image }}"
+                        imagePullPolicy: "{{ condor_image_pull_policy | default('IfNotPresent') }}"
+                        env:
+                          - name: CONDOR_CONFIG
+                            value: "/etc/condor/condor_config"
+                          - name: CONDOR_HOST
+                            value: "htcondor-manager.default.svc.cluster.local"
+                        ports:
+                          - containerPort: 9618
+                        command: ["sh","-c"]
+                        args:
+                          - |
+                            set -eu
+                            HOST=htcondor-manager.default.svc.cluster.local
+                            for i in $(seq 1 60); do
+                              (command -v getent >/dev/null 2>&1 && getent hosts "$HOST" >/dev/null 2>&1) || \
+                              (command -v nslookup >/dev/null 2>&1 && nslookup "$HOST" >/dev/null 2>&1) && break
+                              echo "Waiting for $HOST..."; sleep 3
+                            done
+                            exec condor_master -f
+                        securityContext:
+                          runAsUser: 1000
+                          runAsGroup: 1000
+                          readOnlyRootFilesystem: false
+                        volumeMounts:
+                          - name: condor-config-writable
+                            mountPath: /etc/condor
+                          - name: condor-logs
+                            mountPath: /var/log/condor
+                          - name: condor-passwords
+                            mountPath: /etc/condor/passwords.d
+                          - name: etc-security
+                            mountPath: /etc/passwd
+                            subPath: passwd
+                          - name: etc-security
+                            mountPath: /etc/group
+                            subPath: group
+                          - name: home-dir
+                            mountPath: /home/condor
+                          - name: tmp
+                            mountPath: /tmp
+                          - name: condor-lock
+                            mountPath: /var/lock/condor
+                          - name: condor-run
+                            mountPath: /var/run/condor
+                          - name: condor-lib
+                            mountPath: /var/lib/condor
+                    volumes:
+                      - name: condor-config
+                        configMap:
+                          name: htcondor-execute
                       - name: condor-config-writable
-                        mountPath: /etc/condor
+                        emptyDir: {}
                       - name: condor-logs
-                        mountPath: /var/log/condor
+                        hostPath:
+                          path: "{{ condor_logs_dir }}"
+                          type: DirectoryOrCreate
                       - name: condor-passwords
-                        mountPath: /etc/condor/passwords.d
+                        emptyDir: {}
                       - name: etc-security
-                        mountPath: /etc/passwd
-                        subPath: passwd
-                      - name: etc-security
-                        mountPath: /etc/group
-                        subPath: group
+                        emptyDir: {}
                       - name: home-dir
-                        mountPath: /home/condor
+                        emptyDir: {}
                       - name: tmp
-                        mountPath: /tmp
+                        emptyDir: {}
                       - name: condor-lock
-                        mountPath: /var/lock/condor
+                        emptyDir: {}
                       - name: condor-run
-                        mountPath: /var/run/condor
+                        emptyDir: {}
                       - name: condor-lib
-                        mountPath: /var/lib/condor
-                volumes:
-                  - name: condor-config
-                    configMap:
-                      name: htcondor-execute
-                  - name: condor-config-writable
-                    emptyDir: {}
-                  - name: condor-logs
-                    hostPath:
-                      path: "{{ condor_logs_dir }}"
-                      type: DirectoryOrCreate
-                  - name: condor-passwords
-                    emptyDir: {}
-                  - name: etc-security
-                    emptyDir: {}
-                  - name: home-dir
-                    emptyDir: {}
-                  - name: tmp
-                    emptyDir: {}
-                  - name: condor-lock
-                    emptyDir: {}
-                  - name: condor-run
-                    emptyDir: {}
-                  - name: condor-lib
-                    emptyDir: {}
+                        emptyDir: {}
+      rescue:
+        - name: Show node readiness (diagnostic)
+          command: /usr/bin/kubectl get nodes -o wide
+          environment:
+            KUBECONFIG: "{{ kubeconfig_path }}"
+          register: k8s_nodes
+          changed_when: false
+
+        - name: Describe htcondor-execute DaemonSet (diagnostic)
+          command: /usr/bin/kubectl -n default describe ds/htcondor-execute
+          environment:
+            KUBECONFIG: "{{ kubeconfig_path }}"
+          register: ds_desc
+          changed_when: false
+
+        - name: List htcondor execute pods (diagnostic)
+          command: /usr/bin/kubectl -n default get pods -l app=htcondor,role=execute -o wide
+          environment:
+            KUBECONFIG: "{{ kubeconfig_path }}"
+          register: exec_pods
+          changed_when: false
+
+        - name: Fail with diagnostic
+          fail:
+            msg: |
+              htcondor-execute DaemonSet did not become ready in 600s.
+
+              Nodes:
+              {{ k8s_nodes.stdout | default('(none)') }}
+
+              DaemonSet describe:
+              {{ ds_desc.stdout | default('(none)') }}
+
+              Execute pods:
+              {{ exec_pods.stdout | default('(none)') }}
       when: "'central_manager' in group_names"
       delegate_to: central_manager
       run_once: true

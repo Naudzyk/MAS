@@ -28,13 +28,40 @@
         state: present
       when: resolved_os_family == 'redhat'
 
-    - name: Configure containerd (SystemdCgroup=true + pause {{ pause_version }})
+    - name: Configure containerd (SystemdCgroup=true + pause {{ pause_version }} + docker.io mirror)
       shell: |
         mkdir -p /etc/containerd
         containerd config default > /etc/containerd/config.toml
         sed -ri 's#(SystemdCgroup = )false#\1true#g' /etc/containerd/config.toml
-        sed -ri 's#sandbox_image = "registry\.(k8s\.io|aliyuncs\.com)/google_containers/pause:[0-9\.]+"#sandbox_image = "registry.aliyuncs.com/google_containers/pause:{{ pause_version }}"#g' /etc/containerd/config.toml || true
+        sed -ri 's#sandbox_image = ".*"#sandbox_image = "registry.aliyuncs.com/google_containers/pause:{{ pause_version }}"#g' /etc/containerd/config.toml
+        mkdir -p /etc/containerd/certs.d/docker.io
+        cat >/etc/containerd/certs.d/docker.io/hosts.toml <<'EOF'
+server = "https://registry-1.docker.io"
+
+[host."{{ docker_io_mirror }}"]
+  capabilities = ["pull", "resolve"]
+
+[host."https://registry-1.docker.io"]
+  capabilities = ["pull", "resolve"]
+EOF
+
+        if grep -qE '^\s*config_path\s*=\s*"/etc/containerd/certs\.d"\s*$' /etc/containerd/config.toml; then
+          true
+        elif grep -qE '^\s*\[plugins\."io\.containerd\.grpc\.v1\.cri"\.registry\]\s*$' /etc/containerd/config.toml; then
+          awk '
+            {print}
+            /^\[plugins\."io\.containerd\.grpc\.v1\.cri"\.registry\]$/ {print "  config_path = \"/etc/containerd/certs.d\""}
+          ' /etc/containerd/config.toml > /etc/containerd/config.toml.tmp && mv /etc/containerd/config.toml.tmp /etc/containerd/config.toml
+        else
+          cat >>/etc/containerd/config.toml <<'EOF'
+
+        [plugins."io.containerd.grpc.v1.cri".registry]
+          config_path = "/etc/containerd/certs.d"
+        EOF
+        fi
+
         systemctl daemon-reload
         systemctl enable --now containerd
+        systemctl restart containerd
       args:
         executable: /bin/bash

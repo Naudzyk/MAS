@@ -1,0 +1,7 @@
+executable     = run.sh
+transfer_input_files = gas2003.sqlite3 salib_highs.xml samples.txt method.txt libtbb.so libtbbmalloc.so libtbbmalloc_proxy.so libtbb.so.2 libtbbmalloc.so.2 libtbbmalloc_proxy.so.2
+transfer_output_files = analyze.csv parameter_file.csv
+log                     = run.job.log
+error                   = run.job.err
+output 					= run.job.output
+queue

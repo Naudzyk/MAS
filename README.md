@@ -159,5 +159,6 @@ ansible --version
 - `System has not been booted with systemd as init system` — узел без systemd (контейнер/WSL). Включите `mas.mode=existing-cluster` или исключите `02–07` через `mas.playbooks.skip`.
 - `Inventory не найден` — проверьте `mas.paths.inventory` и наличие `scripts/inventory.ini`.
 - `Playbook ... failed: CONNECTION_FAILURE` — проверьте SSH‑доступ, пользователей и ключи.
+- Таймаут / `Connection timed out` к `prod-cdn.packages.k8s.io` при установке kubeadm/kubelet — на узле нет стабильного доступа к CDN Kubernetes. Рекомендуемый фикс: использовать зеркало `pkgs.k8s.io` от Яндекса (`k8s_pkg_mirror: "yandex"` в `scripts/vars.yml`).
 
 

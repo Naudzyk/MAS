@@ -39,15 +39,15 @@
       run_once: true
       delegate_to: central_manager
 
-    - name: Setup kubeconfig for root and usermaster on control-plane
+    - name: Setup kubeconfig for root and manager on control-plane
       shell: |
         mkdir -p /root/.kube
         cp -f /etc/kubernetes/admin.conf /root/.kube/config
         chown -R root:root /root/.kube
-        mkdir -p /home/usermaster/.kube
-        cp -f /etc/kubernetes/admin.conf /home/usermaster/.kube/config
-        chown usermaster:usermaster /home/usermaster/.kube/config
-        chmod 600 /home/usermaster/.kube/config
+        mkdir -p /home/manager/.kube
+        cp -f /etc/kubernetes/admin.conf /home/manager/.kube/config
+        chown manager:manager /home/manager/.kube/config
+        chmod 600 /home/manager/.kube/config
       when: "'central_manager' in group_names"
       delegate_to: central_manager
 

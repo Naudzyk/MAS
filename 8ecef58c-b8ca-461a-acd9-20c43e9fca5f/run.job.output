@@ -1,0 +1,6 @@
+[23.01.2025 07:05:32] [I] [2976115] Creating MES.
+[23.01.2025 07:05:32] [I] [2976115] Writing output file parameter_file.csv
+[23.01.2025 07:05:32] [I] [2976118] Creating MES.
+[23.01.2025 07:05:53] [I] [2976118] Writing output file ./gas2003_1.duckdb.
+[23.01.2025 07:06:29] [I] [2976926] Reading input file ./gas2003_1.duckdb.
+[23.01.2025 07:06:29] [I] [2976926] Writing output file model_output.csv.

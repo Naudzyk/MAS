@@ -1,0 +1,67 @@
+000 (2077.000.000) 2025-01-23 07:05:26 Job submitted from host: <192.168.55.241:9618?addrs=192.168.55.241-9618&alias=callisto141&noUDP&sock=schedd_3282976_0c59>
+    DAG Node: run
+...
+001 (2077.000.000) 2025-01-23 07:05:32 Job executing on host: <192.168.55.241:9618?addrs=192.168.55.241-9618&alias=callisto141&noUDP&sock=startd_3282976_0c59>
+	SlotName: slot1@callisto141
+	CondorScratchDir = "/var/lib/condor/execute/dir_2976109"
+	Cpus = 1
+	Disk = 4891366
+	Memory = 7150
+...
+006 (2077.000.000) 2025-01-23 07:05:37 Image size of job updated: 72016
+	71  -  MemoryUsage of job (MB)
+	72016  -  ResidentSetSize of job (KB)
+...
+006 (2077.000.000) 2025-01-23 07:05:42 Image size of job updated: 76964
+	76  -  MemoryUsage of job (MB)
+	76964  -  ResidentSetSize of job (KB)
+...
+006 (2077.000.000) 2025-01-23 07:05:47 Image size of job updated: 81872
+	80  -  MemoryUsage of job (MB)
+	81872  -  ResidentSetSize of job (KB)
+...
+006 (2077.000.000) 2025-01-23 07:05:52 Image size of job updated: 86936
+	85  -  MemoryUsage of job (MB)
+	86936  -  ResidentSetSize of job (KB)
+...
+006 (2077.000.000) 2025-01-23 07:05:57 Image size of job updated: 96608
+	95  -  MemoryUsage of job (MB)
+	96608  -  ResidentSetSize of job (KB)
+...
+006 (2077.000.000) 2025-01-23 07:06:02 Image size of job updated: 103492
+	102  -  MemoryUsage of job (MB)
+	103492  -  ResidentSetSize of job (KB)
+...
+006 (2077.000.000) 2025-01-23 07:06:07 Image size of job updated: 106364
+	104  -  MemoryUsage of job (MB)
+	106364  -  ResidentSetSize of job (KB)
+...
+006 (2077.000.000) 2025-01-23 07:06:12 Image size of job updated: 107740
+	106  -  MemoryUsage of job (MB)
+	107740  -  ResidentSetSize of job (KB)
+...
+006 (2077.000.000) 2025-01-23 07:06:17 Image size of job updated: 107868
+	106  -  MemoryUsage of job (MB)
+	107868  -  ResidentSetSize of job (KB)
+...
+006 (2077.000.000) 2025-01-23 07:06:27 Image size of job updated: 108248
+	106  -  MemoryUsage of job (MB)
+	108248  -  ResidentSetSize of job (KB)
+...
+005 (2077.000.000) 2025-01-23 07:06:36 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 00:01:02, Sys 0 00:00:03  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 00:01:02, Sys 0 00:00:03  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+	0  -  Total Bytes Sent By Job
+	0  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated 
+	   Cpus                 :     0.99        1         1 
+	   Disk (KB)            :     5           5   4891366 
+	   Memory (MB)          :   106           1      7150 
+
+	Job terminated of its own accord at 2025-01-23T07:06:36Z with exit-code 0.
+...

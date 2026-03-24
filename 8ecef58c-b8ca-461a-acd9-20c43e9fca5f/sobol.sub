@@ -1,0 +1,8 @@
+executable     = salib
+arguments =  analyze sobol -p parameter_file.csv -Y model_output.txt -c 0 --max-order=max_order.txt -r 1000 > analyze.csv
+transfer_input_files = parameter_file.csv model_output.txt max_order.txt
+transfer_output_files = analyze.csv
+log                     = sobol.job.log
+error                   = sobol.job.err
+output 					= sobol.job.output
+queue

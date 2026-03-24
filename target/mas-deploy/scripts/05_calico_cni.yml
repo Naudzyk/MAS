@@ -4,6 +4,9 @@
   become: yes
   vars_files:
     - vars.yml
+  vars:
+    # kubeadm leaves admin.conf here; override if you use ~/.kube/config
+    kubeconfig_path: /etc/kubernetes/admin.conf
 
   tasks:
     - name: Resolve OS family
@@ -25,7 +28,6 @@
       shell: |
         rm -rf /etc/cni/net.d/* /var/lib/cni/* || true
         systemctl restart kubelet
-      become: yes
 
     - name: Ensure localhost entries in /etc/hosts
       lineinfile:
@@ -35,10 +37,10 @@
         state: present
       loop:
         - "127.0.0.1 localhost"
-        - "::l localhost ip6-localhost ip6-loopback"
+        - "::1 localhost ip6-localhost ip6-loopback"
 
 
-    - name: Ensure node hostname resolves (optinal but recommended)
+    - name: Ensure node hostname resolves (optional but recommended)
       lineinfile:
         path: /etc/hosts
         line: "{{ k8s_node_ip }} {{ inventory_hostname }}"
@@ -58,10 +60,13 @@
       when: resolved_os_family == 'redhat'
 
 
-    - name: Install Calico CNI
-      command: /usr/bin/kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.3/manifests/calico.yaml
+    - name: Install Calico CNI (from {{ calico_image_registry }})
+      shell: |
+        curl -fsSL "https://raw.githubusercontent.com/projectcalico/calico/{{ calico_version }}/manifests/calico.yaml" \
+          | sed 's#docker.io/calico/#{{ calico_image_registry }}/#g' \
+          | /usr/bin/kubectl apply -f -
       environment:
-        KUBECONFIG: /root/.kube/config
+        KUBECONFIG: "{{ kubeconfig_path }}"
       when: "'central_manager' in group_names"
       delegate_to: central_manager
       run_once: true
@@ -86,16 +91,44 @@
         CALICO_IPV6POOL_NAT_OUTGOING=false
         CALICO_IPV4POOL_NAT_OUTGOING=true
       environment:
-        KUBECONFIG: /root/.kube/config
+        KUBECONFIG: "{{ kubeconfig_path }}"
       when: "'central_manager' in group_names"
       delegate_to: central_manager
       run_once: true
 
     - name: Wait for calico-node rollout
-      command: /usr/bin/kubectl -n kube-system rollout status ds/calico-node --timeout=300s
+      command: /usr/bin/kubectl -n kube-system rollout status ds/calico-node --timeout=600s
       environment:
-        KUBECONFIG: /root/.kube/config
+        KUBECONFIG: "{{ kubeconfig_path }}"
+      register: calico_rollout
+      failed_when: false
       when: "'central_manager' in group_names"
       delegate_to: central_manager
+      run_once: true
+
+    - name: Get calico-node pod status when rollout failed (diagnostic)
+      command: /usr/bin/kubectl -n kube-system get pods -l k8s-app=calico-node -o wide
+      environment:
+        KUBECONFIG: "{{ kubeconfig_path }}"
+      register: calico_pods
+      changed_when: false
+      when: calico_rollout is defined and calico_rollout.rc != 0
+      delegate_to: central_manager
+      run_once: true
+
+    - name: Describe calico-node pods when rollout failed (diagnostic)
+      command: /usr/bin/kubectl -n kube-system describe pods -l k8s-app=calico-node
+      environment:
+        KUBECONFIG: "{{ kubeconfig_path }}"
+      register: calico_describe
+      changed_when: false
+      when: calico_rollout is defined and calico_rollout.rc != 0
+      delegate_to: central_manager
+      run_once: true
+
+    - name: Fail with diagnostic if calico-node did not become ready
+      fail:
+        msg: "Calico daemon set did not become ready in 600s. Pods:\n{{ calico_pods.stdout | default('(none)') }}\n\nDescribe:\n{{ calico_describe.stdout | default('(none)') }}\n\nCheck image pull (e.g. docker.io) and node readiness; on control-plane ensure Calico manifest has toleration for node-role.kubernetes.io/control-plane."
+      when: calico_rollout is defined and calico_rollout.rc != 0
       run_once: true
 

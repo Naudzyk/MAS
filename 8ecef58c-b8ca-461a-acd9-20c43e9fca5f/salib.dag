@@ -1,0 +1,10 @@
+JOB m1 m1.sub
+JOB sample sample.sub
+JOB m2 m2.sub
+JOB m3 m3.sub
+JOB analyze analyze.sub
+
+PARENT m1 CHILD sample
+PARENT sample CHILD m2
+PARENT m2 CHILD m3
+PARENT m3 CHILD analyze

@@ -10,6 +10,31 @@
     k8s_repo_version: "v{{ k8s_version.split('.')[0] }}.{{ k8s_version.split('.')[1] }}"
     _debian_like: [Debian, Ubuntu, "Astra Linux"]
     _redhat_like: [RedHat, CentOS, Rocky, AlmaLinux, Fedora, RedOS]
+    
+    k8s_pkgs_mirror_deb_release_key_url: >-
+      {{
+        'https://pkgs.k8s.io/core:/stable:/%s/deb/Release.key' | format(k8s_repo_version)
+        if (k8s_pkg_mirror | default('pkgs')) == 'pkgs'
+        else 'https://mirror.yandex.ru/mirrors/pkgs.k8s.io/core/stable/%s/deb/Release.key' | format(k8s_repo_version)
+      }}
+    k8s_pkgs_mirror_deb_repo_url: >-
+      {{
+        'https://pkgs.k8s.io/core:/stable:/%s/deb/' | format(k8s_repo_version)
+        if (k8s_pkg_mirror | default('pkgs')) == 'pkgs'
+        else 'https://mirror.yandex.ru/mirrors/pkgs.k8s.io/core/stable/%s/deb/' | format(k8s_repo_version)
+      }}
+    k8s_pkgs_mirror_rpm_baseurl: >-
+      {{
+        'https://pkgs.k8s.io/core:/stable:/%s/rpm/' | format(k8s_repo_version)
+        if (k8s_pkg_mirror | default('pkgs')) == 'pkgs'
+        else 'https://mirror.yandex.ru/mirrors/pkgs.k8s.io/core/stable/%s/rpm/' | format(k8s_repo_version)
+      }}
+    k8s_pkgs_mirror_rpm_gpgkey_url: >-
+      {{
+        'https://pkgs.k8s.io/core:/stable:/%s/rpm/repodata/repomd.xml.key' | format(k8s_repo_version)
+        if (k8s_pkg_mirror | default('pkgs')) == 'pkgs'
+        else 'https://mirror.yandex.ru/mirrors/pkgs.k8s.io/core/stable/%s/rpm/repodata/repomd.xml.key' | format(k8s_repo_version)
+      }}
 
   tasks:
     - name: Resolve OS family
@@ -24,18 +49,18 @@
         mode: "0755"
       when: resolved_os_family == 'debian'
 
-    - name: Add Kubernetes apt key (pkgs.k8s.io)
+    - name: Add Kubernetes apt key (pkgs/mirror)
       shell: |
         mkdir -p /etc/apt/keyrings
-        curl -fsSL https://pkgs.k8s.io/core:/stable:/{{ k8s_repo_version }}/deb/Release.key \
+        curl -fsSL "{{ k8s_pkgs_mirror_deb_release_key_url }}" \
           | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
       args:
         creates: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
       when: resolved_os_family == 'debian'
 
-    - name: Add Kubernetes apt repo
+    - name: Add Kubernetes apt repo (pkgs/mirror)
       apt_repository:
-        repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/{{ k8s_repo_version }}/deb/ /"
+        repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] {{ k8s_pkgs_mirror_deb_repo_url }} /"
         filename: kubernetes
         state: present
       when: resolved_os_family == 'debian'
@@ -46,16 +71,16 @@
       when: resolved_os_family == 'debian'
 
     # --- RHEL/Rocky/RedOS ---
-    - name: Add Kubernetes dnf repo (pkgs.k8s.io)
+    - name: Add Kubernetes dnf repo (pkgs/mirror)
       copy:
         dest: /etc/yum.repos.d/kubernetes.repo
         content: |
           [kubernetes]
           name=Kubernetes
-          baseurl=https://pkgs.k8s.io/core:/stable:/{{ k8s_repo_version }}/rpm/
+          baseurl={{ k8s_pkgs_mirror_rpm_baseurl }}
           enabled=1
           gpgcheck=1
-          gpgkey=https://pkgs.k8s.io/core:/stable:/{{ k8s_repo_version }}/rpm/repodata/repomd.xml.key
+          gpgkey={{ k8s_pkgs_mirror_rpm_gpgkey_url }}
         mode: "0644"
       when: resolved_os_family == 'redhat'
 
@@ -78,7 +103,7 @@
       changed_when: false
       when: resolved_os_family == 'debian'
 
-    - name: Install k8s packages (Debian)
+    - name: Install k8s packages (Debian, from apt repo)
       apt:
         name: "{{ item }}"
         state: present

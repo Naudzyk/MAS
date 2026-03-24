@@ -1,0 +1,149 @@
+01/23/25 07:05:25 ******************************************************
+01/23/25 07:05:25 ** condor_scheduniv_exec.2076.0 (CONDOR_DAGMAN) STARTING UP
+01/23/25 07:05:25 ** /usr/bin/condor_dagman
+01/23/25 07:05:25 ** SubsystemInfo: name=DAGMAN type=DAGMAN(9) class=CLIENT(2)
+01/23/25 07:05:25 ** Configuration: subsystem:DAGMAN local:<NONE> class:CLIENT
+01/23/25 07:05:25 ** $CondorVersion: 10.9.0 2023-09-28 BuildID: 678228 PackageID: 10.9.0-1.1 $
+01/23/25 07:05:25 ** $CondorPlatform: X86_64-Ubuntu_22.04 $
+01/23/25 07:05:25 ** PID = 2975996
+01/23/25 07:05:25 ** Log last touched time unavailable (No such file or directory)
+01/23/25 07:05:25 ******************************************************
+01/23/25 07:05:25 Using config source: /etc/condor/condor_config
+01/23/25 07:05:25 Using local config sources: 
+01/23/25 07:05:25    /etc/condor/config.d/00-htcondor-9.0.config
+01/23/25 07:05:25    /etc/condor/config.d/00-minicondor
+01/23/25 07:05:25    /etc/condor/config.d/50-security
+01/23/25 07:05:25    /etc/condor/condor_config.local
+01/23/25 07:05:25 config Macros = 88, Sorted = 88, StringBytes = 2569, TablesBytes = 3232
+01/23/25 07:05:25 CLASSAD_CACHING is ENABLED
+01/23/25 07:05:25 Daemon Log is logging: D_ALWAYS D_ERROR D_STATUS
+01/23/25 07:05:25 DaemonCore: No command port requested.
+01/23/25 07:05:25 DAGMAN_USE_STRICT setting: 1
+01/23/25 07:05:25 DAGMAN_VERBOSITY setting: 3
+01/23/25 07:05:25 DAGMAN_DEBUG_CACHE_SIZE setting: 5242880
+01/23/25 07:05:25 DAGMAN_DEBUG_CACHE_ENABLE setting: False
+01/23/25 07:05:25 DAGMAN_SUBMIT_DELAY setting: 0
+01/23/25 07:05:25 DAGMAN_MAX_SUBMIT_ATTEMPTS setting: 6
+01/23/25 07:05:25 DAGMAN_STARTUP_CYCLE_DETECT setting: False
+01/23/25 07:05:25 DAGMAN_MAX_SUBMITS_PER_INTERVAL setting: 100
+01/23/25 07:05:25 DAGMAN_AGGRESSIVE_SUBMIT setting: False
+01/23/25 07:05:25 DAGMAN_USER_LOG_SCAN_INTERVAL setting: 5
+01/23/25 07:05:25 DAGMAN_QUEUE_UPDATE_INTERVAL setting: 300
+01/23/25 07:05:25 DAGMAN_DEFAULT_PRIORITY setting: 0
+01/23/25 07:05:25 DAGMAN_SUPPRESS_NOTIFICATION setting: True
+01/23/25 07:05:25 allow_events (DAGMAN_ALLOW_EVENTS) setting: 114
+01/23/25 07:05:25 DAGMAN_RETRY_SUBMIT_FIRST setting: True
+01/23/25 07:05:25 DAGMAN_RETRY_NODE_FIRST setting: False
+01/23/25 07:05:25 DAGMAN_MAX_JOBS_IDLE setting: 1000
+01/23/25 07:05:25 DAGMAN_MAX_JOBS_SUBMITTED setting: 0
+01/23/25 07:05:25 DAGMAN_MAX_PRE_SCRIPTS setting: 20
+01/23/25 07:05:25 DAGMAN_MAX_POST_SCRIPTS setting: 20
+01/23/25 07:05:25 DAGMAN_MAX_HOLD_SCRIPTS setting: 20
+01/23/25 07:05:25 DAGMAN_MUNGE_NODE_NAMES setting: True
+01/23/25 07:05:25 DAGMAN_PROHIBIT_MULTI_JOBS setting: False
+01/23/25 07:05:25 DAGMAN_SUBMIT_DEPTH_FIRST setting: False
+01/23/25 07:05:25 DAGMAN_ALWAYS_RUN_POST setting: False
+01/23/25 07:05:25 DAGMAN_CONDOR_SUBMIT_EXE setting: /usr/bin/condor_submit
+01/23/25 07:05:25 DAGMAN_USE_DIRECT_SUBMIT setting: True
+01/23/25 07:05:25 DAGMAN_DEFAULT_APPEND_VARS setting: False
+01/23/25 07:05:25 DAGMAN_ABORT_DUPLICATES setting: True
+01/23/25 07:05:25 DAGMAN_ABORT_ON_SCARY_SUBMIT setting: True
+01/23/25 07:05:25 DAGMAN_PENDING_REPORT_INTERVAL setting: 600
+01/23/25 07:05:25 DAGMAN_AUTO_RESCUE setting: True
+01/23/25 07:05:25 DAGMAN_MAX_RESCUE_NUM setting: 100
+01/23/25 07:05:25 DAGMAN_WRITE_PARTIAL_RESCUE setting: True
+01/23/25 07:05:25 DAGMAN_DEFAULT_NODE_LOG setting: @(DAG_DIR)/@(DAG_FILE).nodes.log
+01/23/25 07:05:25 DAGMAN_GENERATE_SUBDAG_SUBMITS setting: True
+01/23/25 07:05:25 DAGMAN_MAX_JOB_HOLDS setting: 100
+01/23/25 07:05:25 DAGMAN_HOLD_CLAIM_TIME setting: 20
+01/23/25 07:05:25 ALL_DEBUG setting: 
+01/23/25 07:05:25 DAGMAN_DEBUG setting: 
+01/23/25 07:05:25 DAGMAN_SUPPRESS_JOB_LOGS setting: False
+01/23/25 07:05:25 DAGMAN_REMOVE_NODE_JOBS setting: True
+01/23/25 07:05:25 DAGMAN will adjust edges after parsing
+01/23/25 07:05:25 argv[0] == "condor_scheduniv_exec.2076.0"
+01/23/25 07:05:25 argv[1] == "-Lockfile"
+01/23/25 07:05:25 argv[2] == "salib.dag.lock"
+01/23/25 07:05:25 argv[3] == "-AutoRescue"
+01/23/25 07:05:25 argv[4] == "1"
+01/23/25 07:05:25 argv[5] == "-DoRescueFrom"
+01/23/25 07:05:25 argv[6] == "0"
+01/23/25 07:05:25 argv[7] == "-Dag"
+01/23/25 07:05:25 argv[8] == "salib.dag"
+01/23/25 07:05:25 argv[9] == "-Suppress_notification"
+01/23/25 07:05:25 argv[10] == "-CsdVersion"
+01/23/25 07:05:25 argv[11] == "$CondorVersion: 10.9.0 2023-09-28 BuildID: 678228 PackageID: 10.9.0-1.1 $"
+01/23/25 07:05:25 argv[12] == "-Force"
+01/23/25 07:05:25 argv[13] == "-Dagman"
+01/23/25 07:05:25 argv[14] == "/usr/bin/condor_dagman"
+01/23/25 07:05:25 Workflow batch-id: <2076.0>
+01/23/25 07:05:25 Workflow batch-name: <salib.dag+2076>
+01/23/25 07:05:25 Workflow accounting_group: <>
+01/23/25 07:05:25 Workflow accounting_group_user: <>
+01/23/25 07:05:25 Warning: failed to get attribute DAGNodeName
+01/23/25 07:05:25 DAGMAN_LOG_ON_NFS_IS_ERROR setting: False
+01/23/25 07:05:25 Default node log file is: </home/kostromin/server/scheduler/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/./salib.dag.nodes.log>
+01/23/25 07:05:25 DAG Lockfile will be written to salib.dag.lock
+01/23/25 07:05:25 DAG Input file is salib.dag
+01/23/25 07:05:25 Parsing 1 dagfiles
+01/23/25 07:05:25 Parsing salib.dag ...
+01/23/25 07:05:25 Adjusting edges
+01/23/25 07:05:25 Dag contains 1 total jobs
+01/23/25 07:05:25 Bootstrapping...
+01/23/25 07:05:25 Number of pre-completed nodes: 0
+01/23/25 07:05:25 MultiLogFiles: truncating log file /home/kostromin/server/scheduler/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/./salib.dag.nodes.log
+01/23/25 07:05:25 DAG status: 0 (DAG_STATUS_OK)
+01/23/25 07:05:25 Of 1 nodes total:
+01/23/25 07:05:25  Done     Pre   Queued    Post   Ready   Un-Ready   Failed   Futile
+01/23/25 07:05:25   ===     ===      ===     ===     ===        ===      ===      ===
+01/23/25 07:05:25     0       0        0       0       1          0        0        0
+01/23/25 07:05:25 0 job proc(s) currently held
+01/23/25 07:05:25 DAGMan Runtime Statistics: [ EventCycleTimeCount = 0.0; EventCycleTimeSum = 0.0; LogProcessCycleTimeCount = 0.0; LogProcessCycleTimeSum = 0.0; SleepCycleTimeCount = 0.0; SleepCycleTimeSum = 0.0; SubmitCycleTimeCount = 0.0; SubmitCycleTimeSum = 0.0; ]
+01/23/25 07:05:25 Registering condor_event_timer...
+01/23/25 07:05:26 Submitting HTCondor Node run job(s)...
+01/23/25 07:05:26 Submitting node run from file run.sub using direct job submission
+01/23/25 07:05:26 	assigned HTCondor ID (2077.0.0)
+01/23/25 07:05:26 Just submitted 1 job this cycle...
+01/23/25 07:05:26 DAG status: 0 (DAG_STATUS_OK)
+01/23/25 07:05:26 Of 1 nodes total:
+01/23/25 07:05:26  Done     Pre   Queued    Post   Ready   Un-Ready   Failed   Futile
+01/23/25 07:05:26   ===     ===      ===     ===     ===        ===      ===      ===
+01/23/25 07:05:26     0       0        1       0       0          0        0        0
+01/23/25 07:05:26 0 job proc(s) currently held
+01/23/25 07:05:26 DAGMan Runtime Statistics: [ EventCycleTimeCount = 0.0; EventCycleTimeSum = 0.0; LogProcessCycleTimeCount = 0.0; LogProcessCycleTimeSum = 0.0; SleepCycleTimeCount = 0.0; SleepCycleTimeSum = 0.0; SubmitCycleTimeAvg = 0.02872419357299805; SubmitCycleTimeCount = 1.0; SubmitCycleTimeMax = 0.02872419357299805; SubmitCycleTimeMin = 0.02872419357299805; SubmitCycleTimeStd = 0.02872419357299805; SubmitCycleTimeSum = 0.02872419357299805; ]
+01/23/25 07:05:31 Currently monitoring 1 HTCondor log file(s)
+01/23/25 07:05:31 Reassigning the id of job run from (2077.0.0) to (2077.0.0)
+01/23/25 07:05:31 Event: ULOG_SUBMIT for HTCondor Node run (2077.0.0) {01/23/25 07:05:26}
+01/23/25 07:05:31 Number of idle job procs: 1
+01/23/25 07:05:36 Currently monitoring 1 HTCondor log file(s)
+01/23/25 07:05:36 Event: ULOG_EXECUTE for HTCondor Node run (2077.0.0) {01/23/25 07:05:32}
+01/23/25 07:05:36 Number of idle job procs: 0
+01/23/25 07:06:36 Currently monitoring 1 HTCondor log file(s)
+01/23/25 07:06:36 Event: ULOG_JOB_TERMINATED for HTCondor Node run (2077.0.0) {01/23/25 07:06:36}
+01/23/25 07:06:36 Number of idle job procs: 0
+01/23/25 07:06:36 Node run job proc (2077.0.0) completed successfully.
+01/23/25 07:06:36 Node run job completed
+01/23/25 07:06:36 DAG status: 0 (DAG_STATUS_OK)
+01/23/25 07:06:36 Of 1 nodes total:
+01/23/25 07:06:36  Done     Pre   Queued    Post   Ready   Un-Ready   Failed   Futile
+01/23/25 07:06:36   ===     ===      ===     ===     ===        ===      ===      ===
+01/23/25 07:06:36     1       0        0       0       0          0        0        0
+01/23/25 07:06:36 0 job proc(s) currently held
+01/23/25 07:06:36 DAGMan Runtime Statistics: [ EventCycleTimeAvg = 0.002108642033168248; EventCycleTimeCount = 14.0; EventCycleTimeMax = 0.02892804145812988; EventCycleTimeMin = 1.597404479980469E-05; EventCycleTimeStd = 0.007719466669302154; EventCycleTimeSum = 0.02952098846435547; LogProcessCycleTimeAvg = 0.000204006830851237; LogProcessCycleTimeCount = 3.0; LogProcessCycleTimeMax = 0.0002381801605224609; LogProcessCycleTimeMin = 0.0001590251922607422; LogProcessCycleTimeStd = 4.066929931040399E-05; LogProcessCycleTimeSum = 0.0006120204925537109; SleepCycleTimeAvg = 5.003888845443726; SleepCycleTimeCount = 14.0; SleepCycleTimeMax = 5.005146980285645; SleepCycleTimeMin = 5.000455856323242; SleepCycleTimeStd = 0.001660465963406471; SleepCycleTimeSum = 70.05444383621216; SubmitCycleTimeAvg = 0.001918792724609375; SubmitCycleTimeCount = 15.0; SubmitCycleTimeMax = 0.02872419357299805; SubmitCycleTimeMin = 3.099441528320312E-06; SubmitCycleTimeStd = 0.007415490818079859; SubmitCycleTimeSum = 0.02878189086914062; ]
+01/23/25 07:06:36 All jobs Completed!
+01/23/25 07:06:36 Note: 0 total job deferrals because of -MaxJobs limit (0)
+01/23/25 07:06:36 Note: 0 total job deferrals because of -MaxIdle limit (1000)
+01/23/25 07:06:36 Note: 0 total job deferrals because of node category throttles
+01/23/25 07:06:36 Note: 0 total PRE script deferrals because of -MaxPre limit (20) or DEFER
+01/23/25 07:06:36 Note: 0 total POST script deferrals because of -MaxPost limit (20) or DEFER
+01/23/25 07:06:36 Note: 0 total HOLD script deferrals because of -MaxHold limit (20) or DEFER
+01/23/25 07:06:36 DAG status: 0 (DAG_STATUS_OK)
+01/23/25 07:06:36 Of 1 nodes total:
+01/23/25 07:06:36  Done     Pre   Queued    Post   Ready   Un-Ready   Failed   Futile
+01/23/25 07:06:36   ===     ===      ===     ===     ===        ===      ===      ===
+01/23/25 07:06:36     1       0        0       0       0          0        0        0
+01/23/25 07:06:36 0 job proc(s) currently held
+01/23/25 07:06:36 DAGMan Runtime Statistics: [ EventCycleTimeAvg = 0.002108642033168248; EventCycleTimeCount = 14.0; EventCycleTimeMax = 0.02892804145812988; EventCycleTimeMin = 1.597404479980469E-05; EventCycleTimeStd = 0.007719466669302154; EventCycleTimeSum = 0.02952098846435547; LogProcessCycleTimeAvg = 0.000204006830851237; LogProcessCycleTimeCount = 3.0; LogProcessCycleTimeMax = 0.0002381801605224609; LogProcessCycleTimeMin = 0.0001590251922607422; LogProcessCycleTimeStd = 4.066929931040399E-05; LogProcessCycleTimeSum = 0.0006120204925537109; SleepCycleTimeAvg = 5.003888845443726; SleepCycleTimeCount = 14.0; SleepCycleTimeMax = 5.005146980285645; SleepCycleTimeMin = 5.000455856323242; SleepCycleTimeStd = 0.001660465963406471; SleepCycleTimeSum = 70.05444383621216; SubmitCycleTimeAvg = 0.001918792724609375; SubmitCycleTimeCount = 15.0; SubmitCycleTimeMax = 0.02872419357299805; SubmitCycleTimeMin = 3.099441528320312E-06; SubmitCycleTimeStd = 0.007415490818079859; SubmitCycleTimeSum = 0.02878189086914062; ]
+01/23/25 07:06:36 Wrote metrics file salib.dag.metrics.
+01/23/25 07:06:36 DAGMan Runtime Statistics: [ EventCycleTimeAvg = 0.002108642033168248; EventCycleTimeCount = 14.0; EventCycleTimeMax = 0.02892804145812988; EventCycleTimeMin = 1.597404479980469E-05; EventCycleTimeStd = 0.007719466669302154; EventCycleTimeSum = 0.02952098846435547; LogProcessCycleTimeAvg = 0.000204006830851237; LogProcessCycleTimeCount = 3.0; LogProcessCycleTimeMax = 0.0002381801605224609; LogProcessCycleTimeMin = 0.0001590251922607422; LogProcessCycleTimeStd = 4.066929931040399E-05; LogProcessCycleTimeSum = 0.0006120204925537109; SleepCycleTimeAvg = 5.003888845443726; SleepCycleTimeCount = 14.0; SleepCycleTimeMax = 5.005146980285645; SleepCycleTimeMin = 5.000455856323242; SleepCycleTimeStd = 0.001660465963406471; SleepCycleTimeSum = 70.05444383621216; SubmitCycleTimeAvg = 0.001918792724609375; SubmitCycleTimeCount = 15.0; SubmitCycleTimeMax = 0.02872419357299805; SubmitCycleTimeMin = 3.099441528320312E-06; SubmitCycleTimeStd = 0.007415490818079859; SubmitCycleTimeSum = 0.02878189086914062; ]
+01/23/25 07:06:36 **** condor_scheduniv_exec.2076.0 (condor_DAGMAN) pid 2975996 EXITING WITH STATUS 0

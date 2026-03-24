@@ -1,0 +1,9 @@
+{
+	"/DATABASE": {
+		"CID": "Duckdb_manager",
+		"database_options": null,
+		"database_path": "/home/kostromin/server/packages/salib/bin/gas2003_1.duckdb",
+		"read_only_database": false,
+		"research_id": 0
+	}
+}

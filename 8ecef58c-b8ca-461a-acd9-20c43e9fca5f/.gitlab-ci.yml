@@ -1,0 +1,102 @@
+# =============================================================================
+# CI/CD Pipeline: HTCondor-кластер (MAS) + запуск и валидация заданий
+# =============================================================================
+# Требования: self-hosted runner с тегом cluster-manager, SSH-доступ ко всем узлам.
+# Секреты и адреса — в GitLab CI/CD Variables (Protected, Masked).
+# =============================================================================
+
+stages:
+  - setup-nodes
+  - deploy-cluster
+  - run-job
+  - validate
+
+variables:
+  CI_SCRIPTS_DIR: "ci"
+  # Путь к пакету задания в репозитории (файлы .sub, бинарники, данные)
+  JOB_PACKAGE_PATH: "."
+  # Таймауты (секунды)
+  MAS_READY_TIMEOUT: "300"
+  JOB_WAIT_TIMEOUT: "3600"
+  NODE_CHECK_TIMEOUT: "60"
+  # Интервал опроса REST API MAS (секунды)
+  MAS_POLL_INTERVAL: "10"
+
+# -----------------------------------------------------------------------------
+# Только на runner с доступом к кластеру
+# -----------------------------------------------------------------------------
+.only_cluster_runner:
+  tags:
+    - manager
+  timeout: 1h
+
+# -----------------------------------------------------------------------------
+# 1. setup-nodes — проверка доступности submit- и execute-узлов (ping + SSH)
+# -----------------------------------------------------------------------------
+setup-nodes:
+  stage: setup-nodes
+  extends: .only_cluster_runner
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache openssh-client bash
+    - chmod +x "${CI_SCRIPTS_DIR}/setup_nodes.sh"
+  script:
+    - "${CI_SCRIPTS_DIR}/setup_nodes.sh"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
+
+# -----------------------------------------------------------------------------
+# 2. deploy-cluster — загрузка MAS из Registry, копирование на submit-ноду,
+#    запуск MAS, ожидание READY по REST API
+# -----------------------------------------------------------------------------
+deploy-cluster:
+  stage: deploy-cluster
+  extends: .only_cluster_runner
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache openssh-client curl bash
+    - chmod +x "${CI_SCRIPTS_DIR}/deploy_cluster.sh"
+  script:
+    - "${CI_SCRIPTS_DIR}/deploy_cluster.sh"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
+
+# -----------------------------------------------------------------------------
+# 3. run-job — копирование пакета задания на submit-ноду, condor_submit,
+#    ожидание завершения расчётов
+# -----------------------------------------------------------------------------
+run-job:
+  stage: run-job
+  extends: .only_cluster_runner
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache openssh-client bash
+    - chmod +x "${CI_SCRIPTS_DIR}/run_job.sh"
+  script:
+    - "${CI_SCRIPTS_DIR}/run_job.sh"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
+
+# -----------------------------------------------------------------------------
+# 4. validate — скачивание результатов, проверка выходных файлов и данных
+# -----------------------------------------------------------------------------
+validate:
+  stage: validate
+  extends: .only_cluster_runner
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache openssh-client bash
+    - chmod +x "${CI_SCRIPTS_DIR}/validate_results.sh"
+  script:
+    - "${CI_SCRIPTS_DIR}/validate_results.sh"
+  artifacts:
+    when: always
+    paths:
+      - ci/artifacts/
+    expire_in: 7 days
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH

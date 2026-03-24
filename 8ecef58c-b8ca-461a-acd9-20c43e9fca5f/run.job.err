@@ -1,0 +1,21 @@
++ set -o xtrace
++ samples=256
++ max_order=2
++ parameter_file=parameter_file.csv
++ model_input=model_input.csv
++ model_output=model_output.csv
++ analyze_result=analyze.csv
++ sa_method=sobol
++ bin_dir=/f/Build/bin/win64/Release/salib.workspace
++ mkdir -p
+mkdir: missing operand
+Try 'mkdir --help' for more information.
++ ./m1 -i ./gas2003.sqlite3 -q stat1.txt -p ./salib_highs.xml -o parameter_file.csv
++ salib sample saltelli -n 256 -p parameter_file.csv -o model_input.csv '--delimiter= ' --precision=8 --max-order=2
++ cp gas2003_in.duckdb gas2003_1.duckdb
++ ./m2 -w 1 -i ./gas2003.sqlite3 -q stat2.txt -p ./salib_highs.xml -j model_input.csv -d ./duckdb.json -a ./gas2003_1.duckdb
++ ./m3 -d ./duckdb.json -a ./gas2003_1.duckdb -o model_output.csv -b metric1 -c measure0 -q stat3.txt
++ sed -i 1d model_output.csv
++ [[ sobol == \d\e\l\t\a ]]
++ [[ sobol == \s\o\b\o\l ]]
++ salib analyze sobol -p parameter_file.csv -Y model_output.csv -c 0 --max-order=2 -r 1000

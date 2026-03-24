@@ -1,0 +1,7 @@
+executable     = m3.sh
+transfer_input_files = duckdb.json gas2003_out.duckdb libtbb.so libtbbmalloc.so libtbbmalloc_proxy.so libtbb.so.2 libtbbmalloc.so.2 libtbbmalloc_proxy.so.2
+transfer_output_files = stat.txt model_output.txt
+log                     = m3.job.log
+error                   = m3.job.err
+output 					= m3.job.output
+queue

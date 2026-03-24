@@ -1,0 +1,7 @@
+executable     = analyze.sh
+transfer_input_files =  max_order.txt model_output_out.csv parameter_file.csv
+transfer_output_files = analyze.csv
+log                     = analyze.job.log
+error                   = analyze.job.err
+output 					= analyze.job.output
+queue

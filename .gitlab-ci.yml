@@ -1,0 +1,101 @@
+# =============================================================================
+# CI/CD: проверка узлов → развёртывание HTCondor (MAS) → запуск задания → валидация
+# =============================================================================
+# Runner: только self-hosted с тегом manager (SSH до всех узлов).
+# Секреты и адреса — в GitLab CI/CD Variables (Protected, Masked).
+# MAS не в репо — подгружается из GitLab Package Registry (MAS_PACKAGE_URL).
+# =============================================================================
+
+stages:
+  - setup-nodes
+  - deploy-cluster
+  - run-job
+  - validate
+
+variables:
+  CI_SCRIPTS_DIR: "ci"
+  # Папка с пакетом задания (.sub, бинарники m1/m2, данные). Для репо MAS — подпапка с заданием.
+  JOB_PACKAGE_PATH: "8ecef58c-b8ca-461a-acd9-20c43e9fca5f"
+  # Файл для отправки: salib.dag (DAG) или run.sub (один job)
+  JOB_SUBMIT_FILE: "salib.dag"
+  MAS_READY_TIMEOUT: "300"
+  JOB_WAIT_TIMEOUT: "3600"
+  NODE_CHECK_TIMEOUT: "60"
+  MAS_POLL_INTERVAL: "10"
+
+.only_manager_runner:
+  tags:
+    - manager
+  timeout: 1h
+
+# -----------------------------------------------------------------------------
+# 1. setup-nodes — ping + SSH до submit- и execute-узлов
+# -----------------------------------------------------------------------------
+setup-nodes:
+  stage: setup-nodes
+  extends: .only_manager_runner
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache openssh-client bash
+    - chmod +x "${CI_SCRIPTS_DIR}/setup_nodes.sh"
+  script:
+    - "${CI_SCRIPTS_DIR}/setup_nodes.sh"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
+
+# -----------------------------------------------------------------------------
+# 2. deploy-cluster — скачать MAS из Registry, скопировать на submit-ноду,
+#    запустить MAS, ждать GET /api/status → clusterStatus = "DEPLOY CLUSTER"
+# -----------------------------------------------------------------------------
+deploy-cluster:
+  stage: deploy-cluster
+  extends: .only_manager_runner
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache openssh-client curl bash unzip rsync
+    - chmod +x "${CI_SCRIPTS_DIR}/deploy_cluster.sh"
+  script:
+    - "${CI_SCRIPTS_DIR}/deploy_cluster.sh"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
+
+# -----------------------------------------------------------------------------
+# 3. run-job — kubectl с runner напрямую в под (KUBECONFIG на runner), пакет сразу в под
+# -----------------------------------------------------------------------------
+run-job:
+  stage: run-job
+  extends: .only_manager_runner
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache bash curl
+    - curl -sLO "https://dl.k8s.io/release/v1.28.0/bin/linux/amd64/kubectl" && chmod +x kubectl && mv kubectl /usr/local/bin/
+    - chmod +x "${CI_SCRIPTS_DIR}/run_job.sh"
+  script:
+    - "${CI_SCRIPTS_DIR}/run_job.sh"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
+
+# -----------------------------------------------------------------------------
+# 4. validate — kubectl cp из пода напрямую на runner
+# -----------------------------------------------------------------------------
+validate:
+  stage: validate
+  extends: .only_manager_runner
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache bash curl
+    - curl -sLO "https://dl.k8s.io/release/v1.28.0/bin/linux/amd64/kubectl" && chmod +x kubectl && mv kubectl /usr/local/bin/
+    - chmod +x "${CI_SCRIPTS_DIR}/validate_results.sh"
+  script:
+    - "${CI_SCRIPTS_DIR}/validate_results.sh"
+  artifacts:
+    when: always
+    paths:
+      - ci/artifacts/
+    expire_in: 7 days
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
