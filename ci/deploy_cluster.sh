@@ -3,12 +3,13 @@
 # deploy-cluster: загрузка MAS из GitLab Package Registry, копирование на
 # submit-ноду, запуск MAS, ожидание статуса READY (clusterStatus = DEPLOY CLUSTER).
 # Переменные: MAS_PACKAGE_URL (или авто из реестра текущего проекта), SUBMIT_NODE,
-#             SSH_USER, SSH_PRIVATE_KEY, CONDOR_CLUSTER_PASSWORD, [INVENTORY_CONTENT], MAS_READY_TIMEOUT.
+#             SSH_USER, CONDOR_CLUSTER_PASSWORD, [INVENTORY_CONTENT], MAS_READY_TIMEOUT.
 # Опционально: MAS_PACKAGE_NAME, MAS_PACKAGE_VERSION, MAS_PACKAGE_FILE — для авто-URL реестра.
 # -----------------------------------------------------------------------------
-set -euo pipefail
+set -eu
 
-SSH_OPTS="-o StrictHostKeyChecking=no -o ConnectTimeout=30 -o BatchMode=yes"
+SCRIPT_DIR="$(CDPATH= cd "$(dirname "$0")" && pwd)"
+
 REMOTE_DIR="${MAS_REMOTE_DIR:-/opt/mas}"
 READY_STATUS="${MAS_READY_STATUS:-DEPLOY CLUSTER}"
 TIMEOUT="${MAS_READY_TIMEOUT:-300}"
@@ -30,9 +31,19 @@ if [ -z "${MAS_PACKAGE_URL:-}" ]; then
 fi
 
 echo "==> Настройка SSH..."
-mkdir -p ~/.ssh
-echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-chmod 600 ~/.ssh/id_rsa
+KEY_FILE="${HOME}/.ssh/ci_ssh_key"
+
+if [ ! -f "$KEY_FILE" ]; then
+  echo "ERROR: SSH key not found at '$KEY_FILE'. Put your private key on Jenkins server." >&2
+  exit 1
+fi
+
+chmod 600 "$KEY_FILE" || true
+if ! ssh-keygen -y -f "$KEY_FILE" >/dev/null 2>&1; then
+  echo "ERROR: existing SSH key file is not readable/valid by ssh-keygen: '$KEY_FILE'." >&2
+  exit 1
+fi
+SSH_STRICT_OPTS="-o StrictHostKeyChecking=no -o ConnectTimeout=30 -o BatchMode=yes"
 
 echo "==> Загрузка MAS из Registry..."
 curl -fSL --connect-timeout 30 --retry 2 \
@@ -65,24 +76,24 @@ else
     echo "worker ansible_host=192.168.56.105 ansible_user=kuber ansible_ssh_private_key_file=${KEY_PATH_ON_NODE}"
   
   } > mas-deploy/scripts/inventory.ini
-  # Ключ для Ansible на submit-ноде (подключение к central_manager и execute_nodes)
-  echo "$SSH_PRIVATE_KEY" > mas-deploy/scripts/.ssh_deploy_key
+  # Копируем валидный ключ-файл Jenkins на submit-ноду для Ansible.
+  cp "$KEY_FILE" mas-deploy/scripts/.ssh_deploy_key
   chmod 600 mas-deploy/scripts/.ssh_deploy_key
   echo "==> Inventory сгенерирован: central_manager=$SUBMIT_NODE, execute_nodes=${EXECUTE_NODES:- none}."
 fi
 
 echo "==> Копирование MAS на submit-ноду $SUBMIT_NODE..."
-ssh $SSH_OPTS "${SSH_USER}@${SUBMIT_NODE}" "mkdir -p $REMOTE_DIR"
-rsync -avz -e "ssh $SSH_OPTS" mas-deploy/ "${SSH_USER}@${SUBMIT_NODE}:${REMOTE_DIR}/" || {
+ssh -i "$KEY_FILE" $SSH_STRICT_OPTS "${SSH_USER}@${SUBMIT_NODE}" "mkdir -p $REMOTE_DIR"
+rsync -avz -e "ssh -i $KEY_FILE $SSH_STRICT_OPTS" mas-deploy/ "${SSH_USER}@${SUBMIT_NODE}:${REMOTE_DIR}/" || {
   echo "WARN: rsync не найден, используем scp..."
-  scp $SSH_OPTS -r mas-deploy/* "${SSH_USER}@${SUBMIT_NODE}:${REMOTE_DIR}/"
+  scp -i "$KEY_FILE" $SSH_STRICT_OPTS -r mas-deploy/* "${SSH_USER}@${SUBMIT_NODE}:${REMOTE_DIR}/"
 }
 
 echo "==> Запуск MAS на submit-ноду..."
 JAR=$(find mas-deploy -maxdepth 1 -name '*.jar' -type f 2>/dev/null | head -1)
 JAR_BASE=${JAR:+$(basename "$JAR")}
 JAR_BASE=${JAR_BASE:-MAS-1.0-SNAPSHOT.jar}
-ssh $SSH_OPTS "${SSH_USER}@${SUBMIT_NODE}" "cd $REMOTE_DIR && export CONDOR_CLUSTER_PASSWORD='$CONDOR_CLUSTER_PASSWORD' && nohup java -jar $JAR_BASE > mas.log 2>&1 &"
+ssh -i "$KEY_FILE" $SSH_STRICT_OPTS "${SSH_USER}@${SUBMIT_NODE}" "cd $REMOTE_DIR && export CONDOR_CLUSTER_PASSWORD='$CONDOR_CLUSTER_PASSWORD' && nohup java -jar $JAR_BASE > mas.log 2>&1 &"
 sleep 15
 
 echo "==> Ожидание статуса READY (clusterStatus = $READY_STATUS), таймаут ${TIMEOUT}s..."

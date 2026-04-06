@@ -36,14 +36,14 @@
         sed -ri 's#sandbox_image = ".*"#sandbox_image = "registry.aliyuncs.com/google_containers/pause:{{ pause_version }}"#g' /etc/containerd/config.toml
         mkdir -p /etc/containerd/certs.d/docker.io
         cat >/etc/containerd/certs.d/docker.io/hosts.toml <<'EOF'
-server = "https://registry-1.docker.io"
+        server = "https://registry-1.docker.io"
 
-[host."{{ docker_io_mirror }}"]
-  capabilities = ["pull", "resolve"]
+        [host."{{ docker_io_mirror }}"]
+          capabilities = ["pull", "resolve"]
 
-[host."https://registry-1.docker.io"]
-  capabilities = ["pull", "resolve"]
-EOF
+        [host."https://registry-1.docker.io"]
+          capabilities = ["pull", "resolve"]
+        EOF
 
         if grep -qE '^\s*config_path\s*=\s*"/etc/containerd/certs\.d"\s*$' /etc/containerd/config.toml; then
           true

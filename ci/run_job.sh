@@ -4,7 +4,7 @@
 #             HTCONDOR_MANAGER_POD или HTCONDOR_MANAGER_POD_PREFIX, JOB_PACKAGE_PATH,
 #             JOB_SUBMIT_FILE, JOB_WAIT_TIMEOUT, REMOTE_JOB_DIR, PYTHON_VENV_NAME, PIP_PACKAGES.
 # -----------------------------------------------------------------------------
-set -euo pipefail
+set -eu
 
 REMOTE_JOB_DIR="${REMOTE_JOB_DIR:-/tmp/condor-job}"
 PYTHON_VENV_NAME="${PYTHON_VENV_NAME:-python_env}"
@@ -66,11 +66,14 @@ if [ -n "${PIP_PACKAGES:-}" ]; then
 fi
 
 echo "==> Отправка задания в HTCondor (в поде $POD)..."
-if [[ "$SUBMIT_FILE" == *.dag ]]; then
-  kubectl exec -n "$NS" "$POD" -- bash -c "cd $REMOTE_JOB_DIR && condor_submit_dag -maxjobs 100 $SUBMIT_FILE" | tee submit.out
-else
-  kubectl exec -n "$NS" "$POD" -- bash -c "cd $REMOTE_JOB_DIR && condor_submit $SUBMIT_FILE" | tee submit.out
-fi
+case "$SUBMIT_FILE" in
+  *.dag)
+    kubectl exec -n "$NS" "$POD" -- bash -c "cd $REMOTE_JOB_DIR && condor_submit_dag -maxjobs 100 $SUBMIT_FILE" | tee submit.out
+    ;;
+  *)
+    kubectl exec -n "$NS" "$POD" -- bash -c "cd $REMOTE_JOB_DIR && condor_submit $SUBMIT_FILE" | tee submit.out
+    ;;
+esac
 cluster_id=$(grep "submitted to cluster" submit.out | sed -n 's/.*submitted to cluster \([0-9]*\).*/\1/p' | head -1)
 
 if [ -z "${cluster_id:-}" ]; then

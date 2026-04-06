@@ -6,7 +6,7 @@
 #             HTCONDOR_MANAGER_POD или HTCONDOR_MANAGER_POD_PREFIX, REMOTE_JOB_DIR, JOB_OUTPUT_FILES.
 # Пример на runner: export KUBECONFIG=/etc/kubernetes/admin.conf
 # -----------------------------------------------------------------------------
-set -euo pipefail
+set -eu
 
 REMOTE_JOB_DIR="${REMOTE_JOB_DIR:-/tmp/condor-job}"
 ARTIFACTS_DIR="${CI_PROJECT_DIR:-.}/ci/artifacts"
