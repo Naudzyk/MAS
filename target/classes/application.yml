@@ -19,4 +19,4 @@ mas:
     group: bootstrap
     public-key: ~/.ssh/id_ed25519.pub
   playbook:
-    timeout-minutes: 15
+    timeout-minutes: 45

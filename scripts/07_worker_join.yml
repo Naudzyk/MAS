@@ -1,5 +1,5 @@
 - name: Join worker nodes to Kubernetes cluster
-  hosts: all
+  hosts: central_manager
   gather_facts: yes
   become: yes
   vars_files:
@@ -7,15 +7,11 @@
 
   tasks:
     - name: Stop kubelet on workers
-      when: inventory_hostname == groups['central_manager'][0]
-      run_once: true
       delegate_to: "{{ item }}"
       shell: systemctl stop kubelet || true
       loop: "{{ groups['execute_nodes'] | default([]) }}"
 
     - name: Unmount kubelet mounts on workers
-      when: inventory_hostname == groups['central_manager'][0]
-      run_once: true
       delegate_to: "{{ item }}"
       shell: |
         for m in $(mount | awk '/\/var\/lib\/kubelet/ {print $3}' | sort -r); do umount -f "$m" || true; done
@@ -24,16 +20,12 @@
       loop: "{{ groups['execute_nodes'] | default([]) }}"
 
     - name: kubeadm reset on workers
-      when: inventory_hostname == groups['central_manager'][0]
-      run_once: true
       delegate_to: "{{ item }}"
       command: /usr/bin/kubeadm reset -f
       ignore_errors: true
       loop: "{{ groups['execute_nodes'] | default([]) }}"
 
     - name: Remove kube/kubelet PKI and configs on workers
-      when: inventory_hostname == groups['central_manager'][0]
-      run_once: true
       delegate_to: "{{ item }}"
       shell: |
         rm -rf /etc/kubernetes/pki \
@@ -46,19 +38,77 @@
       loop: "{{ groups['execute_nodes'] | default([]) }}"
 
     - name: Clean CNI state on workers
-      when: inventory_hostname == groups['central_manager'][0]
-      run_once: true
       delegate_to: "{{ item }}"
       shell: rm -rf /etc/cni/net.d/* /var/lib/cni/* || true
       loop: "{{ groups['execute_nodes'] | default([]) }}"
 
+    - name: Ensure CNI plugin directories on workers
+      delegate_to: "{{ item }}"
+      shell: mkdir -p /opt/cni/bin /etc/cni/net.d /var/lib/cni/networks /var/log/calico/cni
+      loop: "{{ groups['execute_nodes'] | default([]) }}"
+
+    - name: Install kubernetes-cni on workers (required by calico install-cni)
+      delegate_to: "{{ item }}"
+      apt:
+        name: kubernetes-cni
+        state: present
+        update_cache: yes
+      loop: "{{ groups['execute_nodes'] | default([]) }}"
+
     - name: Restart containerd and kubelet on workers
-      when: inventory_hostname == groups['central_manager'][0]
-      run_once: true
       delegate_to: "{{ item }}"
       shell: |
         systemctl restart containerd || true
         systemctl restart kubelet || true
+      loop: "{{ groups['execute_nodes'] | default([]) }}"
+
+    - name: Deploy containerd configure script on workers
+      template:
+        src: templates/configure_containerd.sh.j2
+        dest: /tmp/mas-configure-containerd.sh
+        mode: "0755"
+      delegate_to: "{{ item }}"
+      loop: "{{ groups['execute_nodes'] | default([]) }}"
+
+    - name: Run containerd configure on workers
+      command: /tmp/mas-configure-containerd.sh
+      delegate_to: "{{ item }}"
+      loop: "{{ groups['execute_nodes'] | default([]) }}"
+
+    - name: Pre-pull pause image on workers
+      command: ctr -n k8s.io images pull {{ pause_image }}
+      delegate_to: "{{ item }}"
+      register: prepull_pause
+      retries: 3
+      delay: 30
+      until: prepull_pause is succeeded
+      loop: "{{ groups['execute_nodes'] | default([]) }}"
+
+    - name: Pre-pull Calico CNI image on workers
+      command: ctr -n k8s.io images pull {{ calico_cni_image }}
+      delegate_to: "{{ item }}"
+      register: prepull_calico_cni
+      retries: 3
+      delay: 30
+      until: prepull_calico_cni is succeeded
+      loop: "{{ groups['execute_nodes'] | default([]) }}"
+
+    - name: Pre-pull Calico node image on workers
+      command: ctr -n k8s.io images pull {{ calico_node_image }}
+      delegate_to: "{{ item }}"
+      register: prepull_calico_node
+      retries: 3
+      delay: 30
+      until: prepull_calico_node is succeeded
+      loop: "{{ groups['execute_nodes'] | default([]) }}"
+
+    - name: Pre-pull kube-proxy image on workers
+      command: ctr -n k8s.io images pull {{ k8s_image_repository }}/kube-proxy:v{{ k8s_version }}
+      delegate_to: "{{ item }}"
+      register: prepull_kube_proxy
+      retries: 3
+      delay: 30
+      until: prepull_kube_proxy is succeeded
       loop: "{{ groups['execute_nodes'] | default([]) }}"
 
     - name: Get join command (control-plane)
@@ -66,38 +116,75 @@
       environment:
         KUBECONFIG: /etc/kubernetes/admin.conf
       register: join_cmd
-      when: "'central_manager' in group_names"
-      run_once: true
-      delegate_to: central_manager
 
     - name: Build full join command using system kubeadm
       set_fact:
         join_command_full: "{{ join_cmd.stdout | trim | regex_replace('^kubeadm','/usr/bin/kubeadm') }}"
       when: join_cmd is defined
-      run_once: true
-      delegate_to: central_manager
 
-    - name: Join workers to cluster (single driver)
+    - name: Join workers to cluster
       when:
-        - inventory_hostname == groups['central_manager'][0]
         - groups['execute_nodes'] is defined
         - (groups['execute_nodes'] | length) > 0
         - join_command_full is defined
-      run_once: true
       delegate_to: "{{ item }}"
       shell: "{{ join_command_full }}"
       args:
         executable: /bin/bash
       loop: "{{ groups['execute_nodes'] }}"
 
-    - name: Wait for nodes Ready
-      command: /usr/bin/kubectl get nodes -o jsonpath='{.items[*].status.conditions[?(@.type=="Ready")].status}'
+    - name: Point Calico at real API server before waiting for CNI on workers
+      shell: |
+        /usr/bin/kubectl -n kube-system create configmap kubernetes-services-endpoint \
+          --from-literal=KUBERNETES_SERVICE_HOST="{{ central_manager_ip }}" \
+          --from-literal=KUBERNETES_SERVICE_PORT="6443" \
+          --dry-run=client -o yaml | /usr/bin/kubectl apply -f -
       environment:
         KUBECONFIG: /root/.kube/config
-      register: nodes_status
+
+    - name: Restart calico-node after worker join (pick up API endpoint override)
+      command: /usr/bin/kubectl -n kube-system rollout restart ds/calico-node
+      environment:
+        KUBECONFIG: /root/.kube/config
+
+    - name: Wait for all nodes Ready
+      shell: |
+        set -e
+        not_ready=$(/usr/bin/kubectl get nodes --no-headers | awk '$2!="Ready"{print $1}' | paste -sd, -)
+        if [ -n "$not_ready" ]; then
+          echo "Not Ready: $not_ready"
+          exit 1
+        fi
+      environment:
+        KUBECONFIG: /root/.kube/config
+      register: nodes_ready
       retries: 60
       delay: 10
-      until: "'True' in nodes_status.stdout"
-      when: "'central_manager' in group_names"
-      delegate_to: central_manager
+      until: nodes_ready.rc == 0
 
+    - name: Wait for calico-node on all nodes after worker join
+      command: /usr/bin/kubectl -n kube-system rollout status ds/calico-node --timeout=600s
+      environment:
+        KUBECONFIG: /root/.kube/config
+      register: calico_after_join
+      failed_when: false
+
+    - name: Get calico-node status when rollout failed after join (diagnostic)
+      command: /usr/bin/kubectl -n kube-system get pods -l k8s-app=calico-node -o wide
+      environment:
+        KUBECONFIG: /root/.kube/config
+      register: calico_pods_after
+      changed_when: false
+      when:
+        - calico_after_join is defined
+        - calico_after_join.rc != 0
+
+    - name: Fail if calico-node not ready after worker join
+      fail:
+        msg: |
+          calico-node did not become ready after worker join (worker stays NotReady without CNI).
+          Pods:
+          {{ calico_pods_after.stdout | default('(none)') }}
+      when:
+        - calico_after_join is defined
+        - calico_after_join.rc != 0

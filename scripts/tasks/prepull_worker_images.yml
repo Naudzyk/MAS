@@ -1,0 +1,27 @@
+- name: Pre-pull pause image on worker (pod sandbox)
+  command: ctr -n k8s.io images pull {{ pause_image }}
+  register: prepull_pause
+  retries: 3
+  delay: 30
+  until: prepull_pause.rc == 0
+
+- name: Pre-pull Calico CNI image on worker
+  command: ctr -n k8s.io images pull {{ calico_cni_image }}
+  register: prepull_calico_cni
+  retries: 3
+  delay: 30
+  until: prepull_calico_cni.rc == 0
+
+- name: Pre-pull Calico node image on worker
+  command: ctr -n k8s.io images pull {{ calico_node_image }}
+  register: prepull_calico_node
+  retries: 3
+  delay: 30
+  until: prepull_calico_node.rc == 0
+
+- name: Pre-pull kube-proxy image on worker
+  command: ctr -n k8s.io images pull {{ k8s_image_repository }}/kube-proxy:v{{ k8s_version }}
+  register: prepull_kube_proxy
+  retries: 3
+  delay: 30
+  until: prepull_kube_proxy.rc == 0

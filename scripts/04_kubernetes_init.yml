@@ -19,21 +19,29 @@
         systemctl restart containerd
         systemctl restart kubelet
 
-    - name: Pre-pull images for kubeadm (control-plane only)
-      command: /usr/bin/kubeadm config images pull --kubernetes-version v{{ k8s_version }} --image-repository registry.aliyuncs.com/google_containers
+    - name: Render kubeadm config (control-plane only)
+      template:
+        src: templates/kubeadm-config.yaml.j2
+        dest: /tmp/kubeadm-config.yaml
+        mode: "0644"
       when: "'central_manager' in group_names"
       run_once: true
       delegate_to: central_manager
 
+    - name: Pre-pull images for kubeadm (control-plane only)
+      command: /usr/bin/kubeadm config images pull --config /tmp/kubeadm-config.yaml
+      when: "'central_manager' in group_names"
+      run_once: true
+      delegate_to: central_manager
+      register: prepull_result
+      retries: 3
+      delay: 60
+      until: prepull_result.rc == 0
+      async: 3600
+      poll: 30
+
     - name: kubeadm init on control-plane
-      command: >
-        /usr/bin/kubeadm init
-        --kubernetes-version v{{ k8s_version }}
-        --control-plane-endpoint {{ central_manager_ip }}
-        --apiserver-advertise-address={{ central_manager_ip }}
-        --pod-network-cidr=10.244.0.0/16
-        --image-repository registry.aliyuncs.com/google_containers
-        --v=5
+      command: /usr/bin/kubeadm init --config /tmp/kubeadm-config.yaml --v=5
       register: init_out
       when: "'central_manager' in group_names"
       run_once: true

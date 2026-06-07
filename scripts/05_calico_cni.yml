@@ -70,6 +70,26 @@
       delegate_to: central_manager
       run_once: true
 
+    - name: Point Calico at real API server (workers cannot reach 10.96.0.1 before CNI)
+      shell: |
+        /usr/bin/kubectl -n kube-system create configmap kubernetes-services-endpoint \
+          --from-literal=KUBERNETES_SERVICE_HOST="{{ central_manager_ip }}" \
+          --from-literal=KUBERNETES_SERVICE_PORT="6443" \
+          --dry-run=client -o yaml | /usr/bin/kubectl apply -f -
+      environment:
+        KUBECONFIG: "{{ kubeconfig_path }}"
+      when: "'central_manager' in group_names"
+      delegate_to: central_manager
+      run_once: true
+
+    - name: Restart calico-node to pick up API endpoint override
+      command: /usr/bin/kubectl -n kube-system rollout restart ds/calico-node
+      environment:
+        KUBECONFIG: "{{ kubeconfig_path }}"
+      when: "'central_manager' in group_names"
+      delegate_to: central_manager
+      run_once: true
+
     - name: Ensure vxlan module loads on boot
       lineinfile:
         path: /etc/modules-load.d/k8s.conf

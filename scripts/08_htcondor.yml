@@ -165,6 +165,24 @@
 
     - name: Create DaemonSet for Execute Nodes
       block:
+        - name: Require worker nodes Ready before execute DaemonSet
+          shell: |
+            set -e
+            workers=$(/usr/bin/kubectl get nodes -l '!node-role.kubernetes.io/control-plane' --no-headers | wc -l)
+            if [ "$workers" -eq 0 ]; then
+              echo "No worker nodes in cluster"
+              exit 1
+            fi
+            not_ready=$(/usr/bin/kubectl get nodes -l '!node-role.kubernetes.io/control-plane' --no-headers | awk '$2!="Ready"{print $1}' | paste -sd, -)
+            if [ -n "$not_ready" ]; then
+              echo "Worker nodes NotReady: $not_ready"
+              exit 1
+            fi
+          environment:
+            KUBECONFIG: "{{ kubeconfig_path }}"
+          register: workers_ready
+          changed_when: false
+
         - name: Apply DaemonSet manifest
           kubernetes.core.k8s:
             kubeconfig: "{{ kubeconfig_path }}"
