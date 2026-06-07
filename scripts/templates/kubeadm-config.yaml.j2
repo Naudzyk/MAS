@@ -1,4 +1,13 @@
 apiVersion: kubeadm.k8s.io/v1beta3
+kind: InitConfiguration
+localAPIEndpoint:
+  advertiseAddress: {{ central_manager_ip }}
+  bindPort: 6443
+nodeRegistration:
+  kubeletExtraArgs:
+    node-ip: "{{ central_manager_ip }}"
+---
+apiVersion: kubeadm.k8s.io/v1beta3
 kind: ClusterConfiguration
 kubernetesVersion: v{{ k8s_version }}
 imageRepository: {{ k8s_image_repository }}
@@ -8,6 +17,4 @@ dns:
 {% endif %}
 networking:
   podSubnet: 10.244.0.0/16
-controlPlaneEndpoint: {{ central_manager_ip }}
-localAPIEndpoint:
-  advertiseAddress: {{ central_manager_ip }}
+controlPlaneEndpoint: "{{ central_manager_ip }}:6443"

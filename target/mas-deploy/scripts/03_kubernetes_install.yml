@@ -171,9 +171,9 @@
       changed_when: false
       failed_when: route_ip.rc != 0 and (route_ip.stdout | trim) == ""
 
-    - name: Compute kubelet node-ip
+    - name: Compute kubelet node-ip (inventory host IP, not NAT default route)
       set_fact:
-        k8s_node_ip: "{{ (route_ip.stdout | trim) | default(ansible_default_ipv4.address, true) }}"
+        k8s_node_ip: "{{ ansible_host | default((route_ip.stdout | trim) | default(ansible_default_ipv4.address, true)) }}"
 
     - name: Ensure kubelet env dir exists (RHEL)
       file:

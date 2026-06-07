@@ -1,89 +1,13 @@
-- name: Configure containerd (SystemdCgroup + pause + registry mirrors)
+- name: Deploy containerd configure script
+  template:
+    src: templates/configure_containerd.sh.j2
+    dest: /usr/local/sbin/mas-configure-containerd.sh
+    mode: "0755"
+    newline_sequence: "\n"
+
+- name: Run containerd configure script
   shell: |
-    mkdir -p /etc/containerd
-    containerd config default > /etc/containerd/config.toml
-    sed -ri 's#(SystemdCgroup = )false#\1true#g' /etc/containerd/config.toml
-    sed -ri 's#sandbox_image = ".*"#sandbox_image = "{{ k8s_image_repository }}/pause:{{ pause_version }}"#g' /etc/containerd/config.toml
-    mkdir -p /etc/containerd/certs.d/docker.io
-    cat >/etc/containerd/certs.d/docker.io/hosts.toml <<'EOF'
-    server = "https://registry-1.docker.io"
-
-    [host."{{ docker_io_mirror }}"]
-      capabilities = ["pull", "resolve"]
-
-    [host."https://registry-1.docker.io"]
-      capabilities = ["pull", "resolve"]
-    EOF
-
-    mkdir -p /etc/containerd/certs.d/quay.io
-    cat >/etc/containerd/certs.d/quay.io/hosts.toml <<'EOF'
-    server = "https://quay.io"
-
-    [host."{{ quay_io_mirror }}"]
-      capabilities = ["pull", "resolve"]
-
-    [host."https://quay.io"]
-      capabilities = ["pull", "resolve"]
-    EOF
-
-    mkdir -p /etc/containerd/certs.d/ghcr.io
-    cat >/etc/containerd/certs.d/ghcr.io/hosts.toml <<'EOF'
-    server = "https://ghcr.io"
-
-    [host."{{ ghcr_io_mirror }}"]
-      capabilities = ["pull", "resolve"]
-
-    [host."https://ghcr.io"]
-      capabilities = ["pull", "resolve"]
-    EOF
-
-    mkdir -p /etc/containerd/certs.d/registry.k8s.io
-    if [ -n "{{ k8s_registry_mirror }}" ]; then
-      cat >/etc/containerd/certs.d/registry.k8s.io/hosts.toml <<'EOF'
-    server = "https://registry.k8s.io"
-
-    [host."{{ k8s_registry_mirror }}"]
-      capabilities = ["pull", "resolve"]
-
-    [host."https://registry.k8s.io"]
-      capabilities = ["pull", "resolve"]
-    EOF
-    else
-      cat >/etc/containerd/certs.d/registry.k8s.io/hosts.toml <<'EOF'
-    server = "https://registry.k8s.io"
-
-    [host."https://registry.k8s.io"]
-      capabilities = ["pull", "resolve"]
-    EOF
-    fi
-
-    if grep -qE '^\s*config_path\s*=\s*"/etc/containerd/certs\.d"\s*$' /etc/containerd/config.toml; then
-      true
-    elif grep -qE '^\s*\[plugins\."io\.containerd\.grpc\.v1\.cri"\.registry\]\s*$' /etc/containerd/config.toml; then
-      awk '
-        {print}
-        /^\[plugins\."io\.containerd\.grpc\.v1\.cri"\.registry\]$/ {print "  config_path = \"/etc/containerd/certs.d\""}
-      ' /etc/containerd/config.toml > /etc/containerd/config.toml.tmp && mv /etc/containerd/config.toml.tmp /etc/containerd/config.toml
-    else
-      cat >>/etc/containerd/config.toml <<'EOF'
-
-    [plugins."io.containerd.grpc.v1.cri".registry]
-      config_path = "/etc/containerd/certs.d"
-    EOF
-    fi
-
-    mkdir -p /var/lib/containerd
-    systemctl daemon-reload
-    systemctl enable --now containerd
-    systemctl restart containerd
+    sed -i 's/\r$//' /usr/local/sbin/mas-configure-containerd.sh
+    /bin/bash /usr/local/sbin/mas-configure-containerd.sh
   args:
     executable: /bin/bash
-
-- name: Install crictl endpoint config
-  copy:
-    dest: /etc/crictl.yaml
-    mode: "0644"
-    content: |
-      runtime-endpoint: unix:///run/containerd/containerd.sock
-      image-endpoint: unix:///run/containerd/containerd.sock
-      timeout: 0

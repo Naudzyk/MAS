@@ -1,10 +1,95 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 
+PAUSE_IMAGE="{{ pause_image }}"
+CONFIG="/etc/containerd/config.toml"
+CERTS_DIR="/etc/containerd/certs.d"
+
+IMAGES='^\[plugins\."io\.containerd\.cri\.v1\.images"\]$'
+IMAGES_ANY='^\[plugins\."io\.containerd\.cri\.v1\.images"'
+IMAGES_REG='^\[plugins\."io\.containerd\.cri\.v1\.images"\.registry\]$'
+GRPC='^\[plugins\."io\.containerd\.grpc\.v1\.cri"\]$'
+GRPC_REG='^\[plugins\."io\.containerd\.grpc\.v1\.cri"\.registry\]$'
+
 mkdir -p /etc/containerd
-containerd config default > /etc/containerd/config.toml
-sed -ri 's#(SystemdCgroup = )false#\1true#g' /etc/containerd/config.toml
-sed -ri 's#sandbox_image = ".*"#sandbox_image = "{{ pause_image }}"#g' /etc/containerd/config.toml
+containerd config default > "${CONFIG}"
+sed -ri 's#(SystemdCgroup = )false#\1true#g' "${CONFIG}"
+
+# sandbox_image
+# containerd 2.x often has only [plugins."io.containerd.cri.v1.images".registry]
+# which implicitly creates the parent table — appending [..images] again duplicates it.
+if grep -qE '^\s*sandbox_image\s*=' "${CONFIG}"; then
+  sed -ri "0,/^\s*sandbox_image\s*=.*$/s//  sandbox_image = \"${PAUSE_IMAGE}\"/" "${CONFIG}"
+elif grep -qE "${IMAGES}" "${CONFIG}"; then
+  awk -v img="${PAUSE_IMAGE}" '
+    /^\[plugins\."io\.containerd\.cri\.v1\.images"\]$/ {
+      print
+      print "  sandbox_image = \"" img "\""
+      next
+    }
+    { print }
+  ' "${CONFIG}" > "${CONFIG}.tmp" && mv "${CONFIG}.tmp" "${CONFIG}"
+elif grep -qE "${IMAGES_ANY}" "${CONFIG}"; then
+  awk -v img="${PAUSE_IMAGE}" '
+    /^\[plugins\."io\.containerd\.cri\.v1\.images"/ && !done {
+      print "[plugins.\"io.containerd.cri.v1.images\"]"
+      print "  sandbox_image = \"" img "\""
+      print ""
+      done = 1
+    }
+    { print }
+  ' "${CONFIG}" > "${CONFIG}.tmp" && mv "${CONFIG}.tmp" "${CONFIG}"
+elif grep -qE "${GRPC}" "${CONFIG}"; then
+  awk -v img="${PAUSE_IMAGE}" '
+    /^\[plugins\."io\.containerd\.grpc\.v1\.cri"\]$/ {
+      print
+      print "  sandbox_image = \"" img "\""
+      next
+    }
+    { print }
+  ' "${CONFIG}" > "${CONFIG}.tmp" && mv "${CONFIG}.tmp" "${CONFIG}"
+else
+  cat >>"${CONFIG}" <<EOF
+
+[plugins."io.containerd.cri.v1.images"]
+  sandbox_image = "${PAUSE_IMAGE}"
+EOF
+fi
+
+# registry mirrors path
+if grep -qE '^\s*config_path\s*=' "${CONFIG}"; then
+  sed -ri "s#^\s*config_path\s*=.*#  config_path = \"${CERTS_DIR}\"#g" "${CONFIG}"
+elif grep -qE "${IMAGES_REG}" "${CONFIG}"; then
+  awk -v p="${CERTS_DIR}" '
+    /^\[plugins\."io\.containerd\.cri\.v1\.images"\.registry\]$/ {
+      print
+      print "  config_path = \"" p "\""
+      next
+    }
+    { print }
+  ' "${CONFIG}" > "${CONFIG}.tmp" && mv "${CONFIG}.tmp" "${CONFIG}"
+elif grep -qE "${GRPC_REG}" "${CONFIG}"; then
+  awk -v p="${CERTS_DIR}" '
+    /^\[plugins\."io\.containerd\.grpc\.v1\.cri"\.registry\]$/ {
+      print
+      print "  config_path = \"" p "\""
+      next
+    }
+    { print }
+  ' "${CONFIG}" > "${CONFIG}.tmp" && mv "${CONFIG}.tmp" "${CONFIG}"
+elif grep -qE "${IMAGES}" "${CONFIG}" && ! grep -qE "${IMAGES_REG}" "${CONFIG}"; then
+  cat >>"${CONFIG}" <<EOF
+
+[plugins."io.containerd.cri.v1.images".registry]
+  config_path = "${CERTS_DIR}"
+EOF
+elif grep -qE "${GRPC}" "${CONFIG}" && ! grep -qE "${GRPC_REG}" "${CONFIG}"; then
+  cat >>"${CONFIG}" <<EOF
+
+[plugins."io.containerd.grpc.v1.cri".registry]
+  config_path = "${CERTS_DIR}"
+EOF
+fi
 
 mkdir -p /etc/containerd/certs.d/docker.io
 cat >/etc/containerd/certs.d/docker.io/hosts.toml <<'EOF'
@@ -59,21 +144,6 @@ server = "https://registry.k8s.io"
 EOF
 {% endif %}
 
-if grep -qE '^\s*config_path\s*=\s*"/etc/containerd/certs\.d"\s*$' /etc/containerd/config.toml; then
-  true
-elif grep -qE '^\s*\[plugins\."io\.containerd\.grpc\.v1\.cri"\.registry\]\s*$' /etc/containerd/config.toml; then
-  awk '
-    {print}
-    /^\[plugins\."io\.containerd\.grpc\.v1\.cri"\.registry\]$/ {print "  config_path = \"/etc/containerd/certs.d\""}
-  ' /etc/containerd/config.toml > /etc/containerd/config.toml.tmp && mv /etc/containerd/config.toml.tmp /etc/containerd/config.toml
-else
-  cat >>/etc/containerd/config.toml <<'EOF'
-
-[plugins."io.containerd.grpc.v1.cri".registry]
-  config_path = "/etc/containerd/certs.d"
-EOF
-fi
-
 cat >/etc/crictl.yaml <<'EOF'
 runtime-endpoint: unix:///run/containerd/containerd.sock
 image-endpoint: unix:///run/containerd/containerd.sock
@@ -81,6 +151,13 @@ timeout: 0
 EOF
 
 mkdir -p /var/lib/containerd
+
+if ! containerd --config "${CONFIG}" config dump >/dev/null 2>&1; then
+  echo "containerd config validation failed:" >&2
+  containerd --config "${CONFIG}" config dump >&2 || true
+  exit 1
+fi
+
 systemctl daemon-reload
-systemctl enable --now containerd
+systemctl enable containerd
 systemctl restart containerd

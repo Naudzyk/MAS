@@ -65,13 +65,18 @@
     - name: Deploy containerd configure script on workers
       template:
         src: templates/configure_containerd.sh.j2
-        dest: /tmp/mas-configure-containerd.sh
+        dest: /usr/local/sbin/mas-configure-containerd.sh
         mode: "0755"
+        newline_sequence: "\n"
       delegate_to: "{{ item }}"
       loop: "{{ groups['execute_nodes'] | default([]) }}"
 
     - name: Run containerd configure on workers
-      command: /tmp/mas-configure-containerd.sh
+      shell: |
+        sed -i 's/\r$//' /usr/local/sbin/mas-configure-containerd.sh
+        /bin/bash /usr/local/sbin/mas-configure-containerd.sh
+      args:
+        executable: /bin/bash
       delegate_to: "{{ item }}"
       loop: "{{ groups['execute_nodes'] | default([]) }}"
 

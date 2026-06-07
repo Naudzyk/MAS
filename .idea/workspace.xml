@@ -5,80 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version  07.06.2026 ver &quot;">
-      <change afterPath="$PROJECT_DIR$/scripts/tasks/configure_containerd.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/tasks/prepull_worker_images.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/templates/configure_containerd.sh.j2" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/templates/kubeadm-config.yaml.j2" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/.gitlab-ci.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/analyze.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/analyze.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/analyze.sub" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/conaninfo.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/conanmanifest.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/deploy_manifest.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/duckdb.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/gas2003.sqlite3" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/gas2003_1.duckdb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/gas2003_in.duckdb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/libprojectlib.a" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/libtbb.so" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/libtbb.so.2" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/libtbbmalloc.so" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/libtbbmalloc.so.2" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/libtbbmalloc_proxy.so" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/libtbbmalloc_proxy.so.2" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/m1" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/m1.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/m1.sub" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/m2" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/m2.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/m2.sub" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/m3" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/m3.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/m3.sub" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/max_order.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/method.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/model_input.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/model_output.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/parameter_file.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/run.job.err" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/run.job.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/run.job.output" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/run.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/run.sub" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/salib.dag" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/salib.dag.condor.sub" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/salib.dag.dagman.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/salib.dag.dagman.out" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/salib.dag.lib.err" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/salib.dag.lib.out" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/salib.dag.metrics" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/salib.dag.nodes.log" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/salib.dag.old" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/salib.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/salib_highs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/sample.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/sample.sub" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/samples.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/8ecef58c-b8ca-461a-acd9-20c43e9fca5f/sobol.sub" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ci/README-CICD.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ci/deploy_cluster.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ci/run_job.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ci/setup_nodes.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ci/validate_results.sh" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/02_containerd.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/02_containerd.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/04_kubernetes_init.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/04_kubernetes_init.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/05_calico_cni.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/05_calico_cni.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/03_kubernetes_install.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/03_kubernetes_install.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/07_worker_join.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/07_worker_join.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/08_htcondor.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/08_htcondor.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/vars.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/vars.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/tasks/configure_containerd.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/tasks/configure_containerd.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/templates/configure_containerd.sh.j2" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/templates/configure_containerd.sh.j2" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/templates/kubeadm-config.yaml.j2" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/templates/kubeadm-config.yaml.j2" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar.original" beforeDir="false" afterPath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar.original" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/antrun/build-main.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/mas-deploy-1.1.1.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/mas-deploy-1.0-SNAPSHOT.zip" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/target/mas-deploy/MAS-1.0-SNAPSHOT.jar" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/target/mas-deploy/scripts/01_system_preparation.yml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/target/mas-deploy/scripts/02_containerd.yml" beforeDir="false" />
@@ -97,6 +34,10 @@
       <change beforePath="$PROJECT_DIR$/target/mas-deploy/scripts/inventory.ini" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/target/mas-deploy/scripts/os/debian.yml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/target/mas-deploy/scripts/os/redhat.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/mas-deploy/scripts/tasks/configure_containerd.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/mas-deploy/scripts/tasks/prepull_worker_images.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/mas-deploy/scripts/templates/configure_containerd.sh.j2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/mas-deploy/scripts/templates/kubeadm-config.yaml.j2" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/target/mas-deploy/scripts/vars.yml" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -369,15 +310,7 @@
       <workItem from="1779168724430" duration="667000" />
       <workItem from="1779169412858" duration="396000" />
       <workItem from="1779525593849" duration="23000" />
-      <workItem from="1780803653174" duration="786000" />
-    </task>
-    <task id="LOCAL-00049" summary="&quot;Version Spring-Web 8.5&quot;">
-      <option name="closed" value="true" />
-      <created>1762238575285</created>
-      <option name="number" value="00049" />
-      <option name="presentableId" value="LOCAL-00049" />
-      <option name="project" value="LOCAL" />
-      <updated>1762238575285</updated>
+      <workItem from="1780803653174" duration="2478000" />
     </task>
     <task id="LOCAL-00050" summary="&quot;Version Spring-Web 8.6&quot;">
       <option name="closed" value="true" />
@@ -763,7 +696,15 @@
       <option name="project" value="LOCAL" />
       <updated>1780804499994</updated>
     </task>
-    <option name="localTasksCounter" value="98" />
+    <task id="LOCAL-00098" summary="&quot;Version  07.06.2026 ver &quot;">
+      <option name="closed" value="true" />
+      <created>1780807553655</created>
+      <option name="number" value="00098" />
+      <option name="presentableId" value="LOCAL-00098" />
+      <option name="project" value="LOCAL" />
+      <updated>1780807553655</updated>
+    </task>
+    <option name="localTasksCounter" value="99" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

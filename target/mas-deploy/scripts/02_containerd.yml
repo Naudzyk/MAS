@@ -28,8 +28,19 @@
         state: present
       when: resolved_os_family == 'redhat'
 
-    - name: Apply containerd configuration
-      import_tasks: tasks/configure_containerd.yml
+    - name: Deploy containerd configure script
+      template:
+        src: templates/configure_containerd.sh.j2
+        dest: /usr/local/sbin/mas-configure-containerd.sh
+        mode: "0755"
+        newline_sequence: "\n"
+
+    - name: Run containerd configure script
+      shell: |
+        sed -i 's/\r$//' /usr/local/sbin/mas-configure-containerd.sh
+        /bin/bash /usr/local/sbin/mas-configure-containerd.sh
+      args:
+        executable: /bin/bash
 
     - name: Pre-pull pause image on all nodes (pod sandbox)
       command: ctr -n k8s.io images pull {{ pause_image }}
