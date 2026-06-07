@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="maven-antrun-" default="main">
+  <target name="main">
+    <property name="deploy.dir" value="C:\Users\EVgeNII\IdeaProjects\MAS\target/mas-deploy" />
+    <mkdir dir="${deploy.dir}" />
+    <copy file="C:\Users\EVgeNII\IdeaProjects\MAS\target/MAS-1.0-SNAPSHOT.jar" tofile="${deploy.dir}/MAS-1.0-SNAPSHOT.jar" />
+    <copy todir="${deploy.dir}/scripts" overwrite="true">
+      <fileset dir="C:\Users\EVgeNII\IdeaProjects\MAS/scripts" />
+    </copy>
+  </target>
+</project>

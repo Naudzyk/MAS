@@ -1,0 +1,1 @@
+central_manager_ip: "{{ hostvars[groups['central_manager'][0]].ansible_host | default(groups['central_manager'][0]) }}"

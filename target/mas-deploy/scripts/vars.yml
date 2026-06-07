@@ -1,0 +1,23 @@
+ansible_python_interpreter: /usr/bin/python3
+
+k8s_version: "1.30.7"
+# Manual pull tests on submit: Aliyun google_containers OK (incl. coredns); DaoCloud coredns 503.
+k8s_image_repository: registry.cn-hangzhou.aliyuncs.com/google_containers
+# Only for mirrors like k8s.m.daocloud.io; leave empty for google_containers layout.
+k8s_dns_image_repository: ""
+# Optional containerd fallback for registry.k8s.io; empty when kubeadm pulls from google_containers directly.
+k8s_registry_mirror: ""
+k8s_pkg_mirror: "yandex"
+pause_version: "3.9"
+pause_image: "{{ k8s_image_repository }}/pause:{{ pause_version }}"
+calico_cni_image: "{{ calico_image_registry }}/cni:{{ calico_version }}"
+calico_node_image: "{{ calico_image_registry }}/node:{{ calico_version }}"
+condor_image: "ghcr.io/naudzyk/condor-ubuntu24.04:latest"
+htcondor_busybox_image: "quay.io/quay/busybox:latest"
+condor_logs_dir: "/var/log/condor"
+condor_cluster_password: "{{ lookup('env', 'CONDOR_CLUSTER_PASSWORD') }}"
+calico_image_registry: "quay.io/calico"
+calico_version: "v3.27.3"
+docker_io_mirror: "https://docker.m.daocloud.io"
+quay_io_mirror: "https://quay.m.daocloud.io"
+ghcr_io_mirror: "https://ghcr.m.daocloud.io"

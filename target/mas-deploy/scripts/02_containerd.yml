@@ -1,0 +1,41 @@
+---
+- name: Install and configure containerd
+  hosts: all
+  gather_facts: yes
+  become: yes
+  vars_files:
+    - vars.yml
+
+  vars:
+    _debian_like: [Debian, Ubuntu, "Astra Linux"]
+    _redhat_like: [RedHat, CentOS, Rocky, AlmaLinux, Fedora, RedOS]
+
+  tasks:
+    - name: Resolve OS family
+      set_fact:
+        resolved_os_family: "{{ 'redhat' if (ansible_os_family in _redhat_like or (ansible_distribution | default('')) in ['RedOS', 'Red OS']) else 'debian' }}"
+
+    - name: Install containerd (Debian/Ubuntu/AstraLinux)
+      apt:
+        name: containerd
+        state: present
+        update_cache: yes
+      when: resolved_os_family == 'debian'
+
+    - name: Install containerd (RHEL/Rocky/RedOS)
+      dnf:
+        name: containerd
+        state: present
+      when: resolved_os_family == 'redhat'
+
+    - name: Apply containerd configuration
+      import_tasks: tasks/configure_containerd.yml
+
+    - name: Pre-pull pause image on all nodes (pod sandbox)
+      command: ctr -n k8s.io images pull {{ pause_image }}
+      register: pause_pull
+      retries: 3
+      delay: 30
+      until: pause_pull.rc == 0
+      async: 600
+      poll: 15
