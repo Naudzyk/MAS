@@ -1,5 +1,7 @@
+# hosts: central_manager (а не all): задачи делегируются воркерам через delegate_to,
+# поэтому при hosts: all каждая задача выполнялась бы по одному разу на каждый хост inventory.
 - name: Prepare worker nodes for Kubernetes
-  hosts: all
+  hosts: central_manager
   gather_facts: yes
   become: yes
   vars_files:

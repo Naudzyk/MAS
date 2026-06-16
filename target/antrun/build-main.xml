@@ -7,5 +7,6 @@
     <copy todir="${deploy.dir}/scripts" overwrite="true">
       <fileset dir="C:\Users\EVgeNII\IdeaProjects\MAS/scripts" />
     </copy>
+    <zip basedir="${deploy.dir}" destfile="C:\Users\EVgeNII\IdeaProjects\MAS\target/mas-deploy-1.0-SNAPSHOT.zip" />
   </target>
 </project>

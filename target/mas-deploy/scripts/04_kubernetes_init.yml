@@ -26,13 +26,13 @@
         mode: "0644"
       when: "'central_manager' in group_names"
       run_once: true
-      delegate_to: central_manager
+      delegate_to: "{{ groups['central_manager'][0] }}"
 
     - name: Pre-pull images for kubeadm (control-plane only)
       command: /usr/bin/kubeadm config images pull --config /tmp/kubeadm-config.yaml
       when: "'central_manager' in group_names"
       run_once: true
-      delegate_to: central_manager
+      delegate_to: "{{ groups['central_manager'][0] }}"
       register: prepull_result
       retries: 3
       delay: 60
@@ -45,19 +45,21 @@
       register: init_out
       when: "'central_manager' in group_names"
       run_once: true
-      delegate_to: central_manager
+      delegate_to: "{{ groups['central_manager'][0] }}"
 
-    - name: Setup kubeconfig for root and manager on control-plane
+    - name: Setup kubeconfig for root (and manager, if such user exists) on control-plane
       shell: |
         mkdir -p /root/.kube
         cp -f /etc/kubernetes/admin.conf /root/.kube/config
         chown -R root:root /root/.kube
-        mkdir -p /home/manager/.kube
-        cp -f /etc/kubernetes/admin.conf /home/manager/.kube/config
-        chown manager:manager /home/manager/.kube/config
-        chmod 600 /home/manager/.kube/config
+        if id manager >/dev/null 2>&1; then
+          mkdir -p /home/manager/.kube
+          cp -f /etc/kubernetes/admin.conf /home/manager/.kube/config
+          chown manager:manager /home/manager/.kube/config
+          chmod 600 /home/manager/.kube/config
+        fi
       when: "'central_manager' in group_names"
-      delegate_to: central_manager
+      delegate_to: "{{ groups['central_manager'][0] }}"
 
 
   handlers:

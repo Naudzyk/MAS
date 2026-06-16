@@ -5,7 +5,15 @@
   vars_files:
     - vars.yml
 
+  vars:
+    kubeconfig_path: /etc/kubernetes/admin.conf
+
   tasks:
+    - name: Gather facts on workers before join
+      setup:
+      delegate_to: "{{ item }}"
+      loop: "{{ groups['execute_nodes'] | default([]) }}"
+
     - name: Stop kubelet on workers
       delegate_to: "{{ item }}"
       shell: systemctl stop kubelet || true
@@ -49,10 +57,10 @@
 
     - name: Install kubernetes-cni on workers (required by calico install-cni)
       delegate_to: "{{ item }}"
-      apt:
+      # package: auto-selects apt/dnf, so it works for Debian and RHEL/RedOS workers
+      package:
         name: kubernetes-cni
         state: present
-        update_cache: yes
       loop: "{{ groups['execute_nodes'] | default([]) }}"
 
     - name: Restart containerd and kubelet on workers
@@ -116,6 +124,32 @@
       until: prepull_kube_proxy is succeeded
       loop: "{{ groups['execute_nodes'] | default([]) }}"
 
+    - name: Load vxlan module on workers (required by Calico VXLAN)
+      delegate_to: "{{ item }}"
+      shell: modprobe vxlan || true
+      loop: "{{ groups['execute_nodes'] | default([]) }}"
+
+    - name: Ensure kubelet node-ip on workers matches inventory (before join)
+      delegate_to: "{{ item }}"
+      copy:
+        dest: >-
+          {{ '/etc/sysconfig/kubelet'
+             if (hostvars[item].ansible_os_family | default('')) in ['RedHat','Rocky','AlmaLinux','CentOS','Fedora']
+             or (hostvars[item].ansible_distribution | default('')) in ['RedOS', 'Red OS']
+             else '/etc/default/kubelet' }}
+        content: |
+          KUBELET_EXTRA_ARGS="--node-ip={{ hostvars[item].ansible_host | default(item) }}"
+        mode: "0644"
+      loop: "{{ groups['execute_nodes'] | default([]) }}"
+
+    - name: Restart kubelet on workers to apply node-ip before join
+      delegate_to: "{{ item }}"
+      systemd:
+        name: kubelet
+        state: restarted
+        daemon_reload: yes
+      loop: "{{ groups['execute_nodes'] | default([]) }}"
+
     - name: Get join command (control-plane)
       command: /usr/bin/kubeadm token create --print-join-command
       environment:
@@ -127,7 +161,7 @@
         join_command_full: "{{ join_cmd.stdout | trim | regex_replace('^kubeadm','/usr/bin/kubeadm') }}"
       when: join_cmd is defined
 
-    - name: Join workers to cluster
+    - name: Join workers to cluster (node-ip via kubelet KUBELET_EXTRA_ARGS, not kubeadm flag)
       when:
         - groups['execute_nodes'] is defined
         - (groups['execute_nodes'] | length) > 0
@@ -145,12 +179,15 @@
           --from-literal=KUBERNETES_SERVICE_PORT="6443" \
           --dry-run=client -o yaml | /usr/bin/kubectl apply -f -
       environment:
-        KUBECONFIG: /root/.kube/config
+        KUBECONFIG: "{{ kubeconfig_path }}"
+
+    - name: Re-apply Calico env after worker join (VXLAN + node IP autodetect)
+      include_tasks: tasks/configure_calico_node_env.yml
 
     - name: Restart calico-node after worker join (pick up API endpoint override)
       command: /usr/bin/kubectl -n kube-system rollout restart ds/calico-node
       environment:
-        KUBECONFIG: /root/.kube/config
+        KUBECONFIG: "{{ kubeconfig_path }}"
 
     - name: Wait for all nodes Ready
       shell: |
@@ -161,7 +198,7 @@
           exit 1
         fi
       environment:
-        KUBECONFIG: /root/.kube/config
+        KUBECONFIG: "{{ kubeconfig_path }}"
       register: nodes_ready
       retries: 60
       delay: 10
@@ -170,15 +207,25 @@
     - name: Wait for calico-node on all nodes after worker join
       command: /usr/bin/kubectl -n kube-system rollout status ds/calico-node --timeout=600s
       environment:
-        KUBECONFIG: /root/.kube/config
+        KUBECONFIG: "{{ kubeconfig_path }}"
       register: calico_after_join
       failed_when: false
 
     - name: Get calico-node status when rollout failed after join (diagnostic)
       command: /usr/bin/kubectl -n kube-system get pods -l k8s-app=calico-node -o wide
       environment:
-        KUBECONFIG: /root/.kube/config
+        KUBECONFIG: "{{ kubeconfig_path }}"
       register: calico_pods_after
+      changed_when: false
+      when:
+        - calico_after_join is defined
+        - calico_after_join.rc != 0
+
+    - name: Describe calico-node pods when rollout failed after join (diagnostic)
+      command: /usr/bin/kubectl -n kube-system describe pods -l k8s-app=calico-node
+      environment:
+        KUBECONFIG: "{{ kubeconfig_path }}"
+      register: calico_describe_after
       changed_when: false
       when:
         - calico_after_join is defined
@@ -190,6 +237,12 @@
           calico-node did not become ready after worker join (worker stays NotReady without CNI).
           Pods:
           {{ calico_pods_after.stdout | default('(none)') }}
+
+          Describe:
+          {{ calico_describe_after.stdout | default('(none)') }}
+
+          Проверьте: доступ к quay.io/calico, firewall UDP {{ calico_vxlan_port | default(4789) }} (VXLAN) между узлами,
+          совпадение node-ip в inventory и `kubectl get nodes -o wide`.
       when:
         - calico_after_join is defined
         - calico_after_join.rc != 0

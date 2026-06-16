@@ -18,9 +18,9 @@
       changed_when: false
       failed_when: route_ip.rc != 0 and (route_ip.stdout | trim) == ""
 
-    - name: Compute kubelet node-ip (route -> default fallback)
+    - name: Compute kubelet node-ip (inventory IP first — must match kubelet --node-ip from playbook 05)
       set_fact:
-        k8s_node_ip: "{{ (route_ip.stdout | trim) | default(ansible_default_ipv4.address, true) }}"
+        k8s_node_ip: "{{ ansible_host | default((route_ip.stdout | trim) | default(ansible_default_ipv4.address, true)) }}"
 
 
     - name: Wipe CNI state on all nodes (before Calico)
@@ -67,7 +67,7 @@
       environment:
         KUBECONFIG: "{{ kubeconfig_path }}"
       when: "'central_manager' in group_names"
-      delegate_to: central_manager
+      delegate_to: "{{ groups['central_manager'][0] }}"
       run_once: true
 
     - name: Point Calico at real API server (workers cannot reach 10.96.0.1 before CNI)
@@ -79,7 +79,7 @@
       environment:
         KUBECONFIG: "{{ kubeconfig_path }}"
       when: "'central_manager' in group_names"
-      delegate_to: central_manager
+      delegate_to: "{{ groups['central_manager'][0] }}"
       run_once: true
 
     - name: Restart calico-node to pick up API endpoint override
@@ -87,7 +87,7 @@
       environment:
         KUBECONFIG: "{{ kubeconfig_path }}"
       when: "'central_manager' in group_names"
-      delegate_to: central_manager
+      delegate_to: "{{ groups['central_manager'][0] }}"
       run_once: true
 
     - name: Ensure vxlan module loads on boot
@@ -99,20 +99,13 @@
     - name: Load vxlan now
       shell: modprobe vxlan || true
 
+    - name: Open Calico VXLAN port in host firewall (all nodes)
+      include_tasks: tasks/open_calico_firewall.yml
 
-    - name: Configure calico-node env (IP autodetect + VXLAN + NAT)
-      command: >
-        /usr/bin/kubectl -n kube-system set env ds/calico-node
-        IP_AUTODETECTION_METHOD=kubernetes-internal-ip
-        CALICO_IPV4POOL_CIDR=10.244.0.0/16
-        CALICO_IPV4POOL_VXLAN=Always
-        CALICO_IPV4POOL_IPIP=Never
-        CALICO_IPV6POOL_NAT_OUTGOING=false
-        CALICO_IPV4POOL_NAT_OUTGOING=true
-      environment:
-        KUBECONFIG: "{{ kubeconfig_path }}"
+    - name: Configure calico-node (autodetect, VXLAN port, NAT)
+      include_tasks: tasks/configure_calico_node_env.yml
       when: "'central_manager' in group_names"
-      delegate_to: central_manager
+      delegate_to: "{{ groups['central_manager'][0] }}"
       run_once: true
 
     - name: Wait for calico-node rollout
@@ -122,7 +115,7 @@
       register: calico_rollout
       failed_when: false
       when: "'central_manager' in group_names"
-      delegate_to: central_manager
+      delegate_to: "{{ groups['central_manager'][0] }}"
       run_once: true
 
     - name: Get calico-node pod status when rollout failed (diagnostic)
@@ -132,7 +125,7 @@
       register: calico_pods
       changed_when: false
       when: calico_rollout is defined and calico_rollout.rc != 0
-      delegate_to: central_manager
+      delegate_to: "{{ groups['central_manager'][0] }}"
       run_once: true
 
     - name: Describe calico-node pods when rollout failed (diagnostic)
@@ -142,7 +135,7 @@
       register: calico_describe
       changed_when: false
       when: calico_rollout is defined and calico_rollout.rc != 0
-      delegate_to: central_manager
+      delegate_to: "{{ groups['central_manager'][0] }}"
       run_once: true
 
     - name: Fail with diagnostic if calico-node did not become ready

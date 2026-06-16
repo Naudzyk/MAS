@@ -4,11 +4,33 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version  07.06.2026 ver 2&quot;">
+    <list default="true" id="e8a0387c-73ba-4681-ba72-2f8da7fc6c60" name="Changes" comment="&quot;Version  07.06.2026 ver 3&quot;">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/templates/configure_containerd.sh.j2" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/templates/configure_containerd.sh.j2" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/mas-deploy-1.0-SNAPSHOT.zip" beforeDir="false" afterPath="$PROJECT_DIR$/target/mas-deploy-1.0-SNAPSHOT.zip" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/mas-deploy/scripts/templates/configure_containerd.sh.j2" beforeDir="false" afterPath="$PROJECT_DIR$/target/mas-deploy/scripts/templates/configure_containerd.sh.j2" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/04_kubernetes_init.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/04_kubernetes_init.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/05_calico_cni.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/05_calico_cni.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/06_worker_preparation.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/06_worker_preparation.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/07_worker_join.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/07_worker_join.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/08_htcondor.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/08_htcondor.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/group_vars/all.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/group_vars/all.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/templates/kubeadm-config.yaml.j2" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/templates/kubeadm-config.yaml.j2" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/vars.yml" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/vars.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/CoordinatorAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/mas/Agent/CoordinatorAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar.original" beforeDir="false" afterPath="$PROJECT_DIR$/target/MAS-1.0-SNAPSHOT.jar.original" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/antrun/build-main.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/antrun/build-main.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/mas-deploy-1.0-SNAPSHOT.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/mas-deploy/MAS-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/mas-deploy/MAS-1.0-SNAPSHOT.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/mas-deploy/scripts/04_kubernetes_init.yml" beforeDir="false" afterPath="$PROJECT_DIR$/target/mas-deploy/scripts/04_kubernetes_init.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/mas-deploy/scripts/05_calico_cni.yml" beforeDir="false" afterPath="$PROJECT_DIR$/target/mas-deploy/scripts/05_calico_cni.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/mas-deploy/scripts/06_worker_preparation.yml" beforeDir="false" afterPath="$PROJECT_DIR$/target/mas-deploy/scripts/06_worker_preparation.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/mas-deploy/scripts/07_worker_join.yml" beforeDir="false" afterPath="$PROJECT_DIR$/target/mas-deploy/scripts/07_worker_join.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/mas-deploy/scripts/08_htcondor.yml" beforeDir="false" afterPath="$PROJECT_DIR$/target/mas-deploy/scripts/08_htcondor.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/mas-deploy/scripts/group_vars/all.yml" beforeDir="false" afterPath="$PROJECT_DIR$/target/mas-deploy/scripts/group_vars/all.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/mas-deploy/scripts/templates/kubeadm-config.yaml.j2" beforeDir="false" afterPath="$PROJECT_DIR$/target/mas-deploy/scripts/templates/kubeadm-config.yaml.j2" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/mas-deploy/scripts/vars.yml" beforeDir="false" afterPath="$PROJECT_DIR$/target/mas-deploy/scripts/vars.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -280,15 +302,15 @@
       <workItem from="1779168724430" duration="667000" />
       <workItem from="1779169412858" duration="396000" />
       <workItem from="1779525593849" duration="23000" />
-      <workItem from="1780803653174" duration="3928000" />
-    </task>
-    <task id="LOCAL-00051" summary="&quot;Version Spring-Web 8.6&quot;">
-      <option name="closed" value="true" />
-      <created>1762239225382</created>
-      <option name="number" value="00051" />
-      <option name="presentableId" value="LOCAL-00051" />
-      <option name="project" value="LOCAL" />
-      <updated>1762239225382</updated>
+      <workItem from="1780803653174" duration="4849000" />
+      <workItem from="1781051029543" duration="634000" />
+      <workItem from="1781052101921" duration="33000" />
+      <workItem from="1781511703606" duration="169000" />
+      <workItem from="1781520466095" duration="126000" />
+      <workItem from="1781520866692" duration="83000" />
+      <workItem from="1781521277865" duration="387000" />
+      <workItem from="1781521732620" duration="514000" />
+      <workItem from="1781581560852" duration="188000" />
     </task>
     <task id="LOCAL-00052" summary="&quot;Version Spring-Web 8.7&quot;">
       <option name="closed" value="true" />
@@ -674,7 +696,15 @@
       <option name="project" value="LOCAL" />
       <updated>1780812113327</updated>
     </task>
-    <option name="localTasksCounter" value="100" />
+    <task id="LOCAL-00100" summary="&quot;Version  07.06.2026 ver 3&quot;">
+      <option name="closed" value="true" />
+      <created>1780824034966</created>
+      <option name="number" value="00100" />
+      <option name="presentableId" value="LOCAL-00100" />
+      <option name="project" value="LOCAL" />
+      <updated>1780824034966</updated>
+    </task>
+    <option name="localTasksCounter" value="101" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -695,7 +725,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="&quot;Version Spring-Web 8.8&quot;" />
     <MESSAGE value="&quot;Version Spring-Web 9.0&quot;" />
     <MESSAGE value="&quot;Version Spring-Web 10.0&quot;" />
     <MESSAGE value="&quot;Version Spring-Web 10.1&quot;" />
@@ -720,7 +749,8 @@
     <MESSAGE value="&quot;Version  06.04.2026 ver &quot;" />
     <MESSAGE value="&quot;Version  07.06.2026 ver &quot;" />
     <MESSAGE value="&quot;Version  07.06.2026 ver 2&quot;" />
-    <option name="LAST_COMMIT_MESSAGE" value="&quot;Version  07.06.2026 ver 2&quot;" />
+    <MESSAGE value="&quot;Version  07.06.2026 ver 3&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="&quot;Version  07.06.2026 ver 3&quot;" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

@@ -28,7 +28,7 @@
             extra_args: --break-system-packages
       when: "'central_manager' in group_names"
       run_once: true
-      delegate_to: central_manager
+      delegate_to: "{{ groups['central_manager'][0] }}"
 
     - name: Create ConfigMap for HTCondor Central Manager
       kubernetes.core.k8s:
@@ -44,7 +44,7 @@
             condor_config: |
               {{ lookup('template', 'condor_config.manager-config.j2') }}
       when: "'central_manager' in group_names"
-      delegate_to: central_manager
+      delegate_to: "{{ groups['central_manager'][0] }}"
       run_once: true
 
     - name: Create ConfigMap for HTCondor Execute nodes
@@ -61,7 +61,7 @@
             condor_config: |
               {{ lookup('template', 'condor_config.execute-config.j2') }}
       when: "'central_manager' in group_names"
-      delegate_to: central_manager
+      delegate_to: "{{ groups['central_manager'][0] }}"
       run_once: true
 
     - name: Create Service for HTCondor Manager
@@ -85,13 +85,43 @@
                 targetPort: 9618
             type: ClusterIP
       when: "'central_manager' in group_names"
-      delegate_to: central_manager
+      delegate_to: "{{ groups['central_manager'][0] }}"
+      run_once: true
+
+    - name: Resolve control-plane node name for htcondor-manager
+      shell: |
+        set -e
+        ip="{{ central_manager_ip }}"
+        /usr/bin/kubectl get nodes -o json | python3 -c "
+        import json, sys
+        ip = sys.argv[1]
+        data = json.load(sys.stdin)
+        for n in data.get('items', []):
+          for addr in n.get('status', {}).get('addresses', []):
+            if addr.get('type') in ('InternalIP', 'ExternalIP') and addr.get('address') == ip:
+              print(n['metadata']['name'])
+              raise SystemExit(0)
+        for n in data.get('items', []):
+          labels = n.get('metadata', {}).get('labels', {})
+          if 'node-role.kubernetes.io/control-plane' in labels or 'node-role.kubernetes.io/master' in labels:
+            print(n['metadata']['name'])
+            raise SystemExit(0)
+        raise SystemExit('control-plane node not found')
+        " "$ip"
+      environment:
+        KUBECONFIG: "{{ kubeconfig_path }}"
+      register: htcondor_manager_node_lookup
+      changed_when: false
+      when: "'central_manager' in group_names"
+      delegate_to: "{{ groups['central_manager'][0] }}"
       run_once: true
 
     - name: Deploy HTCondor Manager (StatefulSet)
       kubernetes.core.k8s:
         kubeconfig: "{{ kubeconfig_path }}"
         state: present
+        wait: yes
+        wait_timeout: 300
         definition:
           apiVersion: apps/v1
           kind: StatefulSet
@@ -115,12 +145,16 @@
               spec:
                 securityContext:
                   fsGroup: 0
-                nodeSelector:
-                  node-role.kubernetes.io/control-plane: ""
+                nodeName: "{{ htcondor_manager_node_lookup.stdout | trim }}"
                 tolerations:
-                  - key: "node-role.kubernetes.io/control-plane"
-                    operator: "Exists"
-                    effect: "NoSchedule"
+                  - key: node-role.kubernetes.io/control-plane
+                    operator: Exists
+                  - key: node-role.kubernetes.io/master
+                    operator: Exists
+                  - key: node.kubernetes.io/not-ready
+                    operator: Exists
+                  - key: node.kubernetes.io/unreachable
+                    operator: Exists
                 containers:
                   - name: htcondor
                     image: "{{ condor_image | default('docker.io/evgenii457/htcondor2:latest') }}"
@@ -160,7 +194,7 @@
                     hostPath:
                       path: "{{ condor_logs_dir }}"
       when: "'central_manager' in group_names"
-      delegate_to: central_manager
+      delegate_to: "{{ groups['central_manager'][0] }}"
       run_once: true
 
     - name: Create DaemonSet for Execute Nodes
@@ -387,7 +421,7 @@
               Execute pods:
               {{ exec_pods.stdout | default('(none)') }}
       when: "'central_manager' in group_names"
-      delegate_to: central_manager
+      delegate_to: "{{ groups['central_manager'][0] }}"
       run_once: true
 
   handlers:
