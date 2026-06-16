@@ -60,14 +60,8 @@
 
 
     - name: Install Calico CNI (from {{ calico_image_registry }})
-      shell: |
-        curl -fsSL "https://raw.githubusercontent.com/projectcalico/calico/{{ calico_version }}/manifests/calico.yaml" \
-          | sed 's#docker.io/calico/#{{ calico_image_registry }}/#g' \
-          | /usr/bin/kubectl apply -f -
-      environment:
-        KUBECONFIG: "{{ kubeconfig_path }}"
+      include_tasks: tasks/install_calico_manifest.yml
       when: "'central_manager' in group_names"
-      delegate_to: "{{ groups['central_manager'][0] }}"
       run_once: true
 
     - name: Point Calico at real API server (workers cannot reach 10.96.0.1 before CNI)

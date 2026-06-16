@@ -1,0 +1,52 @@
+- name: Stage bundled Calico manifest from dist
+  copy:
+    src: "files/calico/calico-{{ calico_version }}.yaml"
+    dest: /tmp/calico-manifest-{{ calico_version }}.yaml
+    mode: "0644"
+  register: calico_copy_bundled
+  failed_when: false
+  delegate_to: "{{ groups['central_manager'][0] }}"
+  run_once: true
+
+- name: Try Calico manifest download mirrors
+  get_url:
+    url: "{{ item }}"
+    dest: /tmp/calico-manifest-{{ calico_version }}.yaml
+    mode: "0644"
+    timeout: 180
+    force: true
+  loop: "{{ calico_manifest_urls }}"
+  register: calico_mirror_attempts
+  failed_when: false
+  when: calico_copy_bundled is failed
+  delegate_to: "{{ groups['central_manager'][0] }}"
+  run_once: true
+
+- name: Verify staged Calico manifest is present
+  stat:
+    path: "/tmp/calico-manifest-{{ calico_version }}.yaml"
+  register: calico_manifest_staged
+  delegate_to: "{{ groups['central_manager'][0] }}"
+  run_once: true
+
+- name: Fail when Calico manifest file is missing or too small
+  fail:
+    msg: >-
+      Calico {{ calico_version }} manifest not available at /tmp/calico-manifest-{{ calico_version }}.yaml.
+      Include scripts/files/calico/calico-{{ calico_version }}.yaml in the dist package
+      or allow HTTPS access to GitHub/jsDelivr mirrors.
+  when: not calico_manifest_staged.stat.exists or (calico_manifest_staged.stat.size | default(0) | int) < 1000
+  delegate_to: "{{ groups['central_manager'][0] }}"
+  run_once: true
+
+- name: Apply Calico manifest (registry {{ calico_image_registry }})
+  shell: |
+    sed 's#docker.io/calico/#{{ calico_image_registry }}/#g' \
+      "/tmp/calico-manifest-{{ calico_version }}.yaml" \
+      | /usr/bin/kubectl apply -f -
+  args:
+    executable: /bin/bash
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+  delegate_to: "{{ groups['central_manager'][0] }}"
+  run_once: true

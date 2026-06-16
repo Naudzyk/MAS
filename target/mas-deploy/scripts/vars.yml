@@ -15,6 +15,12 @@ condor_logs_dir: "/var/log/condor"
 condor_cluster_password: "{{ lookup('env', 'CONDOR_CLUSTER_PASSWORD') }}"
 calico_image_registry: "quay.io/calico"
 calico_version: "v3.32.0"
+# URL-зеркала манифеста (если raw.githubusercontent.com недоступен). Локальная копия надёжнее:
+# scripts/files/calico/calico-v3.32.0.yaml
+calico_manifest_urls:
+  - "https://raw.githubusercontent.com/projectcalico/calico/{{ calico_version }}/manifests/calico.yaml"
+  - "https://cdn.jsdelivr.net/gh/projectcalico/calico@{{ calico_version }}/manifests/calico.yaml"
+  - "https://mirror.ghproxy.com/https://raw.githubusercontent.com/projectcalico/calico/{{ calico_version }}/manifests/calico.yaml"
 # UDP-порт VXLAN Calico (фиксированный — добавьте его в firewall между всеми нодами).
 calico_vxlan_port: 4789
 # true — плейбук сам откроет calico_vxlan_port/udp в ufw или firewalld.
