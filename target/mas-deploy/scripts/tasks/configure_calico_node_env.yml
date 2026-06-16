@@ -1,0 +1,35 @@
+- name: Resolve Calico IP autodetection method
+  set_fact:
+    calico_resolved_ip_autodetection: >-
+      {{
+        calico_ip_autodetection_method
+        if (calico_ip_autodetection_method | default('') | length > 0)
+        else (
+          'interface=' ~ calico_node_interface
+          if (calico_node_interface | default('') | length > 0)
+          else 'kubernetes-internal-ip'
+        )
+      }}
+
+- name: Configure calico-node env (autodetect, VXLAN, NAT, port)
+  command: >
+    /usr/bin/kubectl -n kube-system set env ds/calico-node
+    IP_AUTODETECTION_METHOD={{ calico_resolved_ip_autodetection }}
+    FELIX_VXLANPORT={{ calico_vxlan_port | default(4789) }}
+    CALICO_IPV4POOL_CIDR={{ calico_pod_cidr | default('10.244.0.0/16') }}
+    CALICO_IPV4POOL_VXLAN=Always
+    CALICO_IPV4POOL_IPIP=Never
+    CALICO_IPV6POOL_NAT_OUTGOING=false
+    CALICO_IPV4POOL_NAT_OUTGOING=true
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+
+- name: Set VXLAN UDP port on default Calico IP pool
+  command: >
+    /usr/bin/kubectl patch ippool default-ipv4-ippool --type merge
+    -p '{"spec":{"vxlanPort":{{ calico_vxlan_port | default(4789) }}}}'
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+  register: calico_ippool_vxlan_port
+  failed_when: false
+  changed_when: calico_ippool_vxlan_port.rc == 0
